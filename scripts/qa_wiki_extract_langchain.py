@@ -14,6 +14,7 @@ import concurrent.futures
 import json
 import os
 import re
+import signal
 import sys
 import threading
 import time
@@ -181,7 +182,23 @@ def build_llm(config: LlmConfig):
     )
 
 
+def _wrapper_is_disabled(wrapper_path: Path | str | None) -> bool:
+    """wrapper prompt bypass 여부를 결정.
+
+    bypass 조건:
+      - wrapper_path is None
+      - wrapper_path 문자열 표현이 'none' / 'off' / '' (case-insensitive)
+    """
+    if wrapper_path is None:
+        return False  # Path(None) 불가 — 호출자가 명시한 경우만 처리
+    text = str(wrapper_path).strip().lower()
+    return text in {"none", "off", ""}
+
+
 def wrap_prompt(prompt: str, wrapper_path: Path) -> str:
+    if _wrapper_is_disabled(wrapper_path):
+        # wrapper 미적용: user_template을 그대로 LLM에 전송
+        return prompt
     wrapper = read_text(wrapper_path)
     if "{{PROMPT}}" not in wrapper:
         raise ValueError(f"Wrapper prompt must contain {{PROMPT}} placeholder: {wrapper_path}")
@@ -787,6 +804,52 @@ def command_auto_full(args: argparse.Namespace) -> int:
             },
         )
 
+    # 재사용 record를 attempt 진입 전에 jsonl/summary로 즉시 flush
+    # (attempt 시작 후 크래시/중단되더라도 reused 결과는 보존됨)
+    write_auto_outputs(
+        run_dir=run_dir,
+        source_records=selected_records,
+        completed_records=completed_records,
+        remaining_ids=remaining_ids,
+        attempt_reports=attempt_reports,
+        last_failures=last_failures,
+        complete=False,
+        reused_record_count=len([record for record in completed_records.values() if record.get("_auto_reused")]),
+    )
+
+    # SIGINT(Ctrl+C) 수신 시 현재까지의 부분 산출물을 한 번 flush 후 종료.
+    # auto_state는 attempt 루프가 mutate하는 라이브 상태를 가리킨다.
+    auto_state: dict[str, Any] = {
+        "completed_records": completed_records,
+        "remaining_ids": remaining_ids,
+        "attempt_reports": attempt_reports,
+        "last_failures": last_failures,
+    }
+
+    def _sigint_handler(signum: int, frame: Any) -> None:
+        try:
+            append_jsonl(
+                run_dir / "events.jsonl",
+                {"time": now_iso(), "event": "sigint_received", "signum": int(signum)},
+            )
+            write_auto_outputs(
+                run_dir=run_dir,
+                source_records=selected_records,
+                completed_records=auto_state["completed_records"],
+                remaining_ids=auto_state["remaining_ids"],
+                attempt_reports=auto_state["attempt_reports"],
+                last_failures=auto_state["last_failures"],
+                complete=False,
+                reused_record_count=len(
+                    [record for record in auto_state["completed_records"].values() if record.get("_auto_reused")]
+                ),
+            )
+        finally:
+            sys.exit(130)
+
+    previous_sigint = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, _sigint_handler)
+
     for attempt_number in range(1, args.max_attempts + 1):
         pending_records = [records_by_id[gall_num] for gall_num in remaining_ids if gall_num not in completed_records]
         if not pending_records:
@@ -827,6 +890,8 @@ def command_auto_full(args: argparse.Namespace) -> int:
                 last_failures.pop(gall_num, None)
         last_failures.update(result["failed_posts"])
         remaining_ids = [gall_num for gall_num in source_order if gall_num not in completed_records]
+        # SIGINT 핸들러가 참조하는 라이브 상태 갱신
+        auto_state["remaining_ids"] = remaining_ids
 
         attempt_report = {
             "attempt_number": attempt_number,
@@ -856,6 +921,11 @@ def command_auto_full(args: argparse.Namespace) -> int:
         )
 
     complete = not remaining_ids
+    # SIGINT 핸들러 원복 (이후 일반 KeyboardInterrupt 흐름 유지)
+    try:
+        signal.signal(signal.SIGINT, previous_sigint)
+    except (TypeError, ValueError):
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
     summary = write_auto_outputs(
         run_dir=run_dir,
         source_records=selected_records,
@@ -906,7 +976,9 @@ def load_existing_auto_full_successes(
         if run_dir.resolve() == current_run_dir.resolve():
             continue
         config = read_run_config(run_dir)
-        if config.get("mode") != "auto-full":
+        # cross-mode reuse 허용: validate_extraction이 record 적합성을 보장하므로
+        # auto-full/full/sample 어느 mode에서 나온 record든 재사용 가능.
+        if config.get("mode") not in {"auto-full", "full", "sample"}:
             continue
         for gall_num, record in recover_success_records_from_auto_run(run_dir, records_by_id).items():
             enriched = dict(record)
@@ -1132,6 +1204,46 @@ def prepare_attempt_run(
     return batch_infos
 
 
+CIRCUIT_BREAKER_THRESHOLD = 3
+CIRCUIT_BREAKER_EXCEPTION_NAMES = {
+    "RateLimitError",
+    "AuthenticationError",
+    "PermissionDeniedError",
+    "APIStatusError",
+    "BadRequestError",
+}
+CIRCUIT_BREAKER_MESSAGE_SIGNALS = (
+    "429",
+    "401",
+    "402",
+    "rate limit",
+    "rate_limit",
+    "insufficient_quota",
+    "insufficient credit",
+    "credit",
+    "quota",
+    "billing",
+    "unauthorized",
+    "authentication",
+)
+
+
+def is_circuit_breaker_error(exc: BaseException) -> tuple[bool, str]:
+    """Application-level rate-limit / credit / auth error 식별.
+
+    openai 라이브러리 버전 차이를 흡수하기 위해 클래스 이름 + 메시지 패턴을 모두 본다.
+    반환: (트립 여부, 이유 문자열)
+    """
+    name = type(exc).__name__
+    if name in CIRCUIT_BREAKER_EXCEPTION_NAMES:
+        return True, f"exception:{name}"
+    message = str(exc).lower()
+    for token in CIRCUIT_BREAKER_MESSAGE_SIGNALS:
+        if token in message:
+            return True, f"message:{token}"
+    return False, ""
+
+
 def process_attempt(
     *,
     attempt_dir: Path,
@@ -1145,10 +1257,43 @@ def process_attempt(
     failed_posts: dict[str, dict[str, Any]] = {}
     events_lock = threading.Lock()
     results_lock = threading.Lock()
+    # 연속 N회 rate-limit/credit/auth 에러 발생 시 남은 배치를 모두 skip
+    breaker_state = {
+        "consecutive": 0,
+        "tripped": False,
+        "reason": "",
+    }
 
     def _run_one_batch(info: dict[str, Any]) -> None:
         batch_number = int(info["batch_number"])
         expected_gall_nums = list(info["gall_nums"])
+        # 서킷 트립 상태면 LLM 호출 없이 즉시 실패 기록
+        with results_lock:
+            tripped_now = breaker_state["tripped"]
+            tripped_reason = breaker_state["reason"]
+        if tripped_now:
+            with results_lock:
+                for gall_num in expected_gall_nums:
+                    failed_posts[gall_num] = post_failure(
+                        gall_num,
+                        attempt_number,
+                        batch_number,
+                        "circuit_breaker_skipped",
+                        errors=[tripped_reason] if tripped_reason else None,
+                    )
+            with events_lock:
+                append_jsonl(
+                    events_path,
+                    {
+                        "time": now_iso(),
+                        "event": "attempt_batch_skipped",
+                        "attempt_number": attempt_number,
+                        "batch_number": batch_number,
+                        "reason": "circuit_breaker_tripped",
+                        "tripped_reason": tripped_reason,
+                    },
+                )
+            return
         with events_lock:
             append_jsonl(
                 events_path,
@@ -1185,6 +1330,8 @@ def process_attempt(
             with results_lock:
                 succeeded_records.update(split["succeeded_records"])
                 failed_posts.update(split["failed_posts"])
+                # 성공적으로 응답을 받았으므로 서킷 카운터 리셋
+                breaker_state["consecutive"] = 0
             duration = round(time.perf_counter() - started, 3)
             if split["failed_posts"] or split["unexpected_gall_nums"]:
                 write_json(
@@ -1214,6 +1361,7 @@ def process_attempt(
                 )
         except Exception as exc:  # noqa: BLE001 - continue with later batches
             duration = round(time.perf_counter() - started, 3)
+            is_breaker, breaker_reason = is_circuit_breaker_error(exc)
             failure_payload = {
                 "error": type(exc).__name__,
                 "message": str(exc),
@@ -1232,8 +1380,37 @@ def process_attempt(
                         "reason": type(exc).__name__,
                         "message": str(exc),
                     }
+                if is_breaker:
+                    breaker_state["consecutive"] += 1
+                    if (
+                        breaker_state["consecutive"] >= CIRCUIT_BREAKER_THRESHOLD
+                        and not breaker_state["tripped"]
+                    ):
+                        breaker_state["tripped"] = True
+                        breaker_state["reason"] = breaker_reason
+                        trip_now = True
+                    else:
+                        trip_now = False
+                    trip_consecutive = breaker_state["consecutive"]
+                else:
+                    # 서킷 트리거 외 예외에서는 연속 카운터 리셋
+                    breaker_state["consecutive"] = 0
+                    trip_now = False
+                    trip_consecutive = 0
             with events_lock:
                 append_jsonl(events_path, {"time": now_iso(), "event": "attempt_batch_failed", **failure_payload})
+                if trip_now:
+                    append_jsonl(
+                        events_path,
+                        {
+                            "time": now_iso(),
+                            "event": "circuit_breaker_tripped",
+                            "attempt_number": attempt_number,
+                            "batch_number": batch_number,
+                            "reason": breaker_reason,
+                            "consecutive": trip_consecutive,
+                        },
+                    )
 
     progress = Progress(
         TextColumn("[bold blue]{task.description}"),
@@ -1350,11 +1527,24 @@ def write_auto_outputs(
 ) -> dict[str, Any]:
     output_jsonl = run_dir / "jsonl" / "extractions.jsonl"
     output_jsonl.parent.mkdir(parents=True, exist_ok=True)
-    with output_jsonl.open("w", encoding="utf-8") as handle:
+    provenance_path = run_dir / "provenance.jsonl"
+    # extractions.jsonl 은 모델 산출 데이터만, _auto_* 마커는 provenance.jsonl 로 분리
+    with output_jsonl.open("w", encoding="utf-8") as handle, provenance_path.open(
+        "w", encoding="utf-8"
+    ) as prov_handle:
         for source_record in source_records:
             record = completed_records.get(source_record.gall_num)
-            if record:
-                handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+            if not record:
+                continue
+            clean_record = {key: value for key, value in record.items() if not str(key).startswith("_auto_")}
+            handle.write(json.dumps(clean_record, ensure_ascii=False) + "\n")
+            provenance_entry = {
+                "gall_num": record.get("gall_num", source_record.gall_num),
+                "_auto_reused": bool(record.get("_auto_reused", False)),
+                "_auto_reused_from_run": record.get("_auto_reused_from_run"),
+                "_auto_attempt": record.get("_auto_attempt"),
+            }
+            prov_handle.write(json.dumps(provenance_entry, ensure_ascii=False) + "\n")
 
     failed_path = run_dir / "failures" / "failed_posts.jsonl"
     failed_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1378,6 +1568,7 @@ def write_auto_outputs(
         "attempts": attempt_reports,
         "record_count": len(completed_records),
         "extractions_jsonl": str(output_jsonl),
+        "provenance_jsonl": str(provenance_path),
         "failed_posts_jsonl": str(failed_path),
     }
     write_json(run_dir / "summary.json", summary)

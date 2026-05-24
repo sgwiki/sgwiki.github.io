@@ -136,6 +136,56 @@ QUESTION_TYPE_CONCEPTS = {
     "ost_media": "OST/자료",
 }
 
+# concept_id 정규화 후 표준 catalog ID로 흡수하기 위한 alias 매핑.
+# 우변(타겟)은 CONCEPT_CATALOG에 존재하는 ID여야만 활성화된다.
+# 미존재 타겟은 빌드 시점에 _filter_concept_aliases가 제거하고 경고를 찍는다.
+_CONCEPT_ALIASES_RAW: dict[str, str] = {
+    "amadeus_system": "amadeus",
+    "merch_info": "merchandise",
+    "merchandise_buying": "merchandise",
+    "media_merchandise": "merchandise",
+    "novel_media": "media",
+    "media_supplementary": "media",
+    "media_relation": "media",
+    "media_identification": "media",
+    "other_media": "media",
+    "other_media_franchise": "media",
+    "spin_off_media": "media",
+    "franchise_status": "franchise_news",
+    "series_production": "franchise_news",
+    "sciadv_series": "science_adventure_series",
+    "real_world_locations": "real_world_pilgrimage",
+    "real_world_physics": "general_physics",
+    "robotics_notes_characters": "other_works",
+    "noah_eye": "character_events",
+    "chaos_head_setting": "other_works",
+    "hiyoku_rene": "other_works",
+    "occultic_nine": "other_works",
+    "media_franchise": "franchise_news",
+    "media_industry": "game_industry",
+    "media_business": "game_industry",
+}
+
+
+def _filter_concept_aliases(raw: dict[str, str]) -> tuple[dict[str, str], list[tuple[str, str]]]:
+    valid: dict[str, str] = {}
+    dropped: list[tuple[str, str]] = []
+    for alias, target in raw.items():
+        if target in CONCEPT_CATALOG:
+            valid[alias] = target
+        else:
+            dropped.append((alias, target))
+    return valid, dropped
+
+
+CONCEPT_ALIASES, _DROPPED_CONCEPT_ALIASES = _filter_concept_aliases(_CONCEPT_ALIASES_RAW)
+if _DROPPED_CONCEPT_ALIASES:
+    print(
+        "warning: dropped concept aliases whose targets are not in CONCEPT_CATALOG: "
+        + ", ".join(f"{alias}->{target}" for alias, target in _DROPPED_CONCEPT_ALIASES),
+        file=sys.stderr,
+    )
+
 CONCEPT_PRIORITY = {
     "dmail": 0,
     "time_leap": 0,
@@ -558,6 +608,48 @@ def validate_extraction(record: dict[str, Any]) -> list[str]:
     return errors
 
 
+ENTITY_ALLOWED_KEYS = {"characters", "organizations", "media"}
+
+
+def validate_extraction_warnings(record: dict[str, Any]) -> list[str]:
+    """초경량 추가 검증. 기존 valid record 흐름을 깨지 않도록 warning-only.
+
+    검증 항목:
+      1) primary_count_invalid: concept_candidates 중 relation=="primary" 개수 != 1
+      2) evidence_index_negative: answer_candidate.evidence_comment_indexes 에 음수/비정수
+      3) entities_unknown_keys: entities dict 키가 {characters, organizations, media} 부분집합 아님
+    """
+    warnings: list[str] = []
+
+    candidates = record.get("concept_candidates")
+    if isinstance(candidates, list):
+        primary_count = sum(
+            1 for candidate in candidates
+            if isinstance(candidate, dict) and candidate.get("relation") == "primary"
+        )
+        if primary_count != 1:
+            warnings.append(f"primary_count_invalid: {primary_count}")
+
+    answer = record.get("answer_candidate")
+    if isinstance(answer, dict):
+        evidence = answer.get("evidence_comment_indexes")
+        if isinstance(evidence, list):
+            for index_position, value in enumerate(evidence):
+                if not isinstance(value, int) or isinstance(value, bool):
+                    warnings.append(f"evidence_index_not_int[{index_position}]: {value!r}")
+                    continue
+                if value < 0:
+                    warnings.append(f"evidence_index_negative[{index_position}]: {value}")
+
+    entities = record.get("entities")
+    if isinstance(entities, dict):
+        unknown_keys = sorted(key for key in entities if key not in ENTITY_ALLOWED_KEYS)
+        if unknown_keys:
+            warnings.append(f"entities_unknown_keys: {unknown_keys}")
+
+    return warnings
+
+
 def command_validate(args: argparse.Namespace) -> int:
     input_path = Path(args.input_path)
     records = parse_json_or_jsonl(input_path)
@@ -565,7 +657,12 @@ def command_validate(args: argparse.Namespace) -> int:
     if args.source_csv:
         source_ids = {record.gall_num for record in load_posts(Path(args.source_csv))}
 
-    errors_by_id = {}
+    strict = bool(getattr(args, "strict", False))
+    errors_by_id: dict[str, list[str]] = {}
+    warnings_by_id: dict[str, list[str]] = {}
+    primary_invalid_gall_nums: list[str] = []
+    entities_warning_gall_nums: list[str] = []
+    evidence_warning_gall_nums: list[str] = []
     duplicate_counter = Counter()
     for index, record in enumerate(records):
         gall_num = str(record.get("gall_num", f"index:{index}"))
@@ -573,6 +670,18 @@ def command_validate(args: argparse.Namespace) -> int:
         errors = validate_extraction(record)
         if source_ids and gall_num not in source_ids:
             errors.append("gall_num not found in source_csv")
+        warnings = validate_extraction_warnings(record)
+        if warnings:
+            warnings_by_id[gall_num] = warnings
+            for warning in warnings:
+                if warning.startswith("primary_count_invalid"):
+                    primary_invalid_gall_nums.append(gall_num)
+                elif warning.startswith("entities_unknown_keys"):
+                    entities_warning_gall_nums.append(gall_num)
+                elif warning.startswith("evidence_index"):
+                    evidence_warning_gall_nums.append(gall_num)
+        if strict:
+            errors.extend(warnings)
         if errors:
             errors_by_id[gall_num] = errors
 
@@ -582,8 +691,14 @@ def command_validate(args: argparse.Namespace) -> int:
         "record_count": len(records),
         "valid_count": len(records) - len(errors_by_id),
         "error_count": len(errors_by_id),
+        "warning_count": len(warnings_by_id),
+        "strict": strict,
         "duplicate_gall_nums": duplicates,
         "errors_by_gall_num": errors_by_id,
+        "warnings_by_gall_num": warnings_by_id,
+        "primary_invalid_gall_nums": sorted(set(primary_invalid_gall_nums)),
+        "entities_warning_gall_nums": sorted(set(entities_warning_gall_nums)),
+        "evidence_warning_gall_nums": sorted(set(evidence_warning_gall_nums)),
     }
     if args.report:
         Path(args.report).write_text(
@@ -667,28 +782,44 @@ def invalid_records_by_id(records: list[dict[str, Any]]) -> dict[str, list[str]]
 
 def write_grouped_wiki(records: list[dict[str, Any]], out_dir: Path, *, clean: bool) -> dict[str, Any]:
     out_dir.mkdir(parents=True, exist_ok=True)
+    misc_dir = out_dir / "_misc"
     if clean:
         for old_markdown in out_dir.glob("*.md"):
             old_markdown.unlink()
+        if misc_dir.exists():
+            for old_markdown in misc_dir.glob("*.md"):
+                old_markdown.unlink()
 
     groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for record in records:
         group_id = primary_concept_id(record)
         groups[group_id].append(record)
 
-    index_rows = []
+    index_rows: list[dict[str, Any]] = []
+    misc_count = 0
     for group_id in sorted(groups):
         group_records = sorted(groups[group_id], key=lambda item: str(item.get("gall_num", "")))
         label = concept_label(group_id, group_records)
-        filename = f"{safe_slug(group_id)}.md"
-        output_path = out_dir / filename
+        is_catalog = group_id in CONCEPT_CATALOG
+        slug = safe_slug(group_id)
+        if is_catalog:
+            filename = f"{slug}.md"
+            output_path = out_dir / filename
+            link_path = filename
+        else:
+            misc_dir.mkdir(parents=True, exist_ok=True)
+            filename = f"{slug}.md"
+            output_path = misc_dir / filename
+            link_path = f"_misc/{filename}"
+            misc_count += 1
         output_path.write_text(render_wiki_group(label, group_id, group_records), encoding="utf-8")
         index_rows.append(
             {
                 "concept_id": group_id,
                 "label": label,
                 "count": len(group_records),
-                "path": filename,
+                "path": link_path,
+                "is_catalog": is_catalog,
                 "review_count": sum(1 for item in group_records if item.get("needs_human_review")),
             }
         )
@@ -698,6 +829,8 @@ def write_grouped_wiki(records: list[dict[str, Any]], out_dir: Path, *, clean: b
     return {
         "group_count": len(groups),
         "record_count": len(records),
+        "catalog_group_count": sum(1 for row in index_rows if row.get("is_catalog")),
+        "misc_group_count": misc_count,
     }
 
 
@@ -864,7 +997,17 @@ def safe_concept_id(value: str) -> str:
     lowered = value.strip().lower()
     if lowered in CONCEPT_CATALOG:
         return lowered
-    return safe_slug(lowered) or "uncategorized"
+    # alias 매핑은 정규화된 ID 기준으로 한 번 더 적용
+    if lowered in CONCEPT_ALIASES:
+        mapped = CONCEPT_ALIASES[lowered]
+        if mapped in CONCEPT_CATALOG:
+            return mapped
+    slugged = safe_slug(lowered) or "uncategorized"
+    if slugged in CONCEPT_ALIASES:
+        mapped = CONCEPT_ALIASES[slugged]
+        if mapped in CONCEPT_CATALOG:
+            return mapped
+    return slugged
 
 
 def safe_slug(value: str) -> str:
@@ -902,18 +1045,40 @@ def concept_label(group_id: str, records: list[dict[str, Any]]) -> str:
 
 
 def render_index(rows: list[dict[str, Any]]) -> str:
+    catalog_rows = [row for row in rows if row.get("is_catalog", True)]
+    misc_rows = [row for row in rows if not row.get("is_catalog", True)]
+
     lines = [
         "# QA 위키 초안 인덱스",
         "",
         "| 개념 | 문서 | 질문 수 | 검토 필요 |",
         "| --- | --- | ---: | ---: |",
     ]
-    for row in sorted(rows, key=lambda item: (-item["count"], item["label"])):
+    for row in sorted(catalog_rows, key=lambda item: (-item["count"], item["label"])):
         lines.append(
             f"| {row['label']} | [{row['path']}](./{row['path']}) | "
             f"{row['count']} | {row['review_count']} |"
         )
     lines.append("")
+
+    if misc_rows:
+        lines.extend(
+            [
+                "## 미분류 (추가 검토)",
+                "",
+                "표준 CONCEPT_CATALOG 외 임의 슬러그로 분류된 그룹입니다. alias 매핑 또는 catalog 확장이 필요한 후보군.",
+                "",
+                "| 개념 | 문서 | 질문 수 | 검토 필요 |",
+                "| --- | --- | ---: | ---: |",
+            ]
+        )
+        for row in sorted(misc_rows, key=lambda item: (-item["count"], item["label"])):
+            lines.append(
+                f"| {row['label']} | [{row['path']}](./{row['path']}) | "
+                f"{row['count']} | {row['review_count']} |"
+            )
+        lines.append("")
+
     return "\n".join(lines)
 
 
@@ -1150,6 +1315,11 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("input_path")
     validate.add_argument("--source-csv", default=None)
     validate.add_argument("--report", default=None)
+    validate.add_argument(
+        "--strict",
+        action="store_true",
+        help="warning-level 검증(primary_count/evidence_index/entities_keys)을 error로 승격",
+    )
     validate.set_defaults(func=command_validate)
 
     group = subparsers.add_parser("group", help="Group extraction output into wiki draft markdown")

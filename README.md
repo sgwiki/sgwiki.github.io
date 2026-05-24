@@ -16,21 +16,27 @@
 .
 ├── data/
 │   ├── 2025-05-04_질문목록_수동필터링.csv
-│   ├── QA 탬플릿.md
-│   └── *.md
-├── 공식/
-│   └── 공식 인터뷰, 공식 Q&A 자료 번역/정리 문서
-├── 유저/
-│   └── 유저 작성 해설 자료
+│   └── QA 탬플릿.md
+├── reference/
+│   ├── official/          공식 인터뷰, 공식 Q&A 자료 번역/정리
+│   └── user/              유저 작성 해설 자료
+├── wiki/
+│   ├── README.md          위키 안내 및 근거 체계
+│   ├── _template/         문서 템플릿 (main, depth)
+│   └── lore/              핵심 설정 해설 문서
 ├── prompts/
 │   ├── wiki_qa_extraction_system.md
 │   ├── wiki_qa_extraction_user_template.md
+│   ├── wiki_writing_system.md
+│   ├── wiki_writing_user_template.md
 │   └── local_completion_wrapper.md
 ├── scripts/
 │   ├── qa_wiki_extract_langchain.py
 │   └── qa_wiki_pipeline.py
 ├── docs/
-│   └── qa_wiki_pipeline.md
+│   ├── qa_wiki_pipeline.md
+│   ├── plan.md
+│   └── project-status.md
 ├── artifacts/
 │   └── qa-wiki/
 ├── pyproject.toml
@@ -44,6 +50,9 @@
 - `scripts/qa_wiki_pipeline.py`: CSV 파싱, 수동 프롬프트 생성, SLM 출력 검증, 위키 초안 그룹핑을 담당하는 후처리 도구입니다.
 - `prompts/`: 시스템 프롬프트, 유저 템플릿, 로컬 completion wrapper를 분리해 프롬프트 수정이 쉽도록 구성했습니다.
 - `data/2025-05-04_질문목록_수동필터링.csv`: 게시판 질문/댓글 원본 데이터입니다.
+- `reference/`: 위키 집필 근거 자료(공식 + 팬 해설)를 정리한 디렉터리입니다.
+- `wiki/`: SLM으로 생성한 한국어 슈타인즈 게이트 설정 해설 위키입니다.
+- `prompts/wiki_writing_*.md`: 위키 집필용 시스템 프롬프트와 유저 템플릿입니다.
 - `artifacts/qa-wiki/runs/`: LangChain 추출 실행 결과가 실행 단위로 저장됩니다.
 - `request_test.sh`: `http://localhost:8000/v1/completions` 로컬 SLM 서버 smoke test 스크립트입니다.
 
@@ -207,3 +216,5 @@ summary.json
 ## 문서
 
 - [QA 위키 정제 파이프라인](docs/qa_wiki_pipeline.md)
+- [프로젝트 현황](docs/project-status.md)
+- [위키 안내 및 근거 체계](wiki/README.md)
