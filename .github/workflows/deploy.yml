@@ -18,8 +18,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Install MkDocs Material
-        run: pip install mkdocs-material
+        run: uv pip install --system mkdocs-material
 
       - name: Build site
         run: mkdocs build --strict
