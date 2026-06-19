@@ -154,9 +154,9 @@ spoiler: main_story
 
 > **[공식]** "수렴은 우리말로는 수렴이나 종속이라고 하며, 운명과 같이 어떤 노력을 해도 결과가 바뀌지 않는 반드시 일어나는 사건을 말합니다." — 커뮤니티 QA
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 2.1.1 세계선
-[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 1.4.1 세계선
-[^3]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 2.7 요약
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), 2.1.1 세계선
+[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch1.md), 1.4.1 세계선
+[^3]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), 2.7 요약
 
 ## 관련 문서
 

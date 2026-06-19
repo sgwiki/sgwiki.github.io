@@ -13,7 +13,7 @@
 타임리프는 현재 자신의 뇌를 스캔하여 그 데이터를 과거의 자신에게 전송하는 기술입니다. 과거의 자신은 현재의 기억으로 덮어씌워집니다.
 
 > **[팬 분석]** "타임 리프는 과거로 보내는 메시지입니다. … 전송 시점에서 보낸 사람의 뇌가 스캔되어 전송 전 상태의 받는 사람의 뇌에 덮어씌워집니다."
-> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 2. Mechanics §2.2.3
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), 2. Mechanics §2.2.3
 
 ### 제한사항
 
@@ -28,7 +28,7 @@
 타임리프도 D메일과 마찬가지로 세계선 변동을 일으킵니다. 하지만 차이가 있습니다.
 
 > **[팬 분석]** "타임리프는 D메일과 달리 현재의 위치를 이동시킵니다. 과거의 자신에게 기억을 덮어씌우는 것은 현재의 '내용'을 바꾸는 것이므로, 세계선이 재구성됩니다."
-> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 2. Mechanics §2.2.3
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), 2. Mechanics §2.2.3
 
 D메일이 **메시지가 과거에 도착하는 것**이 원인이라면, 타임리프는 **과거의 자신이 가진 기억이 바뀌는 것**이 원인입니다.
 

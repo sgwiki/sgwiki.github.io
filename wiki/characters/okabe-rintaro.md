@@ -163,6 +163,6 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.3 Reading Steiner
-[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.3.3 Other Manifestations
-[^3]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 3.1.3 Operation Skuld
+[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.3 Reading Steiner
+[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.3.3 Other Manifestations
+[^3]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md)》, 3.1.3 Operation Skuld

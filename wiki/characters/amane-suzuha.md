@@ -132,7 +132,7 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.2.4 Physical Time Travel, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^3]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 4.3.3 Why Suzuha Disappears, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^4]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.6.1 Series Chronology, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.2.4 Physical Time Travel, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^3]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch4.md)》, 4.3.3 Why Suzuha Disappears, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^4]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.6.1 Series Chronology, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5

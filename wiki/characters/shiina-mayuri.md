@@ -132,5 +132,5 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md) (2.4.1 젤 마유리)
-[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md) (3.1.2 아크라이트 작전)
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md) (2.4.1 젤 마유리)
+[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) (3.1.2 아크라이트 작전)

@@ -44,7 +44,7 @@ spoiler: main_story
 키류 모에카는 텐노지 유고의 직속 부하로, 라운더 임무를 수행하며 그와 밀접한 관계를 유지한다. 모에카는 FB(텐노지)에게 하루 평균 열 통 가까이 메일을 보낼 정도로 그에게 의존하고 있었으며, FB는 그 모든 메일에 답장을 써줄 정도로 모에카를 돌봤다. 이는 라운더 조직 내에서의 상하 관계를 넘어선 유대감으로 해석된다.
 
 > **[팬 분석]** "FB는 라운더의 IBN 회수 임무를 중단했나? '의무를 다하면 '처분'당하게 돼. 그래서 우리는 개보다 가축에 가까워.' 나는 그 남자의 마지막 말을 머릿속에서 되새긴다. 그는 그녀가 처분되지 않도록 그것을 중단했다. 만약 그것이 사실이라면, 그는 정말로 모에카를 구하기 위해 그렇게 했을지도 모른다."
-> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 2.6.3 Reversing Moeka's D-mail
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), 2.6.3 Reversing Moeka's D-mail
 
 모에카와의 이러한 관계는 텐노지가 단순한 SERN의 하수인이 아니라, 인간적인 면모를 가진 인물임을 보여준다. 그는 모에카를 '처분'에서 보호하기 위해 IBN 검색을 중단하기도 했으며, 이는 그의 딸바보 기질과 이중적인 입지를 보여주는 중요한 사례다.
 
@@ -120,6 +120,6 @@ D메일을 보내지 않는 세계선에서, 텐노지는 모에카를 총으로
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.6.3 Reversing Moeka's D-mail
+[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.6.3 Reversing Moeka's D-mail
 [^2]: 《Steins;Gate》 챕터 11
 [^3]: 《Steins;Gate Elite》 챕터 11

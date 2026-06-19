@@ -174,5 +174,5 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), "2.1.1 World Lines" - 존 타이타의 세계선 변동 시 인과 재구성 설명
-[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), "3.1.3 Operation Skuld" - 스쿨드 작전의 "세계를 속이는" 접근 원리
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), "2.1.1 World Lines" - 존 타이타의 세계선 변동 시 인과 재구성 설명
+[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), "3.1.3 Operation Skuld" - 스쿨드 작전의 "세계를 속이는" 접근 원리

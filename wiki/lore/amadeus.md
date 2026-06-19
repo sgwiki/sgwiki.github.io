@@ -145,4 +145,4 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 2.2.3 Time Leaping, 2.3 Reading Steiner
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), 2.2.3 Time Leaping, 2.3 Reading Steiner
