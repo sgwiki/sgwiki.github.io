@@ -12,45 +12,10 @@ spoiler: endgame
 > 팬 분석 논문의 한국어 번역본입니다. [← 목차로 돌아가기](./index.md)
 
 
-## 4 HEALTHY KID” is sent to Luka’s mother while she
 
-2.6.2 Luka’s D-mail
-The D-mail that was sent to Luka’s mother, in order to change Luka’s sex, is particularly
-controversial.
-Here, the lab’s plan was to make use of an urban myth about diet
-determining the sex of a baby:
-“
-[Kurisu]: “Looks like there’s a common saying that if you eat a lot of meat,
-you’ll give birth to a boy, and if you eat a lot of vegetables, a girl.”
-Chapter 4, Steins;Gate ”
-The pager message “EAT VEG
+## 4.1 서론
 
-4 HEALTHY KID” is sent to Luka’s mother while she
-was pregnant, and this succeeds in shifting the world line to one where Luka was born
-female.
-The are two objectionable elements here: First, there is no truth to the idea that diet
-can affect the sex of a baby. And second, Luka was already conceived at the time the
-D-mail arrived, so even some sort of butterfly effect has no way of altering his already
-determined sex.
-But given the established mechanics, there is a straightforward explanation for both
-of these. The key is to think about which world lines exist, and which do not. For
-example, it would be perfectly reasonable for Luka’s sex to influence his mother’s food
-cravings during pregnancy. (Either through hormone differences, or a butterfly effect.)
-Suppose therefore that Luka’s mother naturally eats more vegetables on all world lines
-where Luka is female.
-When the “EAT VEG
-
-
-
-## 4.1 Introduction
-
-4 Misconceptions
-
-4.1 Introduction
-In this exciting bonus chapter, we address some common misconceptions about the
-mechanics of Steins;Gate. This chapter is not necessary to understand the rest of the
-guide, but does help to explain why common alternative theories are incorrect.
-
+이 흥미로운 보너스 장에서는 슈타인즈;게이트의 메커니즘에 대한 몇 가지 일반적인 오해를 다룹니다. 이 장은 가이드의 나머지 부분을 이해하는 데 필요하지 않지만, 일반적인 대안 이론이 왜 틀렸는지 설명하는 데 도움이 됩니다.
 
 
 ## 4.2 세계선은 어떻게 생성되는가
@@ -122,7 +87,7 @@ guide, but does help to explain why common alternative theories are incorrect.
 > [스즈하]: "이건 네가 내 전화를 빼앗은 이유와 관련이 있지만, 7월 28일의 오카린 삼촌도 여기 있어. 즉, 이 세상에는 두 명의 오카베 린타로가 존재해. 알았어? 절대로 자신과 접촉해서는 안 돼. 그러면 안 돼. 시간 역설을 만들게 될 거야."
 > 
 > 
-> 슈타in즈;게이트 11장
+> 슈타인즈;게이트 11장
 >
 
 여기서, 그들은 현재 과거의 오카베가 미래의 자신을 직접 만나지 않은 세계선에 있습니다. 그 역사를 바꾸면 잠재적으로 오카베가 크리스가 죽은 것을 보지 못하는 세계선으로 이동할 수 있으며, 따라서 그녀를 구하기 위해 시간 여행을 하지 않아 시간 여행하는 오카베와 스즈하를 완전히 지워버릴 수 있습니다. 그 가능성은 확실히 피해야 할 것입니다.
