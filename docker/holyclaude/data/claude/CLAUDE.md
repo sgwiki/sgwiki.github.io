@@ -183,11 +183,40 @@ Add your personal preferences below. This section persists across container rebu
 3. `sg_game_sge` 내용은 어떤 형태로도 위키에 포함 금지 (완전 배제).
 4. `sg_game_sg0_en` 원문 직접 인용 금지 — 산문 요약만 허용.
 5. 파이프라인 1은 MCP 커버리지 게이트 6개 항목이 모두 성공하기 전에는 commit 금지.
+6. 파이프라인 1 팀장은 `/workspace/.admin/p1-work-registry.json`을 작업 현황 memory로 사용한다.
+7. planner 기획서 승인 전 `node /workspace/scripts/wiki_work_registry.mjs reserve ...`로 출력 파일을 예약한다.
+8. registry 예약 실패, 기존 문서 존재, 동일 주제 감지 시 writer를 호출하지 않는다.
 
 ### 기획서 승인 기준
 
 - dataforge MCP(`qaset_with_rag`)에서 주제 QA **5건 이상**
 - `/workspace/wiki/`에 동일 주제 문서 **없음**
+- `/workspace/.admin/p1-work-registry.json`에 동일 출력 파일이 active 상태로 예약되어 있지 않음
+- planner 기획서의 출력 파일 예약 명령이 성공함
+
+### 팀장 승인/거부/피드백 판정
+
+planner가 기획서를 반환하면 팀장은 반드시 아래 중 하나를 로그에 남긴다.
+
+- `APPROVED PLAN`: 승인 사유, 주제, 출력 파일, registry 예약 결과를 함께 기록하고 writer를 호출한다.
+- `REJECTED PLAN`: 동일 주제/동일 파일 존재, qaset 근거 부족, MCP 실패, registry 예약 실패 등 거부 사유를 기록하고 writer를 호출하지 않는다.
+- `REVISION REQUESTED`: 기획서는 유효하지만 범위·스포일러·출력 경로·근거 요약 보완이 필요할 때 피드백을 명시해 planner에게 재작성 요청한다.
+
+팀장은 writer 호출 전:
+
+```bash
+node /workspace/scripts/wiki_work_registry.mjs reserve --run-id <run_id> --file wiki/{category}/{slug}.md --topic "{주제명}"
+```
+
+단계 전환 시:
+
+```bash
+node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file wiki/{category}/{slug}.md --status writing
+node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file wiki/{category}/{slug}.md --status sanitizing
+node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file wiki/{category}/{slug}.md --status committing
+```
+
+완료 시 `complete`, 거부/폐기/중단 시 `release`를 호출한다.
 
 ### 파이프라인 1 MCP 커버리지 게이트
 
@@ -213,14 +242,14 @@ Add your personal preferences below. This section persists across container rebu
 ### 파이프라인 1 — 콘텐츠 생성
 
 ```
-① /workspace/wiki/ 스캔 → qaset 카테고리 비교 → 미작성 주제 목록
-② MCP 커버리지 게이트 6개 항목을 각기 별도 호출로 수행하도록 Agent 지시
-③ Agent(wiki-planner, 주제) 병렬 스폰 → 기획서 + MCP 커버리지 보고 수신
-④ 팀장 기획서와 MCP 커버리지 검토 → 승인/반려
-⑤ Agent(wiki-writer, 기획서) 병렬 스폰 (다른 파일 대상만 — 동일 파일 동시 쓰기 금지)
-⑥ Agent(source-sanitizer, 초안) → 위반 시 재작성 최대 2회, 초과 시 폐기
-⑦ 팀장 내용 검토 + MCP 커버리지 최종 확인
-⑧ git add <file> && git commit -m "wiki: <제목>" && git push
+① wiki-team-lead가 /workspace/wiki/와 registry memory를 스캔 → 미작성 주제 후보 목록
+② Agent(wiki-planner, 주제) 스폰 → 기획서 + MCP 커버리지 보고 수신
+③ 팀장 기획서 검토 → APPROVED PLAN / REJECTED PLAN / REVISION REQUESTED 판정
+④ APPROVED PLAN인 경우에만 registry reserve 성공 후 Agent(wiki-writer, 기획서) 스폰
+⑤ Agent(source-sanitizer, 초안) → 위반 시 팀장이 writer에게 피드백 재작성 요청 최대 2회, 초과 시 release 후 폐기
+⑥ 팀장 내용 검토 + MCP 커버리지 최종 확인 + registry status committing
+⑦ git add <file> && git commit -m "wiki: <제목>" && git push
+⑧ registry complete 또는 release
 ```
 
 ### 파이프라인 2 — 제안 처리
