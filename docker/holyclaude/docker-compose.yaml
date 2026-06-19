@@ -5,6 +5,34 @@
 # ==============================================================================
 
 services:
+  sg-ontology-http:
+    image: steinsgate-mcp:latest
+    container_name: sg-ontology-http
+    restart: unless-stopped
+    ports:
+      - "8093:8093"
+    command:
+      - sh
+      - -lc
+      - |
+        /app/.venv/bin/python - <<'PY'
+        from amadeus.mcp_server import app
+        from mcp.server.fastmcp.server import TransportSecuritySettings
+
+        app.settings.host = "0.0.0.0"
+        app.settings.port = 8093
+        app.settings.streamable_http_path = "/mcp"
+        app.settings.transport_security = TransportSecuritySettings(
+            allowed_hosts=["host.docker.internal:*", "127.0.0.1:*", "localhost:*"],
+            allowed_origins=[
+                "http://host.docker.internal:*",
+                "http://127.0.0.1:*",
+                "http://localhost:*",
+            ],
+        )
+        app.run(transport="streamable-http")
+        PY
+
   holyclaude:
     build:
       context: .

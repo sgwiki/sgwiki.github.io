@@ -226,6 +226,7 @@ docker compose --env-file ../../.env up -d --build
 |---|---|---|
 | `holyclaude` | 3001 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) |
 | `sg-wiki-admin` | 3002 | 관리 UI — cron 스케줄 · 수동 트리거 · 실행 현황 |
+| `sg-ontology-http` | 8093 | P1 커버리지용 sg-ontology HTTP MCP bridge |
 
 **관리 UI** (`http://localhost:3002`):
 - 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) 수동 실행
@@ -236,6 +237,11 @@ docker compose --env-file ../../.env up -d --build
 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다.
 실행 중 상태는 관리 UI의 "진행 중인 작업"과 `holyclaude` 로그 스트림에서 확인할 수
 있고, 결과 요약은 `.admin/runs/*.json`에 저장됩니다.
+
+P1 실행 래퍼는 팀장/하위 에이전트가 실제로 사용한 MCP tool_result를 추적합니다.
+커밋 전에 아래 6개 항목이 각각 별도 성공 호출로 확인되어야 하며, 하나라도 빠지면
+P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_rag`,
+`sg_game_sg0_en`, `sg_paper`, `sg_game_sge`(배제 감사 전용), `namuwiki`, `sg-ontology`.
 
 관련 환경 변수:
 

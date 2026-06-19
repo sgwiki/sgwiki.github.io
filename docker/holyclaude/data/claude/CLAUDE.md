@@ -182,11 +182,27 @@ Add your personal preferences below. This section persists across container rebu
 2. **source-sanitizer 통과 없이 commit 금지.**
 3. `sg_game_sge` 내용은 어떤 형태로도 위키에 포함 금지 (완전 배제).
 4. `sg_game_sg0_en` 원문 직접 인용 금지 — 산문 요약만 허용.
+5. 파이프라인 1은 MCP 커버리지 게이트 6개 항목이 모두 성공하기 전에는 commit 금지.
 
 ### 기획서 승인 기준
 
 - dataforge MCP(`qaset_with_rag`)에서 주제 QA **5건 이상**
 - `/workspace/wiki/`에 동일 주제 문서 **없음**
+
+### 파이프라인 1 MCP 커버리지 게이트
+
+팀장은 하위 에이전트 보고와 실행 로그를 대조해 아래 6개 항목이 각각 별도 MCP 호출로 1회 이상 성공했는지 확인한다. 하나라도 누락되거나 실패하면 작업을 중단하고 commit/push하지 않는다.
+
+| # | 필수 성공 항목 | 사용 목적 |
+|---|---|---|
+| 1 | dataforge `qaset_with_rag` | 주제 선정·QA 근거 |
+| 2 | dataforge `sg_game_sg0_en` | 영어 원문 기반 교차 확인, 직접 인용 금지 |
+| 3 | dataforge `sg_paper` | 팬 분석 근거 확인 |
+| 4 | dataforge `sg_game_sge` | 배제 감사 전용, 내용 사용 금지 |
+| 5 | `namuwiki` MCP | 외부 요약 교차 확인, 산문 가공 |
+| 6 | `sg-ontology` MCP | 세계선·인과관계 검증 |
+
+하위 에이전트는 완료 보고에 MCP 커버리지 체크리스트를 포함해야 한다.
 
 ### 페이지 승인 기준
 
@@ -198,12 +214,13 @@ Add your personal preferences below. This section persists across container rebu
 
 ```
 ① /workspace/wiki/ 스캔 → qaset 카테고리 비교 → 미작성 주제 목록
-② Agent(wiki-planner, 주제) 병렬 스폰 → 기획서 수신
-③ 팀장 기획서 검토 → 승인/반려
-④ Agent(wiki-writer, 기획서) 병렬 스폰 (다른 파일 대상만 — 동일 파일 동시 쓰기 금지)
-⑤ Agent(source-sanitizer, 초안) → 위반 시 재작성 최대 2회, 초과 시 폐기
-⑥ 팀장 내용 검토
-⑦ git add <file> && git commit -m "wiki: <제목>" && git push
+② MCP 커버리지 게이트 6개 항목을 각기 별도 호출로 수행하도록 Agent 지시
+③ Agent(wiki-planner, 주제) 병렬 스폰 → 기획서 + MCP 커버리지 보고 수신
+④ 팀장 기획서와 MCP 커버리지 검토 → 승인/반려
+⑤ Agent(wiki-writer, 기획서) 병렬 스폰 (다른 파일 대상만 — 동일 파일 동시 쓰기 금지)
+⑥ Agent(source-sanitizer, 초안) → 위반 시 재작성 최대 2회, 초과 시 폐기
+⑦ 팀장 내용 검토 + MCP 커버리지 최종 확인
+⑧ git add <file> && git commit -m "wiki: <제목>" && git push
 ```
 
 ### 파이프라인 2 — 제안 처리
@@ -231,9 +248,10 @@ Add your personal preferences below. This section persists across container rebu
 | `sg_paper` | `[팬 분석]` 태그 + 논문 제목 |
 | `sg_game_sg0_en` | 산문 요약만 (원문 인용 금지) |
 | qaset / namuwiki / sg-ontology | 산문 처리, 출처 미표시 |
-| `sg_game_sge` | **완전 배제** |
+| `sg_game_sge` | **완전 배제** (P1에서는 배제 감사용 MCP 조회만 허용, 내용 사용 금지) |
 
 ### dataforge source_filter 이름
 
 - qaset 검색에는 반드시 `qaset_with_rag`를 사용한다.
 - 하이픈이 들어간 변형은 존재하지 않는 이름이므로 사용하지 않는다.
+- P1 커버리지에는 `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`를 각각 별도 호출로 사용한다.

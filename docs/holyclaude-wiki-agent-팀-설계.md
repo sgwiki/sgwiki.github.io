@@ -48,7 +48,7 @@ dataforge 스택
   ├── dataforge-pgvector-db :5435
   └── dataforge-redis-cache :6379
 
-sg-ontology 컨테이너   :8093  (SPARQL)
+sg-ontology-http       :8093  (SPARQL HTTP bridge)
 namuwiki MCP           stdio  (나무위키 스크래핑)
 ```
 
@@ -95,7 +95,7 @@ docker/holyclaude/data/claude/       →  /home/claude/.claude/
     },
     "sg-ontology": {
       "type": "http",
-      "url": "http://host.docker.internal:8093/mcp/"
+      "url": "http://host.docker.internal:8093/mcp"
     },
     "namuwiki": {
       "command": "python",
@@ -112,8 +112,9 @@ docker/holyclaude/data/claude/       →  /home/claude/.claude/
 | `qaset_with_rag` | 18,604건 RAG 답변 semantic search |
 | `sg_game_sg0_en` | 슈타인즈 게이트 제로 영어 스크립트 |
 | `sg_paper` | 슈타인즈 게이트 논문 (팬 작성) |
+| `sg_game_sge` | 배제 감사 전용 조회. 위키 내용 반영 금지 |
 
-> `sg_game_sge` (한글 패치): 저작권 리스크로 배제. 상세: `docs/rag-소스-저작권-검토.md`
+> `sg_game_sge` (한글 패치): 저작권 리스크로 내용 사용은 배제. P1에서는 배제 대상 소스가 섞이지 않았는지 확인하는 감사용 MCP 호출만 허용한다. 상세: `docs/rag-소스-저작권-검토.md`
 
 ### sg-ontology HTTP 전환
 
@@ -162,6 +163,11 @@ def main() -> None:
 - `prompts/wiki_writing_system.md` 규칙 위반 없음
 - source-sanitizer 통과 (내부 경로 미노출 확인)
 
+**P1 MCP 커버리지 승인 기준**
+- 팀장은 커밋 전 실행 로그와 하위 에이전트 보고를 대조한다.
+- 아래 6개 항목이 각각 별도 MCP 호출로 1회 이상 성공해야 한다: dataforge `qaset_with_rag`, dataforge `sg_game_sg0_en`, dataforge `sg_paper`, dataforge `sg_game_sge`(배제 감사 전용), `namuwiki`, `sg-ontology`.
+- 하나라도 누락되거나 실패하면 P1은 실패 처리하고 commit/push하지 않는다.
+
 ---
 
 ## 5. 파이프라인
@@ -173,25 +179,28 @@ def main() -> None:
   │
   ① wiki/ 현황 vs qaset 카테고리 비교 → 미작성 주제 목록
   │
-  ② Agent(wiki-planner, 주제A) ─┐
+  ② MCP 커버리지 게이트 지시
+       dataforge 4개 source + namuwiki + sg-ontology를 각각 별도 호출로 성공시켜야 함
+  │
+  ③ Agent(wiki-planner, 주제A) ─┐
      Agent(wiki-planner, 주제B) ─┤ 병렬
      Agent(wiki-planner, 주제C) ─┘
-          ↓ 기획서 수신
+          ↓ 기획서 + MCP 커버리지 보고 수신
   │
-  ③ 기획서 검토 (팀장 직접)
-       승인 기준: qaset 5건 이상 + wiki/ 미중복
+  ④ 기획서 검토 (팀장 직접)
+       승인 기준: qaset 5건 이상 + wiki/ 미중복 + MCP 커버리지 6개 성공
   │
-  ④ Agent(wiki-writer, 기획서A) ─┐
+  ⑤ Agent(wiki-writer, 기획서A) ─┐
      Agent(wiki-writer, 기획서B) ─┘ 병렬 (승인된 것만, 서로 다른 파일 대상만 — 동일 파일 동시 쓰기 금지)
           ↓ 초안 수신
   │
-  ⑤ Agent(source-sanitizer, 초안)
+  ⑥ Agent(source-sanitizer, 초안)
        내부 경로·chunk ID 유출 여부 스캔
        위반 시 wiki-writer에게 재작성 요청 (최대 2회 — 초과 시 기획서 폐기 후 팀장 보고)
   │
-  ⑥ 팀장 내용 검토
+  ⑦ 팀장 내용 검토 + MCP 커버리지 최종 확인
   │
-  ⑦ git commit + push
+  ⑧ git commit + push
        → .github/workflows/deploy.yml
        → mkdocs build
        → Cloudflare Pages 배포
@@ -282,7 +291,7 @@ cron 또는 수동 트리거
 
 | # | 항목 | 위치 |
 |---|---|---|
-| 1 | sg-ontology HTTP 활성화 | `~/amadeus/amadeus/mcp_server.py` |
+| 1 | sg-ontology HTTP bridge 유지 | `docker/holyclaude/docker-compose.yaml` |
 | 2 | namuwiki 경로 마운트 | `docker/holyclaude/docker-compose.yaml` |
 | 3 | settings.json 작성 | `docker/holyclaude/data/claude/settings.json` |
 | 4 | CLAUDE.md 작성 | `docker/holyclaude/data/claude/CLAUDE.md` |

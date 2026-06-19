@@ -14,7 +14,7 @@ description: wiki-writer가 작성한 마크다운 초안을 스캔하여 내부
 | # | 항목 | 패턴 예시 |
 |---|---|---|
 | 1 | chunk ID 본문 노출 | `qs-`, `sge_`, `sg0_`, `sp_` 등 |
-| 2 | source_filter 이름 노출 | `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper` 등 |
+| 2 | source_filter 이름 노출 | `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge` 등 |
 | 3 | 내부 파일 경로 노출 | `data/qaset_with_rag/`, `reference/user/` 등 |
 | 4 | `sg_game_sg0_en` 원문 직접 인용 | 영어 게임 대사 블록 인용 |
 | 5 | 배제 소스(`sg_game_sge`) 내용 유출 | 한글 패치 텍스트 흔적 |
@@ -55,3 +55,4 @@ description: wiki-writer가 작성한 마크다운 초안을 스캔하여 내부
 - 파일 수정 금지 (읽기 전용)
 - git 명령 실행 금지
 - 수정은 wiki-writer가 담당, 최종 판단은 팀장이 담당
+- MCP 커버리지 통과 여부는 팀장 판단 사항이다. 단, 초안에 커버리지용 source_filter 이름이나 배제 소스 내용이 노출되면 fail로 보고한다.
