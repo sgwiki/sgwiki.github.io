@@ -17,7 +17,7 @@
 ### 서버 레이어 (GitHub Pages + Cloudflare Worker — 비용 0)
 
 ```
-GitHub Pages (sgwiki.github.io/sg-wiki/)
+GitHub Pages (sgwiki.github.io/)
   └── wiki/ 정적 사이트 (MkDocs Material)
         ├── 한국어 검색, Mermaid 다이어그램
         ├── 스포일러 배지
@@ -203,7 +203,7 @@ def main() -> None:
   ⑧ git commit + push
        → .github/workflows/deploy.yml
        → mkdocs build
-       → GitHub Pages 배포 (sgwiki.github.io/sg-wiki/)
+       → GitHub Pages 배포 (sgwiki.github.io/)
 ```
 
 ### 파이프라인 2 — 제안 처리
