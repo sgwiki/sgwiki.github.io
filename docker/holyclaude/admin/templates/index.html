@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SG Wiki 관리자</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: #58a6ff;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card h2 {
+      font-size: 0.95rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      background: #21262d;
+      color: #c9d1d9;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn:hover { background: #30363d; border-color: #8b949e; }
+    .btn:active { background: #161b22; }
+
+    .btn-primary {
+      background: #1f6feb;
+      border-color: #388bfd;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #388bfd; }
+
+    .btn-danger {
+      background: #da3633;
+      border-color: #f85149;
+      color: #fff;
+    }
+    .btn-danger:hover { background: #f85149; }
+
+    .btn-success {
+      background: #238636;
+      border-color: #3fb950;
+      color: #fff;
+    }
+    .btn-success:hover { background: #3fb950; }
+
+    .btn + .btn { margin-left: 8px; }
+
+    .msg {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: none;
+    }
+    .msg.show { display: block; }
+    .msg.ok  { background: #0d2a17; border: 1px solid #238636; color: #3fb950; }
+    .msg.err { background: #2a0d0d; border: 1px solid #da3633; color: #f85149; }
+    .msg.info { background: #0d1b2a; border: 1px solid #1f6feb; color: #58a6ff; }
+
+    /* Cron section */
+    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .row label { color: #8b949e; font-size: 12px; white-space: nowrap; }
+
+    input[type="text"] {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      padding: 6px 10px;
+      font-size: 13px;
+      width: 140px;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: #58a6ff; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-badge.on  { background: #0d2a17; color: #3fb950; border: 1px solid #238636; }
+    .status-badge.off { background: #2a0d0d; color: #f85149; border: 1px solid #da3633; }
+
+    /* Status table */
+    .full-card { grid-column: 1 / -1; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 8px 10px;
+      color: #8b949e;
+      border-bottom: 1px solid #21262d;
+      font-weight: 500;
+    }
+
+    tbody tr:hover { background: #1c2129; }
+
+    tbody td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #161b22;
+      color: #c9d1d9;
+    }
+
+    .num { text-align: right; }
+    .zero { color: #30363d; }
+
+    .refresh-hint {
+      font-size: 11px;
+      color: #484f58;
+      margin-top: 8px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<h1>SG Wiki 관리자 &mdash; 슈타인즈 게이트 위키</h1>
+
+<div class="grid">
+
+  <!-- 섹션 1: 수동 실행 -->
+  <div class="card">
+    <h2>수동 실행</h2>
+    <div>
+      <button class="btn btn-primary" onclick="triggerPipeline(1)">파이프라인 1 실행</button>
+      <button class="btn btn-success" onclick="triggerPipeline(2)">파이프라인 2 실행</button>
+    </div>
+    <div id="trigger-msg" class="msg"></div>
+  </div>
+
+  <!-- 섹션 2: Cron 스케줄 -->
+  <div class="card">
+    <h2>Cron 스케줄</h2>
+    <div class="row">
+      <label for="cron-expr">Cron 표현식</label>
+      <input type="text" id="cron-expr" value="0 * * * *" placeholder="0 * * * *">
+    </div>
+    <div class="row">
+      <span>상태:</span>
+      <span id="sched-badge" class="status-badge off">비활성</span>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-success" onclick="setSchedule(true)">활성화</button>
+      <button class="btn btn-danger"  onclick="setSchedule(false)">비활성화</button>
+    </div>
+    <div id="sched-msg" class="msg"></div>
+  </div>
+
+  <!-- 섹션 3: 실행 현황 -->
+  <div class="card full-card">
+    <h2>실행 현황</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>타임스탬프</th>
+          <th class="num">처리됨</th>
+          <th class="num">스킵됨</th>
+          <th class="num">오류</th>
+        </tr>
+      </thead>
+      <tbody id="runs-body">
+        <tr><td colspan="4" style="color:#484f58;text-align:center;padding:20px">불러오는 중...</td></tr>
+      </tbody>
+    </table>
+    <p class="refresh-hint">10초마다 자동 갱신</p>
+  </div>
+
+</div>
+
+<script>
+  // ── Trigger ──────────────────────────────────────────────────────────────
+  async function triggerPipeline(n) {
+    const msg = document.getElementById('trigger-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>파이프라인 ' + n + ' 실행 중...');
+    try {
+      const res = await fetch('/trigger/p' + n, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        showMsg(msg, 'ok', JSON.stringify(data, null, 2));
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '요청 실패: ' + e.message);
+    }
+  }
+
+  // ── Schedule ─────────────────────────────────────────────────────────────
+  async function setSchedule(enabled) {
+    const cron = document.getElementById('cron-expr').value.trim();
+    const msg  = document.getElementById('sched-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>스케줄 업데이트 중...');
+    try {
+      const res = await fetch('/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cron, enabled })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showMsg(msg, 'ok', JSON.stringify(data, null, 2));
+        updateBadge(enabled);
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '요청 실패: ' + e.message);
+    }
+  }
+
+  async function loadSchedule() {
+    try {
+      const res  = await fetch('/schedule');
+      const data = await res.json();
+      const jobs = data.jobs ?? [];
+      const active = jobs.length > 0;
+      updateBadge(active);
+    } catch (_) {}
+  }
+
+  function updateBadge(on) {
+    const b = document.getElementById('sched-badge');
+    b.textContent = on ? '활성' : '비활성';
+    b.className   = 'status-badge ' + (on ? 'on' : 'off');
+  }
+
+  // ── Status table ─────────────────────────────────────────────────────────
+  async function loadStatus() {
+    try {
+      const res  = await fetch('/status');
+      const data = await res.json();
+      const runs = data.runs ?? [];
+      const tbody = document.getElementById('runs-body');
+      if (runs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#484f58;text-align:center;padding:20px">실행 기록 없음</td></tr>';
+        return;
+      }
+      tbody.innerHTML = runs.map(r => {
+        const ts  = r.timestamp || '-';
+        const pro = Array.isArray(r.processed) ? r.processed.length : (r.processed ?? 0);
+        const ski = Array.isArray(r.skipped)   ? r.skipped.length   : (r.skipped   ?? 0);
+        const err = Array.isArray(r.errors)    ? r.errors.length    : (r.errors    ?? 0);
+        return `<tr>
+          <td>${ts}</td>
+          <td class="num">${pro}</td>
+          <td class="num ${ski === 0 ? 'zero' : ''}">${ski}</td>
+          <td class="num ${err === 0 ? 'zero' : 'err-cell'}">${err}</td>
+        </tr>`;
+      }).join('');
+    } catch (e) {
+      document.getElementById('runs-body').innerHTML =
+        '<tr><td colspan="4" style="color:#f85149;text-align:center;padding:20px">로드 실패: ' + e.message + '</td></tr>';
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function showMsg(el, type, html) {
+    el.className = 'msg show ' + type;
+    el.innerHTML = html;
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  loadSchedule();
+  loadStatus();
+  setInterval(loadStatus, 10000);
+</script>
+
+</body>
+</html>

@@ -43,3 +43,17 @@ services:
       - ANTHROPIC_AUTH_TOKEN=${ZAI_API_KEY}
       - ANTHROPIC_BASE_URL=https://api.z.ai/api/coding/paas/v4
       - API_TIMEOUT_MS=3000000
+
+  sg-wiki-admin:
+    build: ./admin/
+    container_name: sg-wiki-admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3002"
+    volumes:
+      - ../../:/workspace
+    environment:
+      - R2_MOCK=1
+      - TZ=Asia/Seoul
+      - WORKSPACE=/workspace
+      - ADMIN_RUNS_DIR=/workspace/.admin/runs

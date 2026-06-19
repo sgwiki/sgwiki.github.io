@@ -213,6 +213,36 @@ summary.json
 - `prompts/wiki_qa_extraction_user_template.md`: 배치 입력 지시와 JSON 출력 규칙을 조정합니다.
 - `prompts/local_completion_wrapper.md`: `request_test.sh`와 같은 로컬 completion 모델의 turn wrapper를 조정합니다.
 
+## Docker — holyclaude 에이전트 팀
+
+Claude Code 에이전트 팀과 관리 UI를 Docker로 실행합니다.
+
+```bash
+cd docker/holyclaude
+docker compose --env-file ../../.env up -d --build
+```
+
+| 서비스 | 포트 | 역할 |
+|---|---|---|
+| `holyclaude` | 3001 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) |
+| `sg-wiki-admin` | 3002 | 관리 UI — cron 스케줄 · 수동 트리거 · 실행 현황 |
+
+**관리 UI** (`http://localhost:3002`):
+- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) 수동 실행
+- Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
+- 최근 실행 로그 자동 갱신
+
+**제안 처리 파이프라인 로컬 테스트:**
+
+```bash
+# mock R2 데이터(data/mock-r2/suggestions/)로 폴링 시뮬레이션
+R2_MOCK=1 python scripts/poll_suggestions.py
+```
+
+멱등성 보장: `suggestions/processed/{id}` 파일이 존재하면 재처리 안 함.
+
+설계 문서: [holyclaude 위키 에이전트 팀 설계](docs/holyclaude-wiki-agent-팀-설계.md)
+
 ## 문서
 
 - [QA 위키 정제 파이프라인](docs/qa_wiki_pipeline.md)
