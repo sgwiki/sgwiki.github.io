@@ -233,7 +233,8 @@
 
 ## 자료 출처
 
-- https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=78756
+- 슈타게 WePlay Expo 2025 개발자 토크 전문.txt
+- [DC인사이드 슈타게 갤러리 #78756](https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=78756)
 
 ---
 
