@@ -17,9 +17,12 @@
     "defaultMode": "acceptEdits"
   },
   "env": {
-    "DISABLE_AUTOUPDATER": "1"
+    "DISABLE_AUTOUPDATER": "1",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
   },
-  "model": "sonnet",
+  "model": "glm-5.2",
   "hooks": {
     "Stop": [
       {
