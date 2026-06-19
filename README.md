@@ -1,4 +1,4 @@
-# fg-lab-kr
+# sg-wiki
 
 슈타인즈 게이트 관련 게시판 Q&A, 공식/유저 자료, SLM 정제 프롬프트, LangChain 기반 추출 실행기를 모아둔 작업 저장소입니다. 핵심 흐름은 원본 CSV 질문/댓글 데이터를 구조화 JSON으로 추출하고, 이를 개념 문서 중심의 FAQ 위키 초안으로 묶는 것입니다.
 
@@ -15,7 +15,7 @@
 ```text
 .
 ├── data/
-│   ├── 2025-05-04_질문목록_수동필터링.csv
+│   ├── mock-r2/            로컬 개발용 R2 모의 제안 데이터
 │   └── QA 탬플릿.md
 ├── reference/
 │   ├── official/          공식 인터뷰, 공식 Q&A 자료 번역/정리
@@ -49,7 +49,7 @@
 - `scripts/qa_wiki_extract_langchain.py`: LangChain으로 로컬 OpenAI-compatible SLM을 호출하고, 배치별 중간 산출물을 저장하는 실행기입니다.
 - `scripts/qa_wiki_pipeline.py`: CSV 파싱, 수동 프롬프트 생성, SLM 출력 검증, 위키 초안 그룹핑을 담당하는 후처리 도구입니다.
 - `prompts/`: 시스템 프롬프트, 유저 템플릿, 로컬 completion wrapper를 분리해 프롬프트 수정이 쉽도록 구성했습니다.
-- `data/2025-05-04_질문목록_수동필터링.csv`: 게시판 질문/댓글 원본 데이터입니다.
+- `data/`: 원본 게시판 데이터는 저작권·개인정보 이슈로 저장소에 포함하지 않습니다 (대용량/민감 데이터는 `.gitignore`에서 제외).
 - `reference/`: 위키 집필 근거 자료(공식 + 팬 해설)를 정리한 디렉터리입니다.
 - `wiki/`: SLM으로 생성한 한국어 슈타인즈 게이트 설정 해설 위키입니다.
 - `prompts/wiki_writing_*.md`: 위키 집필용 시스템 프롬프트와 유저 템플릿입니다.
@@ -97,7 +97,7 @@ uv run python scripts/qa_wiki_pipeline.py --help
 
 ```bash
 uv run python scripts/qa_wiki_extract_langchain.py sample \
-  --csv data/2025-05-04_질문목록_수동필터링.csv
+  --csv <원본-CSV-경로>   # 게시판 원본 데이터는 git에 포함되지 않음
 ```
 
 전체 추출부터 재시도, 검증, 위키 생성까지 한 번에 실행:
@@ -123,7 +123,7 @@ jq '{complete, total_record_count, completed_record_count, failed_record_count, 
 
 ```bash
 uv run python scripts/qa_wiki_extract_langchain.py auto-full \
-  --csv data/2025-05-04_질문목록_수동필터링.csv \
+  --csv <원본-CSV-경로> \
   --batch-size 4 \
   --retry-batch-size 2 \
   --final-batch-size 1 \
@@ -145,7 +145,7 @@ uv run python scripts/qa_wiki_extract_langchain.py resume \
 ```bash
 uv run python scripts/qa_wiki_pipeline.py validate \
   artifacts/qa-wiki/runs/{run_id}/jsonl/extractions.jsonl \
-  --source-csv data/2025-05-04_질문목록_수동필터링.csv \
+  --source-csv <원본-CSV-경로> \
   --report artifacts/qa-wiki/runs/{run_id}/validation_report.json
 ```
 
