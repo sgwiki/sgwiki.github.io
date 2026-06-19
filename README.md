@@ -222,6 +222,8 @@ cd docker/holyclaude
 docker compose --env-file ../../.env up -d --build
 ```
 
+> `--env-file ../../.env`를 반드시 지정해야 `.env`의 환경변수가 컨테이너에 전달됩니다.
+
 | 서비스 | 포트 | 역할 |
 |---|---|---|
 | `holyclaude` | 3001 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) |
@@ -233,6 +235,7 @@ docker compose --env-file ../../.env up -d --build
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 - 새로 작성되거나 변경된 `wiki/*.md` 페이지 검토: 보기, 승인, 거부
+- 제안 검토: `suggestions/inbox/`에 수신된 제안 목록 표시 (`GET /suggestions`)
 
 파이프라인 1은 `sg-wiki-admin`이 Docker socket을 통해 `holyclaude`
 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다.
@@ -253,6 +256,12 @@ P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_
 - `HOLYCLAUDE_CONTAINER`: 실행 대상 컨테이너 이름, 기본값 `holyclaude`
 - `P1_SCRIPT`: 컨테이너 내부 P1 실행 스크립트, 기본값 `/workspace/scripts/run_holyclaude_pipeline.mjs`
 - `ADMIN_RUN_OUTPUT_LIMIT`: 실행 로그 저장 tail 길이, 기본값 `30000`
+- `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
+- `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)
+- `R2_ACCESS_KEY` / `R2_SECRET_KEY`: R2 API 토큰 자격증명
+- `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
+- `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)
+- `R2_ACCESS_KEY` / `R2_SECRET_KEY`: R2 API 토큰 자격증명
 
 **제안 처리 파이프라인 로컬 테스트:**
 

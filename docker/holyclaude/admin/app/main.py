@@ -431,6 +431,19 @@ class ScheduleBody(BaseModel):
     enabled: bool = True
 
 
+@app.get("/suggestions")
+async def get_suggestions():
+    inbox_dir = WORKSPACE / "suggestions" / "inbox"
+    items = []
+    if inbox_dir.exists():
+        for f in sorted(inbox_dir.glob("*.json"), reverse=True):
+            try:
+                items.append(json.loads(f.read_text(encoding="utf-8")))
+            except Exception:
+                pass
+    return {"items": items}
+
+
 @app.get("/schedule")
 async def get_schedule():
     return {"jobs": get_jobs()}
@@ -569,21 +582,58 @@ def _tail_text(value: str, limit: int) -> str:
 
 
 async def _run_p2(run_id: str) -> None:
+    started_at = datetime.now().isoformat()
     active_jobs[run_id] = {
         "run_id": run_id,
         "pipeline": "p2",
-        "started_at": datetime.now().isoformat(),
+        "started_at": started_at,
         "status": "running",
+        "last_line": "poll_suggestions.py 실행 중",
     }
     script = WORKSPACE / "scripts" / "poll_suggestions.py"
-    proc = await asyncio.create_subprocess_exec(
-        sys.executable, str(script),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        env={**os.environ},
-    )
-    stdout, stderr = await proc.communicate()
-    active_jobs.pop(run_id, None)
+    log: dict = {}
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, str(script),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env={**os.environ},
+        )
+        stdout, stderr = await proc.communicate()
+        exit_code = proc.returncode
+        output = stdout.decode("utf-8", errors="replace") + stderr.decode("utf-8", errors="replace")
+        completed_at = datetime.now().isoformat()
+        ok = exit_code == 0
+        log = {
+            "run_id": run_id,
+            "pipeline": "p2",
+            "timestamp": completed_at,
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "status": "completed" if ok else "failed",
+            "message": "제안 폴링 완료" if ok else "제안 폴링 실패",
+            "exit_code": exit_code,
+            "errors": [] if ok else [f"exit_code={exit_code}"],
+            "stdout_tail": _tail_text(output, RUN_OUTPUT_LIMIT),
+        }
+    except Exception as exc:
+        completed_at = datetime.now().isoformat()
+        log = {
+            "run_id": run_id,
+            "pipeline": "p2",
+            "timestamp": completed_at,
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "status": "failed",
+            "message": str(exc),
+            "exit_code": None,
+            "errors": [str(exc)],
+            "stdout_tail": "",
+        }
+    finally:
+        active_jobs.pop(run_id, None)
+        if log:
+            _save_run(log)
 
 
 def _save_run(data: dict) -> None:

@@ -400,6 +400,13 @@
     <p class="refresh-hint">새로 작성되거나 변경된 wiki/*.md 페이지를 표시합니다. 승인하면 현재 파일 해시가 승인 기록에 저장되고, 거부하면 해당 파일 변경을 되돌립니다.</p>
   </div>
 
+  <!-- 섹션 5.5: 제안 검토 -->
+  <div class="card full-card">
+    <h2>제안 검토 <span id="sugg-inbox-badge" style="font-size:12px;color:#f0883e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
+    <div id="sugg-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <p class="refresh-hint">30초마다 자동 갱신</p>
+  </div>
+
   <!-- 섹션 6: 에이전트 로그 -->
   <div class="card full-card">
     <div class="log-controls">
@@ -785,17 +792,49 @@
   function reconnectLog() { connectLog(); }
   function clearLog() { document.getElementById('log-terminal').innerHTML = ''; }
 
+  // ── Suggestions ───────────────────────────────────────────────────────────
+  async function loadSuggestions() {
+    try {
+      const res  = await fetch('/suggestions');
+      const data = await res.json();
+      const items = data.items ?? [];
+      const el = document.getElementById('sugg-body');
+      const badge = document.getElementById('sugg-inbox-badge');
+      badge.textContent = items.length > 0 ? `(${items.length}건 대기)` : '';
+      if (items.length === 0) {
+        el.innerHTML = '<span style="color:#484f58">대기 중인 제안 없음</span>';
+        return;
+      }
+      el.innerHTML = items.map(s => {
+        const date = (s.created_at ?? '').slice(0, 10);
+        const contact = s.contact ? `<span style="color:#8b949e;font-size:11px"> · ${escapeHtml(s.contact)}</span>` : '';
+        return `<div style="padding:12px 0;border-bottom:1px solid #21262d">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">
+            <code style="color:#8b949e;font-size:11px">${s.id?.slice(0,8) ?? ''}</code>
+            <span style="color:#484f58;font-size:11px">${date}</span>
+            ${contact}
+          </div>
+          <div style="color:#c9d1d9;line-height:1.6;white-space:pre-wrap;word-break:break-all">${escapeHtml(s.content ?? '')}</div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      document.getElementById('sugg-body').textContent = '로드 실패: ' + e.message;
+    }
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────────
   loadSchedule();
   loadStatus();
   loadRunning();
   loadWikiStatus();
   loadWikiReviews();
+  loadSuggestions();
   connectLog();
-  setInterval(loadStatus,     10000);
-  setInterval(loadRunning,     3000);
-  setInterval(loadWikiStatus, 30000);
-  setInterval(loadWikiReviews, 10000);
+  setInterval(loadStatus,       10000);
+  setInterval(loadRunning,       3000);
+  setInterval(loadWikiStatus,   30000);
+  setInterval(loadWikiReviews,  10000);
+  setInterval(loadSuggestions,  30000);
 </script>
 
 </body>

@@ -4,3 +4,4 @@ apscheduler
 jinja2
 python-multipart
 docker
+boto3
