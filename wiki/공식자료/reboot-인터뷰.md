@@ -360,8 +360,7 @@
 
 ## 자료 출처
 
-- 『STEINS;GATE RE:BOOT』 일본 매체 인터뷰 전문 번역
-- [DC인사이드 슈타게 갤러리 #79181](https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=79181)
+- [『STEINS;GATE RE:BOOT』 일본 매체 인터뷰 전문 번역](https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=79181)
 
 ---
 
