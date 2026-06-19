@@ -184,9 +184,9 @@ spoiler: endgame
 
 ## 관련 문서
 
-- [마키세 크리스](../characters/makise-kurisu.md)
-- [오카베 린타로](../characters/okabe-rintaro.md)
-- [아마네 스즈하](../characters/amane-suzuha.md)
+- [마키세 크리스](./makise-kurisu.md)
+- [오카베 린타로](./okabe-rintaro.md)
+- [아마네 스즈하](./amane-suzuha.md)
 - 어트랙터 필드
 - 세계선
 - 오퍼레이션 스쿨드
