@@ -4,13 +4,38 @@
       "type": "http",
       "url": "http://host.docker.internal:8081/mcp/"
     },
-    "sg-ontology": {
-      "type": "http",
-      "url": "http://host.docker.internal:8093/mcp/"
-    },
     "namuwiki": {
       "command": "python3",
       "args": ["/mnt/f/agent-hub/agents/WebScraper/namuwiki_mcp_server.py"]
     }
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  },
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
+  "model": "sonnet",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/notify.py stop"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/notify.py error"
+          }
+        ]
+      }
+    ]
   }
 }

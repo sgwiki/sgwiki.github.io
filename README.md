@@ -232,6 +232,17 @@ docker compose --env-file ../../.env up -d --build
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 
+파이프라인 1은 `sg-wiki-admin`이 Docker socket을 통해 `holyclaude`
+컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다.
+실행 중 상태는 관리 UI의 "진행 중인 작업"과 `holyclaude` 로그 스트림에서 확인할 수
+있고, 결과 요약은 `.admin/runs/*.json`에 저장됩니다.
+
+관련 환경 변수:
+
+- `HOLYCLAUDE_CONTAINER`: 실행 대상 컨테이너 이름, 기본값 `holyclaude`
+- `P1_SCRIPT`: 컨테이너 내부 P1 실행 스크립트, 기본값 `/workspace/scripts/run_holyclaude_pipeline.mjs`
+- `ADMIN_RUN_OUTPUT_LIMIT`: 실행 로그 저장 tail 길이, 기본값 `30000`
+
 **제안 처리 파이프라인 로컬 테스트:**
 
 ```bash

@@ -157,6 +157,69 @@
       margin-top: 8px;
     }
 
+    /* Log terminal */
+    .terminal {
+      background: #010409;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Menlo', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #c9d1d9;
+      height: 320px;
+      overflow-y: auto;
+      padding: 10px 12px;
+    }
+    .terminal .log-line { white-space: pre-wrap; word-break: break-all; }
+    .terminal .log-line:hover { background: #1c2129; }
+    .log-controls {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #484f58; }
+    .dot.live { background: #3fb950; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+
+    /* Tooltip */
+    .tip {
+      position: relative;
+      display: inline-block;
+    }
+    .tip::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c2129;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 8px 12px;
+      white-space: pre-line;
+      width: 260px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+    .tip::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 3px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #30363d;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+    .tip:hover::after,
+    .tip:hover::before { opacity: 1; }
+
     .spinner {
       display: inline-block;
       width: 12px; height: 12px;
@@ -180,8 +243,12 @@
   <div class="card">
     <h2>수동 실행</h2>
     <div>
-      <button class="btn btn-primary" onclick="triggerPipeline(1)">파이프라인 1 실행</button>
-      <button class="btn btn-success" onclick="triggerPipeline(2)">파이프라인 2 실행</button>
+      <span class="tip" data-tip="콘텐츠 생성 파이프라인&#10;① wiki/ 현황 vs qaset 비교 → 미작성 주제 선정&#10;② wiki-planner: 기획서 작성 (병렬)&#10;③ wiki-writer: 페이지 초안 작성 (병렬)&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
+        <button class="btn btn-primary" onclick="triggerPipeline(1)">파이프라인 1 실행</button>
+      </span>
+      <span class="tip" data-tip="제안 처리 파이프라인&#10;① R2 폴링 → suggestions/inbox/ 저장 (멱등)&#10;② wiki-classifier: Type A(주제 요청) / B(편집 제안) 분류&#10;③ suggestion-judge: MCP 조회 후 승인·거부·피드백 판정&#10;④ decisions/{id}.json 저장&#10;⑤ 히스토리 탭 반영 → Pages 재배포">
+        <button class="btn btn-success" onclick="triggerPipeline(2)">파이프라인 2 실행</button>
+      </span>
     </div>
     <div id="trigger-msg" class="msg"></div>
   </div>
@@ -204,7 +271,32 @@
     <div id="sched-msg" class="msg"></div>
   </div>
 
-  <!-- 섹션 3: 실행 현황 -->
+  <!-- 섹션 3: 진행 중인 작업 -->
+  <div class="card">
+    <h2>진행 중인 작업</h2>
+    <div id="running-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <p class="refresh-hint">3초마다 자동 갱신</p>
+  </div>
+
+  <!-- 섹션 4: 위키 현황 -->
+  <div class="card">
+    <h2>위키 페이지 현황</h2>
+    <div id="wiki-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <p class="refresh-hint">30초마다 자동 갱신</p>
+  </div>
+
+  <!-- 섹션 5: 에이전트 로그 -->
+  <div class="card full-card">
+    <div class="log-controls">
+      <span class="dot" id="log-dot"></span>
+      <h2 style="margin-bottom:0">에이전트 로그 <span style="color:#484f58;font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0">(holyclaude)</span></h2>
+      <button class="btn" style="margin-left:auto;font-size:11px;padding:4px 10px" onclick="reconnectLog()">재연결</button>
+      <button class="btn" style="font-size:11px;padding:4px 10px" onclick="clearLog()">지우기</button>
+    </div>
+    <div class="terminal" id="log-terminal"></div>
+  </div>
+
+  <!-- 섹션 6: 실행 현황 -->
   <div class="card full-card">
     <h2>실행 현황</h2>
     <table>
@@ -282,6 +374,62 @@
     b.className   = 'status-badge ' + (on ? 'on' : 'off');
   }
 
+  // ── Running jobs ─────────────────────────────────────────────────────────
+  async function loadRunning() {
+    try {
+      const res  = await fetch('/running');
+      const data = await res.json();
+      const jobs = data.jobs ?? [];
+      const el   = document.getElementById('running-body');
+      if (jobs.length === 0) {
+        el.innerHTML = '<span style="color:#484f58">실행 중인 작업 없음</span>';
+        return;
+      }
+      el.innerHTML = jobs.map(j => `
+        <div style="display:grid;grid-template-columns:16px 1fr;gap:8px;margin-bottom:8px">
+          <span class="spinner" style="margin-top:2px"></span>
+          <div>
+            <div><b style="color:#c9d1d9">파이프라인 ${j.pipeline?.replace('p','')}</b>
+            &nbsp;<span style="color:#484f58">${j.run_id}</span>
+            &nbsp;<span style="color:#8b949e">${j.started_at?.slice(11,19) ?? ''}</span></div>
+            <div style="color:#8b949e;font-size:11px;line-height:1.5">${j.last_line ?? ''}</div>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      document.getElementById('running-body').textContent = '로드 실패: ' + e.message;
+    }
+  }
+
+  // ── Wiki status ───────────────────────────────────────────────────────────
+  async function loadWikiStatus() {
+    try {
+      const res  = await fetch('/wiki-status');
+      const data = await res.json();
+      const el   = document.getElementById('wiki-body');
+      const sections = data.sections ?? {};
+      const total    = data.total ?? 0;
+      const sugg     = data.suggestions ?? {};
+
+      const sectionHtml = Object.entries(sections).map(([sec, pages]) => `
+        <div style="margin-bottom:8px">
+          <div style="color:#8b949e;margin-bottom:3px">${sec} <span style="color:#484f58">(${pages.length})</span></div>
+          <div style="padding-left:8px;color:#c9d1d9;font-size:11px;line-height:1.7">
+            ${pages.map(p => `<span style="margin-right:8px">• ${p}</span>`).join('')}
+          </div>
+        </div>`).join('');
+
+      el.innerHTML = `
+        <div style="margin-bottom:12px;font-size:13px">
+          총 <b style="color:#58a6ff">${total}</b>페이지
+          &nbsp;·&nbsp;대기 제안 <b style="color:#f0883e">${sugg.inbox ?? 0}</b>건
+          &nbsp;·&nbsp;처리 완료 <b style="color:#3fb950">${sugg.processed ?? 0}</b>건
+        </div>
+        ${total === 0 ? '<span style="color:#484f58">wiki/ 디렉토리가 비어 있습니다</span>' : sectionHtml}`;
+    } catch (e) {
+      document.getElementById('wiki-body').textContent = '로드 실패: ' + e.message;
+    }
+  }
+
   // ── Status table ─────────────────────────────────────────────────────────
   async function loadStatus() {
     try {
@@ -317,10 +465,53 @@
     el.innerHTML = html;
   }
 
+  // ── Log stream ────────────────────────────────────────────────────────────
+  let logEs = null;
+  const MAX_LOG_LINES = 500;
+
+  function connectLog() {
+    if (logEs) logEs.close();
+    const term = document.getElementById('log-terminal');
+    const dot  = document.getElementById('log-dot');
+    dot.classList.remove('live');
+
+    logEs = new EventSource('/logs/stream?tail=200');
+
+    logEs.onopen = () => { dot.classList.add('live'); };
+
+    logEs.onmessage = (e) => {
+      const text = JSON.parse(e.data);
+      if (!text) return;                        // keepalive empty string
+      const div = document.createElement('div');
+      div.className = 'log-line';
+      div.textContent = text;
+      term.appendChild(div);
+      // cap line count
+      while (term.children.length > MAX_LOG_LINES) term.removeChild(term.firstChild);
+      // auto-scroll only when near bottom
+      if (term.scrollHeight - term.scrollTop - term.clientHeight < 60) {
+        term.scrollTop = term.scrollHeight;
+      }
+    };
+
+    logEs.onerror = () => {
+      dot.classList.remove('live');
+      setTimeout(connectLog, 5000);  // auto-reconnect
+    };
+  }
+
+  function reconnectLog() { connectLog(); }
+  function clearLog() { document.getElementById('log-terminal').innerHTML = ''; }
+
   // ── Init ──────────────────────────────────────────────────────────────────
   loadSchedule();
   loadStatus();
-  setInterval(loadStatus, 10000);
+  loadRunning();
+  loadWikiStatus();
+  connectLog();
+  setInterval(loadStatus,     10000);
+  setInterval(loadRunning,     3000);
+  setInterval(loadWikiStatus, 30000);
 </script>
 
 </body>

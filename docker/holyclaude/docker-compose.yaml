@@ -52,6 +52,7 @@ services:
       - "127.0.0.1:3002:3002"
     volumes:
       - ../../:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - R2_MOCK=1
       - TZ=Asia/Seoul
