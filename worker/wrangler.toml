@@ -10,8 +10,7 @@ bucket_name = "sg-wiki-suggestions"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
-# wrangler kv namespace create RATE_LIMIT  →  id를 위 값에 입력
+id = "6d4119855f3242d3a30039f8bf095bbb"
 
 [env.production]
 name = "sg-wiki-suggest"
