@@ -19,7 +19,7 @@
 슈타인즈 게이트 세계선의 핵심 특징은 **수속이 없다**는 것입니다. 알파와 베타 양쪽의 결정적 사건에서 자유롭기 때문에, 평화로운 미래가 가능합니다.
 
 > **[팬 분석]** "슈타인즈 게이트는 오카베가 가설을 세운 세계선으로, 알파와 베타 어트랙터 필드 사이에 완벽하게 위치합니다. 경계에 정확히 균형을 이루고 있어 … 양쪽 다에 도달하지 않아야 한다는 것입니다. 따라서 전쟁이나 디스토피아가 없는 평화로운 미래에 도달할 가능성이 있습니다."
-> — 출처: The Mechanics of Steins Gate v1.0.3, 3. Theory §3.1.1
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 3. Theory §3.1.1
 
 ---
 
@@ -39,7 +39,7 @@
 오카베의 첫 시도는 실패하고, 오히려 자신이 크리스를 찌르게 됩니다. 이것은 과거에 오카베가 들었던 비명이 **자신의 비명**이었던 것입니다 — 루프 폐쇄의 전형적 사례입니다.
 
 > **[팬 분석]** "오카베는 비명을 지르고, 몇 주 전 나카바치 회의에 참석했을 때 들었던 비명이 사실은 자신의 버전이었다는 것을 깨닫습니다."
-> — 출처: The Mechanics of Steins Gate v1.0.3, 3. Theory §3.1.1
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 3. Theory §3.1.1
 
 ---
 

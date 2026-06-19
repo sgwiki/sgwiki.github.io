@@ -13,7 +13,7 @@
 전화렌지는 전화기와 전자레인지를 결합한 장치로, 우연히 미니 블랙홀을 생성하면서 시간 통신 기능을 갖게 되었습니다.
 
 > **[팬 분석]** "전화렌지(가칭)을 사용하여 전송되며, 우연히 미니 블랙홀을 생성합니다. 대형 CRT는 블랙홀에 전자를 기증하여 스핀을 충분히 증가시켜 벌거벗은 특이점이 되도록 합니다. 특이점을 통과한 메시지는 과거로 이동하며, 전자레인지 타이머가 얼마나 멀리 이동할지 제어합니다."
-> — 출처: The Mechanics of Steins Gate v1.0.3, 2. Mechanics §2.2.2
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 2. Mechanics §2.2.2
 
 핵심 부품:
 - **전자레인지**: 타이머로 전송 시점(얼마나 과거로 보낼지)을 제어

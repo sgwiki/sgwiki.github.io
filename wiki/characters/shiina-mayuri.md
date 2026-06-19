@@ -132,5 +132,5 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: The Mechanics of Steins Gate v1.0.3 (2.4.1 젤 마유리)
-[^2]: The Mechanics of Steins Gate v1.0.3 (3.1.2 아크라이트 작전)
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) (2.4.1 젤 마유리)
+[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) (3.1.2 아크라이트 작전)

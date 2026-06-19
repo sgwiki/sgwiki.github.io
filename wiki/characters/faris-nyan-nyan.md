@@ -122,6 +122,6 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: The Mechanics of Steins Gate v1.0.3, 현재 개념 논의, 2.1.2장
-[^2]: The Mechanics of Steins Gate v1.0.3, 세계선 구조, 2.1.1장
-[^3]: The Mechanics of Steins Gate v1.0.3, 스즈하의 1975년 여행, 2.4.2장
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 현재 개념 논의, 2.1.2장
+[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 세계선 구조, 2.1.1장
+[^3]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 스즈하의 1975년 여행, 2.4.2장

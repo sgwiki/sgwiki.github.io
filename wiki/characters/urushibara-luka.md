@@ -103,15 +103,15 @@ Reading Steiner는 오카베만이 가진 능력이 아니며, 모든 사람이 
 
 "식단이 태아의 성별에 영향을 미친다"는 도시 전설은 과학적 근거가 없다. 하지만 슈타인즈;게이트의 세계관에서는 세계선이 사전에 존재하며, 재구성이 가장 유사한 세계선을 선택한다. 따라서 루카가 여성인 세계선에서는 어머니가 자연스럽게 야채를 더 많이 섭취하게 되며, D메일은 이러한 세계선으로 이동하는 트리거가 될 뿐이다.
 
-> **[팬 분석]** "식단이 태아의 성별에 영향을 미친다"는 도시 전설을 이용해 루카의 어머니에게 보낸 D메일은 특히 논란이 많습니다. 여기서 연구소의 계획은 식단이 아기의 성별을 결정한다는 도시 전설을 이용하는 것이었습니다. — The Mechanics of Steins Gate v1.0.3, 2.6.2 루카의 D메일[^1]
+> **[팬 분석]** "식단이 태아의 성별에 영향을 미친다"는 도시 전설을 이용해 루카의 어머니에게 보낸 D메일은 특히 논란이 많습니다. 여기서 연구소의 계획은 식단이 아기의 성별을 결정한다는 도시 전설을 이용하는 것이었습니다. — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 2.6.2 루카의 D메일[^1]
 
 ### 재구성(Reconstruction)
 
 세계선 이동 시 재구성은 과거와 미래 전체에 영향을 미치며, 가장 유사한 세계선을 선택한다. 따라서 D메일이 도착보다 이른 사건을 변경하는 것이 가능하며, 루카의 성별 변화는 재구성의 부작용으로 발생한다. 남성 루카와 여성 루카가 매우 유사한 이유도 재구성이 최소한의 변화만을 가진 세계선을 선택하기 때문이다.
 
-> **[팬 분석]** 활성 세계선이 이동하면, 재구성은 이전 세계선과 가장 유사한 세계선(그러나 이동을 일으킨 변화도 수용하는)을 활성화하도록 선택합니다. 이 사실은 여러 관련 질문에 답하는 데 중요합니다. 예를 들어, 남성 루카와 여성 루카가 얼마나 비슷한지에 놀라는 이유는, 재구성이 최소한의 것을 변경하는 세계선을 선택하기 때문입니다. — The Mechanics of Steins Gate v1.0.3, 2.6.4 세계선 이동에 의해 변하지 않는 사건들[^2]
+> **[팬 분석]** 활성 세계선이 이동하면, 재구성은 이전 세계선과 가장 유사한 세계선(그러나 이동을 일으킨 변화도 수용하는)을 활성화하도록 선택합니다. 이 사실은 여러 관련 질문에 답하는 데 중요합니다. 예를 들어, 남성 루카와 여성 루카가 얼마나 비슷한지에 놀라는 이유는, 재구성이 최소한의 것을 변경하는 세계선을 선택하기 때문입니다. — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 2.6.4 세계선 이동에 의해 변하지 않는 사건들[^2]
 
 ## 인용 출처
 
-[^1]: The Mechanics of Steins Gate v1.0.3.pdf - 2.6.2 루카의 D메일
-[^2]: The Mechanics of Steins Gate v1.0.3.pdf - 2.6.4 세계선 이동에 의해 변하지 않는 사건들
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) - 2.6.2 루카의 D메일
+[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) - 2.6.4 세계선 이동에 의해 변하지 않는 사건들

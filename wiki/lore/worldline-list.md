@@ -140,11 +140,11 @@ spoiler: main_story
 
 ## 인용 출처
 
-> **[팬 분석]** "우주는 중첩 상태에 있는 매우 많거나 무한한 수의 '세계선'으로 구성됩니다. 각 세계선은 특정 세계선 변동률 값을 가진 자체 일관성 있는 역사입니다." — The Mechanics of Steins Gate v1.0.3[^1]
+> **[팬 분석]** "우주는 중첩 상태에 있는 매우 많거나 무한한 수의 '세계선'으로 구성됩니다. 각 세계선은 특정 세계선 변동률 값을 가진 자체 일관성 있는 역사입니다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
 
-> **[팬 분석]** "세계선은 시간 여행에 의해 생성되는 것이 아니라, 무수히 많은 가능성이 중첩된 상태에서 하나가 '활성화'되는 것입니다." — The Mechanics of Steins Gate v1.0.3[^2]
+> **[팬 분석]** "세계선은 시간 여행에 의해 생성되는 것이 아니라, 무수히 많은 가능성이 중첩된 상태에서 하나가 '활성화'되는 것입니다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^2]
 
-> **[팬 분석]** "다이버전스 수치는 원본 세계와의 차이(오차율)를 나타내는 수치로, 세계선과는 별개로 봐야 합니다." — The Mechanics of Steins Gate v1.0.3[^3]
+> **[팬 분석]** "다이버전스 수치는 원본 세계와의 차이(오차율)를 나타내는 수치로, 세계선과는 별개로 봐야 합니다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^3]
 
 > **[공식]** "슈타인즈 게이트는 아무도 본 적 없는 미지의 세계선인 것 같아. 관측되지 않았어. 그러니까 '미지'인 거지." — 아마네 스즈하, 슈타인즈 게이트 11장
 
@@ -154,9 +154,9 @@ spoiler: main_story
 
 > **[공식]** "수렴은 우리말로는 수렴이나 종속이라고 하며, 운명과 같이 어떤 노력을 해도 결과가 바뀌지 않는 반드시 일어나는 사건을 말합니다." — 커뮤니티 QA
 
-[^1]: The Mechanics of Steins Gate v1.0.3, 2.1.1 세계선
-[^2]: The Mechanics of Steins Gate v1.0.3, 1.4.1 세계선
-[^3]: The Mechanics of Steins Gate v1.0.3, 2.7 요약
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 2.1.1 세계선
+[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 1.4.1 세계선
+[^3]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 2.7 요약
 
 ## 관련 문서
 

@@ -46,7 +46,7 @@ spoiler: {none|early_story|main_story|zero_story|endgame}
 |---|---|
 | 공식 QA자료집 | `> **[공식]** "원문" — [슈타게 공식 QA자료집](../공식자료/qa-자료집.md), QN` |
 | 공식 인터뷰 등 기타 공식 출처 | `> **[공식]** "원문" — 출처명` |
-| 팬 논문 | `> **[팬 분석]** "..." — 논문 제목[^N]` |
+| 팬 논문 (`sg_paper`, The Mechanics 등) | `> **[팬 분석]** "..." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §섹션[^N]` |
 | `sg_game_sg0_en` | 간접 사용 허용 (파라프레이즈·풀어쓰기·산문 요약). 원문 블록 직접 인용·소스명·청크ID 노출 금지 |
 | `sg_game_sge` | 간접 사용 허용 (파라프레이즈·풀어쓰기·내용 재료). 원문 블록 직접 인용·소스명·청크ID 노출 금지 |
 | qaset, namuwiki, sg-ontology | 산문 처리. 출처 미표시 |
@@ -61,6 +61,7 @@ spoiler: {none|early_story|main_story|zero_story|endgame}
 - source_filter 이름 기재
 - 내부 파일 경로(`data/qaset_with_rag/`, `reference/user/`, `reference/official/` 등) 기재
 - `[reference/user/...]`, `[reference/official/...]` 형식의 경로 브래킷 기재
+- The Mechanics of Steins;Gate v1.0.3를 GitHub 링크 없이 평문으로만 표기
 - `sg_game_sg0_en` 원문 블록 직접 인용 (파라프레이즈는 허용)
 - `sg_game_sge` 원문 블록 직접 인용 (파라프레이즈는 허용)
 - `sg_game_sg0_en`, `sg_game_sge` 소스명·파일명·청크ID를 본문에 노출

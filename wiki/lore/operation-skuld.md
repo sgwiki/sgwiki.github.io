@@ -69,8 +69,8 @@ spoiler: main_story
 
 오카베가 크리스를 구하기 위한 첫 번째 시도에서 막 돌아왔을 때, 그는 비디오 D메일을 확인하고 작전의 방법을 이해한다. 이때 이미 그는 실패를 경험한 상태이며, 이 실패가 미래의 성공을 위한 필수적인 전제 조건이 되었다.
 
-> **[팬 분석]** "스쿨드 작전은 오카베가 '세상을 속임'으로써 특정 명백하게 수렴된 사건을 피할 수 있다는 깨달음에 기반한 크리스를 구하기 위한 계획입니다." — The Mechanics of Steins Gate[^1]
+> **[팬 분석]** "스쿨드 작전은 오카베가 '세상을 속임'으로써 특정 명백하게 수렴된 사건을 피할 수 있다는 깨달음에 기반한 크리스를 구하기 위한 계획입니다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
 
 ## 인용 출처
 
-[^1]: The Mechanics of Steins Gate v1.0.3 - 3.1.3 스쿨드 작전
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) - 3.1.3 스쿨드 작전

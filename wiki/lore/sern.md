@@ -47,4 +47,4 @@ Z 프로그램은 SERN이 타임 머신 개발을 위해 운영하는 비밀 프
 
 ## 인용 출처
 
-[^1]: The Mechanics of Steins Gate v1.0.3
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)

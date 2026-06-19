@@ -24,7 +24,7 @@
 하지만 **변화가 너무 작아서 세계선 전환을 유발하지 못하는** 경우가 있습니다. 이때 시간 여행의 출발과 도착이 같은 세계선 안에 공존하게 되며, 이것이 루프(닫힌 인과 고리)를 형성합니다.
 
 > **[팬 분석]** "루프 폐쇄는 시간 여행이 세계선 변화를 일으키지만, 동일한 시간 여행 사건이 새로운 세계선에서도 발생하는 것을 막을 만큼 충분하지 않을 때 발생합니다. 재구성의 목적은 역설을 제거하는 것이기 때문에, 새로운 세계선에서 시간 여행 출발과 도착을 짝을 이룹니다."
-> — 출처: The Mechanics of Steins Gate v1.0.3, 3. Theory §3.1
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 3. Theory §3.1
 
 ### 작동 예시: 테스트 D메일
 
@@ -54,7 +54,7 @@
 오카베가 여러 차례 타임리프를 반복하면서, 이전 타임리프의 오카베를 만나지 않는 현상도 루프 폐쇄로 설명됩니다. 세계선 재구성이 이전 타임리프 이벤트를 짝지어 처리하기 때문입니다.
 
 > **[팬 분석]** "오카베가 스쿨드 작전을 수행할 때 이전 자신을 만나지 않는 이유 … 루프 폐쇄는 이런 종류의 행동을 예측합니다."
-> — 출처: The Mechanics of Steins Gate v1.0.3, 3. Theory §3.1
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 3. Theory §3.1
 
 ### 루프가 깨지는 경우
 

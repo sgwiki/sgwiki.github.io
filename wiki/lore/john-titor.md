@@ -110,7 +110,7 @@ spoiler: endgame
 
 실존 티토는 "다세계가 동시에 물리적으로 존재한다"고 주장한 반면, 작중에서는 "동시에 존재하지만 한 번에 물리적으로 실현되는 세계선은 하나뿐"이라는 독자적 변형을 가했습니다. 스즈하는 작중에서 이것이 코펜하겐 해석과 다세계 해석을 "체리피킹"한 것이라고 설명합니다.
 
-> **[팬 분석]** "슈타인즈;게이트의 메커니즘은 실존 존 티토의 글에서 거의 그대로 가져온 부분이 많으며, 특히 어트랙터 필드와 다이버전스가 그 핵심이다. 다만 작중에서는 '세계선이 하나만 물리적으로 활성'이라는 독자적 규칙을 추가했고, 이 때문에 수렴이 보다 강력하게 작용한다." — The Mechanics of Steins Gate[^1]
+> **[팬 분석]** "슈타인즈;게이트의 메커니즘은 실존 존 티토의 글에서 거의 그대로 가져온 부분이 많으며, 특히 어트랙터 필드와 다이버전스가 그 핵심이다. 다만 작중에서는 '세계선이 하나만 물리적으로 활성'이라는 독자적 규칙을 추가했고, 이 때문에 수렴이 보다 강력하게 작용한다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
 
 ## 5. 존 타이타의 "거짓말 목록" (SERN 기만용)
 
@@ -150,4 +150,4 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: The Mechanics of Steins Gate v1.0.3, "2.1 Attractor Field Theory" 및 "4.3.4 Deliberate Lies as John Titor". 작중 메커니즘과 실존 티토 원주장의 대응 관계, 스즈하의 SERN 기만용 거짓말 목록을 정리한 팬 분석 문서.
+[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), "2.1 Attractor Field Theory" 및 "4.3.4 Deliberate Lies as John Titor". 작중 메커니즘과 실존 티토 원주장의 대응 관계, 스즈하의 SERN 기만용 거짓말 목록을 정리한 팬 분석 문서.

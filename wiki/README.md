@@ -15,7 +15,7 @@
 | 태그 | 의미 | 신뢰도 |
 |---|---|---|
 | **[공식]** | 게임 내 대사, TIPS, 공식 인터뷰, 공식 QA자료집 | 작중 확정 설정 |
-| **[팬 분석]** | 팬이 작성한 체계적 해설 (The Mechanics of Steins Gate, 어트랙터 필드 이론 등) | 추론·해석이 포함됨 |
+| **[팬 분석]** | 팬이 작성한 체계적 해설 ([The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 어트랙터 필드 이론 등) | 추론·해석이 포함됨 |
 
 모든 인용에는 **원문을 확인할 수 있는 출처**가 표시됩니다. 팬 분석이 인용될 때는 항상 그 출처가 팬 해설임을 명시합니다.
 
@@ -54,7 +54,7 @@ wiki/
 - **공식 QA자료집** — 슈타인즈 게이트 공식 설정 Q&A (20문항)
 - **RE-BOOT 인터뷰** — 『STEINS;GATE RE-BOOT』 일본 매체 인터뷰 전문 번역
 - **WePlay Expo 2025 개발자 토크** 전문
-- **The Mechanics of Steins Gate v1.0.3** — 영문 팬 해설 (Mechanics, Theory, Misconceptions)
+- **[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)** — 영문 팬 해설 (Mechanics, Theory, Misconceptions)
 - **어트랙터 필드 이론과 그 외 등등** — 한국어 팬 해설
 
 ---
