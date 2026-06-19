@@ -1,0 +1,104 @@
+# AGENTS.md
+
+이 파일은 (자동화된) 코딩 에이전트가 sg-wiki 저장소에서 작업할 때 알아야 할 핵심 컨텍스트를 제공합니다. 일반 개발자 온보딩 문서와 겹치는 부분은 [`README.md`](README.md)를, 위키 집필 규칙은 [`wiki/README.md`](wiki/README.md)를 참고하세요.
+
+## 프로젝트 개요
+
+슈타인즈 게이트 **한국어 설정 해설 위키**. 위키 본문은 `wiki/` 아래 마크다운으로 관리되고, MkDocs Material로 빌드해 [GitHub Pages](https://sgwiki.github.io/)에 배포. 위키 페이지는 Claude Code 에이전트 팀이 자동 작성·검수·커밋하며, 운영자는 관리 UI로 실행·검토·승인.
+
+## 핵심 디렉터리
+
+| 경로 | 역할 | 추적 여부 |
+|---|---|---|
+| `wiki/` | 위키 마크다운 본문 (배포 대상) | tracked |
+| `docs/` | 설계·계획·저작권 검토 문서 | tracked |
+| `scripts/run_holyclaude_pipeline.mjs` | P1/P2 파이프라인 실행 래퍼 | tracked |
+| `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
+| `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
+| `worker/` | "제안하기" 폼 Cloudflare Worker | tracked |
+| `docker/holyclaude/` | 에이전트 팀 + 관리 UI 컨테이너 정의 | tracked |
+| `mkdocs.yml` / `Makefile` | 위키 빌드 설정 · 명령 래퍼 | tracked |
+| `data/qaset_with_rag/`, `data/공식 자료집/` | RAG 소스·공식 자료 (대용량/민감) | **gitignored** |
+| `suggestions/` | 수신 제안 + 처리 상태 (런타임) | **gitignored** |
+| `.admin/` | 실행 로그 · 위키 검토 · registry · locks (런타임) | **gitignored** |
+| `docker/holyclaude/data/cloudcli/` | GitHub 토큰 DB (`auth.db`) — **절대 커밋 금지** | **gitignored** |
+| `docker/holyclaude/data/claude/sessions/` 등 | Claude Code 런타임 산출물 | **gitignored** |
+| `.env` | ZAI/GLM 자격증명 · R2 설정 | **gitignored** |
+
+> `.gitignore`는 **라인 끝 인라인 주석을 지원하지 않습니다** (`pattern # comment` 형태 금지). 주석은 항상 별도 라인에.
+
+## 자주 쓰는 명령
+
+```bash
+make holyclaude-up       # 에이전트 팀 + 관리 UI 빌드 & 시작
+make wiki-serve          # 위키 로컬 미리보기 (localhost:8000)
+make wiki-build          # 정적 사이트 빌드 (site/)
+make wiki-deploy         # 빌드 후 Cloudflare Pages 배포
+make worker-dev          # 제안 폼 Worker 로컬 개발
+```
+
+파이프라인 스크립트 단독 점검:
+
+```bash
+node --check scripts/run_holyclaude_pipeline.mjs
+node --check scripts/wiki_work_registry.mjs
+node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
+```
+
+## 아키텍처 — 에이전트 팀과 파이프라인
+
+### 파이프라인 1 (콘텐츠 생성)
+
+`sg-wiki-admin`이 Docker socket으로 `holyclaude` 컨테이너 안에서 `run_holyclaude_pipeline.mjs p1`을 실행. 팀장(wiki-team-lead)이 하위 에이전트를 조율:
+
+```
+팀장: 주제 선정 → wiki-planner(기획서) → APPROVED 판정 → wiki-writer(초안) → source-sanitizer → commit/push
+```
+
+- **MCP 커버리지 게이트**: 커밋 전 6개 항목이 각각 별도 성공 호출로 확인되어야 함. 하나라도 빠지면 실패 처리, commit/push 금지.
+  - dataforge `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`(**배제 감사 전용 — 본문 사용 금지**), `namuwiki`, `sg-ontology`
+- **자율 push**: `holyclaude` 컨테이너가 `data/cloudcli/auth.db`의 GitHub 토큰을 읽는 credential helper(`docker/holyclaude/scripts/git-credential-cloudcli-github`)로 P1 결과를 직접 commit/push.
+- **위키 집필 규칙** (모든 에이전트 필수 준수): `sg_game_sge` 내용 어떤 형태로도 위키 포함 금지 / `sg_game_sg0_en` 원문 직접 인용 금지(산문 요약만) / 내부 경로·chunk ID·source_filter 이름 공개 위키 노출 금지.
+
+### 파이프라인 2 (제안 처리)
+
+`suggestions/inbox/` 제안 → wiki-classifier(분류) → suggestion-judge(판정) → `approved`만 writer/sanitizer 경유 commit. `rejected`/`partial`은 위키 파일 미수정.
+
+### 동시 실행과 중복 주제 방지
+
+- **전역 풀 동시 실행 cap 10** (`ADMIN_MAX_CONCURRENT_RUNS`). p1/p2 혼합 가능. 초과분은 단일 전역 FIFO 대기열에 적재, 슬롯 해제 시 자동 시작.
+- **per-pipeline 하드 락은 의도적 제거됨**. 대신 `scripts/wiki_work_registry.mjs`가 중복 주제를 막음:
+  - 팀장이 주제 선정 전 `list`로 `active`를 읽어 진행 중 topic/file 회피
+  - writer 호출 전 `reserve`로 atomic 점유 (파일 락 `p1-work-registry.lock`)
+  - 완료/거부 시 `complete`/`release`로 `active`에서 프로그램적 제거
+  - 12시간 미갱신 엔트리는 stale 자동 정리
+- **결론**: 파이프라인 동시성을 다룰 때 `acquirePipelineLock` 같은 전체 직렬화 락을 다시 넣지 말 것. 중복 방지는 registry 계층에서만.
+
+## 위키 집필 규칙 (변경 시 주의)
+
+- 모든 문서 상단에 스포일러 배지(`none`/`early_story`/`main_story`/`zero_story`/`endgame`)와 근거 태그(`[공식]`/`[팬 분석]`) 필수.
+- 근거 체계·문서 구조 템플릿은 `wiki/README.md`와 `wiki/_template/`.
+- **배제 소스 규칙 위반은 가장 흔한 reject 원인**. `sg_game_sge`는 "사용 금지 소스가 섞이지 않았는지" 확인하는 감사용 조회만 허용.
+
+## 코드 변경 시 주의
+
+- **볼륨 마운트 vs 베이크**: `scripts/`, `docker/holyclaude/data/claude/`(에이전트 정의·CLAUDE.md·settings.json)는 컨테이너에 마운트되어 **재빌드 없이 즉시 반영**. 반면 `docker/holyclaude/Dockerfile`이나 `docker/holyclaude/admin/`(admin 서버 코드)은 이미지에 베이크되어 **재빌드 + 컨테이너 재생성 필요**.
+- **admin 서버**(FastAPI, `docker/holyclaude/admin/app/main.py`): 동시성/큐 로직은 `active_jobs_lock`(threading.RLock)로 보호. `_pop_active_job` 완료 시 `_dispatch_next_job`가 FIFO에서 다음 job 승격.
+- **테스트**: FastAPI TestClient는 요청 사이에 `asyncio.create_task`로 만든 백그라운드 작업을 취소하므로, 동시성 로직 테스트 시 실제 실행 대신 task를 기록하는 방식으로 격리해야 함.
+- **동시 commit 경합**: cap 10 병렬 실행 시 `.git/index.lock` 충돌 가능. 드물게 발생하면 registry `committing` 상태 기반 직렬화 추가를 고려.
+
+## 컨테이너 상태 확인
+
+```bash
+curl -s http://127.0.0.1:3002/running    # 동시 실행 현황 (jobs/limit/running/queued)
+curl -s http://127.0.0.1:3002/status     # 최근 실행 결과
+docker logs --tail 50 sg-wiki-admin      # admin 서버 로그
+docker logs --tail 50 holyclaude         # 에이전트 팀 로그
+```
+
+## 추가 문서
+
+- [holyclaude 위키 에이전트 팀 설계](docs/holyclaude-wiki-agent-팀-설계.md)
+- [제안 처리 팀 설계](docs/제안%20처리%20팀%20설계.md)
+- [SG 위키 유지 관리 계획](docs/sg%20위키%20유지%20관리%20계획.md)
+- [RAG 소스 저작권 검토](docs/rag-소스-저작권-검토.md)
