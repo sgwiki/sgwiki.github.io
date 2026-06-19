@@ -62,6 +62,8 @@ tmp/
 skills-lock.json
 
 # HolyClaude 컨테이너 런타임 상태 (머신별 로컬, 공유 금지)
+# cloudcli/auth.db는 GitHub 토큰을 담음 — 절대 커밋 금지
+docker/holyclaude/data/cloudcli/
 docker/holyclaude/data/claude/.codex/
 docker/holyclaude/data/claude/.cursor/
 docker/holyclaude/data/claude/.gemini/
@@ -72,3 +74,7 @@ docker/holyclaude/data/claude/settings.json.bak
 docker/holyclaude/data/claude/project-config.json
 docker/holyclaude/data/claude/plugins/
 docker/holyclaude/data/claude/projects/
+# Claude Code 런타임 산출물
+docker/holyclaude/data/claude/sessions/
+docker/holyclaude/data/claude/shell-snapshots/
+docker/holyclaude/data/claude/backups/
