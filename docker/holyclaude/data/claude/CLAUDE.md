@@ -180,8 +180,8 @@ Add your personal preferences below. This section persists across container rebu
 
 1. **git commit / git push는 팀장(이 세션)만 수행.** 하위 에이전트에게 절대 위임 금지.
 2. **source-sanitizer 통과 없이 commit 금지.**
-3. `sg_game_sge` 내용은 어떤 형태로도 위키에 포함 금지 (완전 배제).
-4. `sg_game_sg0_en` 원문 직접 인용 금지 — 산문 요약만 허용.
+3. `sg_game_sge`·`sg_game_sg0_en` 원문 직접 인용 블록 금지 — 파라프레이즈·풀어쓰기·내용 재료로 간접 사용만 허용.
+4. `sg_game_sge`·`sg_game_sg0_en` 소스명·파일명·청크ID를 위키 본문에 노출 금지.
 5. 파이프라인 1은 MCP 커버리지 게이트 6개 항목이 모두 성공하기 전에는 commit 금지.
 6. 파이프라인 1 팀장은 `/workspace/.admin/p1-work-registry.json`을 작업 현황 memory로 사용한다.
 7. planner 기획서 승인 전 `node /workspace/scripts/wiki_work_registry.mjs reserve ...`로 출력 파일을 예약한다.
@@ -227,7 +227,7 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 | 1 | dataforge `qaset_with_rag` | 주제 선정·QA 근거 |
 | 2 | dataforge `sg_game_sg0_en` | 영어 원문 기반 교차 확인, 직접 인용 금지 |
 | 3 | dataforge `sg_paper` | 팬 분석 근거 확인 |
-| 4 | dataforge `sg_game_sge` | 배제 감사 전용, 내용 사용 금지 |
+| 4 | dataforge `sg_game_sge` | 내용 간접 활용 허용, 직접 인용 블록·소스명·청크ID 노출 금지 |
 | 5 | `namuwiki` MCP | 외부 요약 교차 확인, 산문 가공 |
 | 6 | `sg-ontology` MCP | 세계선·인과관계 검증 |
 
@@ -278,9 +278,9 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 |---|---|
 | `reference/official/` | `[공식]` 태그 + 출처명 |
 | `sg_paper` | `[팬 분석]` 태그 + 논문 제목 |
-| `sg_game_sg0_en` | 산문 요약만 (원문 인용 금지) |
+| `sg_game_sg0_en` | 간접 사용 허용 (파라프레이즈·풀어쓰기). 원문 블록 인용·소스명·청크ID 노출 금지 |
 | qaset / namuwiki / sg-ontology | 산문 처리, 출처 미표시 |
-| `sg_game_sge` | **완전 배제** (P1에서는 배제 감사용 MCP 조회만 허용, 내용 사용 금지) |
+| `sg_game_sge` | 간접 사용 허용 (파라프레이즈·풀어쓰기). 원문 블록 인용·소스명·청크ID 노출 금지 |
 
 ### dataforge source_filter 이름
 
