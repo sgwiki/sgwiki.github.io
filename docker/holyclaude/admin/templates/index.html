@@ -787,19 +787,57 @@
     }
   }
 
+  const pollLocks = new Set();
+
+  async function runPoll(name, loader) {
+    if (pollLocks.has(name)) return;
+    pollLocks.add(name);
+    try {
+      await loader();
+    } finally {
+      pollLocks.delete(name);
+    }
+  }
+
+  function schedulePoll(name, loader, intervalMs) {
+    runPoll(name, loader);
+    return setInterval(() => {
+      if (!document.hidden) runPoll(name, loader);
+    }, intervalMs);
+  }
+
+  function refreshVisibleData() {
+    runPoll('status', loadStatus);
+    runPoll('running', loadRunning);
+    runPoll('wikiStatus', loadWikiStatus);
+    runPoll('wikiReviews', loadWikiReviews);
+    runPoll('suggestions', loadSuggestions);
+  }
+
   // ── Log stream ────────────────────────────────────────────────────────────
   let logEs = null;
+  let logReconnectTimer = null;
   const MAX_LOG_LINES = 500;
 
   function connectLog() {
     if (logEs) logEs.close();
+    if (logReconnectTimer) {
+      clearTimeout(logReconnectTimer);
+      logReconnectTimer = null;
+    }
     const term = document.getElementById('log-terminal');
     const dot  = document.getElementById('log-dot');
     dot.classList.remove('live');
 
     logEs = new EventSource('/logs/stream?tail=200');
 
-    logEs.onopen = () => { dot.classList.add('live'); };
+    logEs.onopen = () => {
+      dot.classList.add('live');
+      if (logReconnectTimer) {
+        clearTimeout(logReconnectTimer);
+        logReconnectTimer = null;
+      }
+    };
 
     logEs.onmessage = (e) => {
       const text = JSON.parse(e.data);
@@ -818,7 +856,9 @@
 
     logEs.onerror = () => {
       dot.classList.remove('live');
-      setTimeout(connectLog, 5000);  // auto-reconnect
+      if (!logReconnectTimer) {
+        logReconnectTimer = setTimeout(connectLog, 5000);  // auto-reconnect
+      }
     };
   }
 
@@ -999,18 +1039,17 @@
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
-  loadSchedule();
-  loadStatus();
-  loadRunning();
-  loadWikiStatus();
-  loadWikiReviews();
-  loadSuggestions();
+  runPoll('schedule', loadSchedule);
+  refreshVisibleData();
   connectLog();
-  setInterval(loadStatus,       10000);
-  setInterval(loadRunning,       3000);
-  setInterval(loadWikiStatus,   30000);
-  setInterval(loadWikiReviews,  10000);
-  setInterval(loadSuggestions,  30000);
+  schedulePoll('status',       loadStatus,       10000);
+  schedulePoll('running',      loadRunning,       3000);
+  schedulePoll('wikiStatus',   loadWikiStatus,   30000);
+  schedulePoll('wikiReviews',  loadWikiReviews,  10000);
+  schedulePoll('suggestions',  loadSuggestions,  30000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshVisibleData();
+  });
 </script>
 
 </body>

@@ -6,6 +6,7 @@ import re
 import shlex
 import subprocess
 import threading
+import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -28,8 +29,38 @@ RUN_OUTPUT_LIMIT = int(os.getenv("ADMIN_RUN_OUTPUT_LIMIT", "30000"))
 SUGGESTION_LOG_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_LIMIT", "5"))
 SUGGESTION_LOG_OUTPUT_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_OUTPUT_LIMIT", "1200"))
 P2_POLL_MATCH_WINDOW_SECONDS = int(os.getenv("ADMIN_P2_POLL_MATCH_WINDOW_SECONDS", "10"))
+ADMIN_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_CACHE_TTL_SECONDS", "5"))
+ADMIN_SUGGESTION_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_SUGGESTION_CACHE_TTL_SECONDS", "10"))
+ADMIN_STATUS_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_STATUS_CACHE_TTL_SECONDS", "2"))
 
 active_jobs: dict[str, dict] = {}
+active_jobs_lock = threading.RLock()
+response_cache: dict[str, tuple[float, object]] = {}
+response_cache_lock = threading.RLock()
+
+
+def _cached(key: str, ttl_seconds: float, loader):
+    now = time.monotonic()
+    with response_cache_lock:
+        item = response_cache.get(key)
+        if item and item[0] > now:
+            return item[1]
+
+    value = loader()
+    expires_at = time.monotonic() + ttl_seconds
+    with response_cache_lock:
+        response_cache[key] = (expires_at, value)
+    return value
+
+
+def _invalidate_cache(*prefixes: str) -> None:
+    with response_cache_lock:
+        if not prefixes:
+            response_cache.clear()
+            return
+        for key in list(response_cache):
+            if any(key.startswith(prefix) for prefix in prefixes):
+                response_cache.pop(key, None)
 
 
 @asynccontextmanager
@@ -74,7 +105,8 @@ async def trigger_p2():
 
 @app.get("/running")
 async def get_running():
-    return {"jobs": list(active_jobs.values())}
+    with active_jobs_lock:
+        return {"jobs": [dict(job) for job in active_jobs.values()]}
 
 
 _ANSI = re.compile(r'\x1b\[[0-9;]*[A-Za-z]|\x1b\][^\x07]*\x07|\x1b[()][AB012]')
@@ -120,6 +152,14 @@ async def stream_logs(tail: int = 200, container: str = "holyclaude"):
 
 @app.get("/wiki-status")
 async def wiki_status():
+    return await asyncio.to_thread(_wiki_status_response)
+
+
+def _wiki_status_response() -> dict:
+    return _cached("wiki_status", ADMIN_CACHE_TTL_SECONDS, _load_wiki_status)
+
+
+def _load_wiki_status() -> dict:
     wiki_dir = WORKSPACE / "wiki"
     by_dir: dict[str, list[str]] = {}
     if wiki_dir.exists():
@@ -150,11 +190,20 @@ class WikiReviewBody(BaseModel):
 
 @app.get("/wiki-reviews")
 async def wiki_reviews():
-    return {"items": _pending_wiki_review_items()}
+    return await asyncio.to_thread(_wiki_reviews_response)
+
+
+def _wiki_reviews_response() -> dict:
+    items = _cached("wiki_reviews", ADMIN_CACHE_TTL_SECONDS, _pending_wiki_review_items)
+    return {"items": items}
 
 
 @app.get("/wiki-review")
 async def wiki_review_detail(path: str):
+    return await asyncio.to_thread(_wiki_review_detail_response, path)
+
+
+def _wiki_review_detail_response(path: str) -> dict:
     rel = _safe_wiki_relpath(path)
     abs_path = WORKSPACE / rel
     if not abs_path.exists():
@@ -171,6 +220,10 @@ async def wiki_review_detail(path: str):
 
 @app.post("/wiki-review/approve")
 async def approve_wiki_review(body: WikiReviewBody):
+    return await asyncio.to_thread(_approve_wiki_review, body)
+
+
+def _approve_wiki_review(body: WikiReviewBody) -> dict:
     rel = _safe_wiki_relpath(body.path)
     item = _wiki_review_item(rel)
     if item is None:
@@ -186,11 +239,16 @@ async def approve_wiki_review(body: WikiReviewBody):
         "reviewed_at": datetime.now().isoformat(),
     }
     _save_review_state(state)
+    _invalidate_cache("wiki_reviews")
     return {"status": "approved", "path": rel}
 
 
 @app.post("/wiki-review/reject")
 async def reject_wiki_review(body: WikiReviewBody):
+    return await asyncio.to_thread(_reject_wiki_review, body)
+
+
+def _reject_wiki_review(body: WikiReviewBody) -> dict:
     rel = _safe_wiki_relpath(body.path)
     item = _wiki_review_item(rel)
     if item is None:
@@ -245,6 +303,7 @@ async def reject_wiki_review(body: WikiReviewBody):
         "reviewed_at": datetime.now().isoformat(),
     }
     _save_review_state(state)
+    _invalidate_cache("wiki_reviews", "wiki_status", "status")
     return {"status": "rejected", "path": rel, "committed_revert": was_committed}
 
 
@@ -365,14 +424,21 @@ def _committed_wiki_changes() -> dict[str, str]:
     return _parse_name_status_z(result.stdout)
 
 
-def _wiki_review_item(rel: str) -> dict | None:
+def _wiki_review_item(
+    rel: str,
+    working: dict[str, str] | None = None,
+    committed: dict[str, str] | None = None,
+    review_state: dict | None = None,
+) -> dict | None:
     rel = _safe_wiki_relpath(rel)
     path = WORKSPACE / rel
     if not path.exists() or not path.is_file():
         return None
 
-    working = _working_tree_wiki_changes()
-    committed = _committed_wiki_changes()
+    if working is None:
+        working = _working_tree_wiki_changes()
+    if committed is None:
+        committed = _committed_wiki_changes()
     source = None
     status = working.get(rel) or committed.get(rel) or "M"
     if rel in committed and rel in working:
@@ -383,7 +449,9 @@ def _wiki_review_item(rel: str) -> dict | None:
         source = "working-tree"
 
     digest = _file_hash(path)
-    state = _load_review_state().get(_review_key(rel, digest), {})
+    if review_state is None:
+        review_state = _load_review_state()
+    state = review_state.get(_review_key(rel, digest), {})
     return {
         "path": rel,
         "title": _page_title(path),
@@ -398,11 +466,19 @@ def _wiki_review_item(rel: str) -> dict | None:
 
 
 def _pending_wiki_review_items() -> list[dict]:
-    candidates = set(_committed_wiki_changes()) | set(_working_tree_wiki_changes())
+    working = _working_tree_wiki_changes()
+    committed = _committed_wiki_changes()
+    review_state = _load_review_state()
+    candidates = set(committed) | set(working)
     items = []
     for rel in sorted(candidates):
         try:
-            item = _wiki_review_item(rel)
+            item = _wiki_review_item(
+                rel,
+                working=working,
+                committed=committed,
+                review_state=review_state,
+            )
         except Exception:
             continue
         if item and item["decision"] != "approved":
@@ -657,8 +733,20 @@ def _suggestion_pipeline_logs() -> dict[str, list[dict]]:
 
 @app.get("/suggestions")
 async def get_suggestions():
+    return await asyncio.to_thread(_suggestions_response)
+
+
+def _suggestions_response() -> dict:
+    return _cached("suggestions", ADMIN_SUGGESTION_CACHE_TTL_SECONDS, _load_suggestions_response)
+
+
+def _load_suggestions_response() -> dict:
     inbox_dir = WORKSPACE / "suggestions" / "inbox"
-    logs_by_sid = _suggestion_pipeline_logs()
+    logs_by_sid = _cached(
+        "suggestion_logs",
+        ADMIN_SUGGESTION_CACHE_TTL_SECONDS,
+        _suggestion_pipeline_logs,
+    )
     items = []
     if inbox_dir.exists():
         for f in sorted(inbox_dir.glob("*.json"), reverse=True):
@@ -675,12 +763,21 @@ async def get_suggestions():
 
 @app.get("/suggestions/{sid}")
 async def get_suggestion(sid: str):
+    return await asyncio.to_thread(_suggestion_detail_response, sid)
+
+
+def _suggestion_detail_response(sid: str) -> dict:
     path = WORKSPACE / "suggestions" / "inbox" / f"{sid}.json"
     if not path.exists():
         raise HTTPException(status_code=404, detail="not found")
     item = json.loads(path.read_text(encoding="utf-8"))
     item["decision"] = _load_decision(sid)
-    item["pipeline_logs"] = _suggestion_pipeline_logs().get(sid, [])
+    logs_by_sid = _cached(
+        "suggestion_logs",
+        ADMIN_SUGGESTION_CACHE_TTL_SECONDS,
+        _suggestion_pipeline_logs,
+    )
+    item["pipeline_logs"] = logs_by_sid.get(sid, [])
     return item
 
 
@@ -701,6 +798,14 @@ async def set_schedule(body: ScheduleBody):
 
 @app.get("/status")
 async def get_status():
+    return await asyncio.to_thread(_status_response)
+
+
+def _status_response() -> dict:
+    return _cached("status", ADMIN_STATUS_CACHE_TTL_SECONDS, _load_status_response)
+
+
+def _load_status_response() -> dict:
     runs = []
     if RUNS_DIR.exists():
         files = sorted(RUNS_DIR.glob("*.json"), reverse=True)[:10]
@@ -714,17 +819,33 @@ async def get_status():
 
 async def _run_p1(run_id: str) -> None:
     started_at = datetime.now().isoformat()
-    active_jobs[run_id] = {
-        "run_id": run_id,
-        "pipeline": "p1",
-        "started_at": started_at,
-        "status": "running",
-        "last_line": "holyclaude 컨테이너 실행 준비 중",
-    }
+    _set_active_job(run_id, "p1", started_at, "holyclaude 컨테이너 실행 준비 중")
     try:
         log = await asyncio.to_thread(_run_holyclaude_pipeline, "p1", run_id, started_at)
         _save_run(log)
     finally:
+        _pop_active_job(run_id)
+
+
+def _set_active_job(run_id: str, pipeline: str, started_at: str, last_line: str) -> None:
+    with active_jobs_lock:
+        active_jobs[run_id] = {
+            "run_id": run_id,
+            "pipeline": pipeline,
+            "started_at": started_at,
+            "status": "running",
+            "last_line": last_line,
+        }
+
+
+def _update_active_job(run_id: str, **values) -> None:
+    with active_jobs_lock:
+        if run_id in active_jobs:
+            active_jobs[run_id].update(values)
+
+
+def _pop_active_job(run_id: str) -> None:
+    with active_jobs_lock:
         active_jobs.pop(run_id, None)
 
 
@@ -753,7 +874,7 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dic
         f"set -o pipefail; su claude -s /bin/sh -c {shlex.quote(inner)} 2>&1 | tee /proc/1/fd/1",
     ]
 
-    active_jobs[run_id]["last_line"] = f"docker exec {HOLYCLAUDE_CONTAINER}"
+    _update_active_job(run_id, last_line=f"docker exec {HOLYCLAUDE_CONTAINER}")
     output: list[str] = []
     try:
         exec_id = client.api.exec_create(
@@ -770,8 +891,11 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dic
             output.append(text)
             for line in text.splitlines():
                 if line.strip():
-                    active_jobs[run_id]["last_line"] = line[-300:]
-                    active_jobs[run_id]["updated_at"] = datetime.now().isoformat()
+                    _update_active_job(
+                        run_id,
+                        last_line=line[-300:],
+                        updated_at=datetime.now().isoformat(),
+                    )
 
         inspect = client.api.exec_inspect(exec_id)
         exit_code = inspect.get("ExitCode")
@@ -833,21 +957,16 @@ def _tail_text(value: str, limit: int) -> str:
 
 async def _run_p2(run_id: str) -> None:
     started_at = datetime.now().isoformat()
-    active_jobs[run_id] = {
-        "run_id": run_id,
-        "pipeline": "p2",
-        "started_at": started_at,
-        "status": "running",
-        "last_line": "holyclaude 제안 처리 파이프라인 실행 준비 중",
-    }
+    _set_active_job(run_id, "p2", started_at, "holyclaude 제안 처리 파이프라인 실행 준비 중")
     try:
         log = await asyncio.to_thread(_run_holyclaude_pipeline, "p2", run_id, started_at)
         _save_run(log)
     finally:
-        active_jobs.pop(run_id, None)
+        _pop_active_job(run_id)
 
 
 def _save_run(data: dict) -> None:
     ts = datetime.now().strftime("%Y%m%dT%H%M%S")
     path = RUNS_DIR / f"{ts}-{data.get('run_id', 'run')}.json"
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+    _invalidate_cache("status", "suggestions", "suggestion_logs", "wiki_status", "wiki_reviews")
