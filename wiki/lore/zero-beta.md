@@ -41,7 +41,7 @@
 베타 세계선에서 2025년의 오카베가 마유리와 스즈하를 구출하는 작전입니다.
 
 > **[팬 분석]** "오카베는 타임머신을 타고 나서 영상 메일을 보냈기 때문에 구하러 가는 장면은 문제가 되지 않는다. 마유리는 2011년, 스즈하는 2036년으로 각각 돌려보내야 하며, 오카베는 2025년에 죽는 것이 수속이기 때문에 세계선에서 사라진다."
-> — 출처: The Mechanics of Steins Gate v1.0.3, 3. Theory §3.1.2 [reference/user/The Mechanics of Steins Gate v1.0.3/3. Theory.md]
+> — 출처: The Mechanics of Steins Gate v1.0.3, 3. Theory §3.1.2
 
 ### 스쿨드 작전
 
