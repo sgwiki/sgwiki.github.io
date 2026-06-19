@@ -23,10 +23,16 @@ async function verifyHcaptcha(token: string, secret: string): Promise<boolean> {
   return data.success;
 }
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "https://sgwiki.github.io",
+  "Access-Control-Allow-Methods": "POST",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...CORS_HEADERS },
   });
 }
 
