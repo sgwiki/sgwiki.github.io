@@ -227,9 +227,12 @@ Add your personal preferences below. This section persists across container rebu
 
 ```
 ① python3 /workspace/scripts/poll_suggestions.py
-② Agent(wiki-classifier) → Type A/B 분류
-③ Agent(suggestion-judge) → 승인/거부/partial 판정
-④ 판정 처리 → suggestions/decisions/{id}.json 저장 → git commit
+② suggestions/inbox/*.json 전체 확인. 수동 승인/거부 기록은 자동 처리 여부를 막지 않음
+③ Agent(wiki-classifier) → Type A/B 분류
+④ Agent(suggestion-judge) → 승인/거부/partial 판정
+⑤ 판정 처리 → suggestions/decisions/{id}.json 저장(automated=true, 런타임 산출물)
+⑥ approved 판정만 wiki-planner/wiki-writer/source-sanitizer 경로로 자동 반영
+⑦ sanitizer pass인 wiki 변경만 git add/commit/push. suggestions/는 commit 금지
 ```
 
 ### MCP 연결

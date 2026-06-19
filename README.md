@@ -235,9 +235,9 @@ docker compose --env-file ../../.env up -d --build
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 - 새로 작성되거나 변경된 `wiki/*.md` 페이지 검토: 보기, 승인, 거부
-- 제안 검토: `suggestions/inbox/`에 수신된 제안 목록 표시 (`GET /suggestions`)
+- 제안 자동 처리: `suggestions/inbox/`에 수신된 제안과 파이프라인 2 자동 판정·작성 로그 표시 (`GET /suggestions`)
 
-파이프라인 1은 `sg-wiki-admin`이 Docker socket을 통해 `holyclaude`
+파이프라인 1과 파이프라인 2는 `sg-wiki-admin`이 Docker socket을 통해 `holyclaude`
 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다.
 실행 중 상태는 관리 UI의 "진행 중인 작업"과 `holyclaude` 로그 스트림에서 확인할 수
 있고, 결과 요약은 `.admin/runs/*.json`에 저장됩니다.
@@ -247,6 +247,11 @@ P1 실행 래퍼는 팀장/하위 에이전트가 실제로 사용한 MCP tool_r
 P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_rag`,
 `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`(배제 감사 전용), `namuwiki`, `sg-ontology`.
 
+P2 실행 래퍼는 R2/mock R2 폴링 후 제안을 자동 분류·판정합니다. `approved` 판정은
+위키 작성 에이전트와 sanitizer로 전달되어 통과한 위키 변경만 commit/push하고,
+`rejected`/`partial` 판정은 위키 파일을 수정하지 않습니다. `suggestions/decisions/`
+파일은 `automated=true` 상태 표시용 런타임 산출물이며 git에 포함하지 않습니다.
+
 위키 페이지 검토 패널은 upstream 이후 변경된 `wiki/*.md`와 아직 커밋되지 않은
 `wiki/*.md`를 표시합니다. 승인하면 현재 파일 해시가 `.admin/wiki_reviews.json`에
 기록되고, 거부하면 해당 파일을 upstream 기준으로 되돌리거나 새 파일을 제거합니다.
@@ -254,7 +259,8 @@ P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_
 관련 환경 변수:
 
 - `HOLYCLAUDE_CONTAINER`: 실행 대상 컨테이너 이름, 기본값 `holyclaude`
-- `P1_SCRIPT`: 컨테이너 내부 P1 실행 스크립트, 기본값 `/workspace/scripts/run_holyclaude_pipeline.mjs`
+- `PIPELINE_SCRIPT`: 컨테이너 내부 P1/P2 실행 스크립트, 기본값 `/workspace/scripts/run_holyclaude_pipeline.mjs`
+- `P1_SCRIPT`: 이전 설정과의 호환용 실행 스크립트 별칭. `PIPELINE_SCRIPT`가 우선합니다.
 - `ADMIN_RUN_OUTPUT_LIMIT`: 실행 로그 저장 tail 길이, 기본값 `30000`
 - `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
 - `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)

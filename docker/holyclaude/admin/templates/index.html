@@ -386,7 +386,7 @@
       <span class="tip" data-tip="콘텐츠 생성 파이프라인&#10;① wiki/ 현황 vs qaset 비교 → 미작성 주제 선정&#10;② wiki-planner: 기획서 작성 (병렬)&#10;③ wiki-writer: 페이지 초안 작성 (병렬)&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
         <button class="btn btn-primary" onclick="triggerPipeline(1)">파이프라인 1 실행</button>
       </span>
-      <span class="tip" data-tip="제안 처리 파이프라인&#10;① R2 폴링 → suggestions/inbox/ 저장 (멱등)&#10;② wiki-classifier: Type A(주제 요청) / B(편집 제안) 분류&#10;③ suggestion-judge: MCP 조회 후 승인·거부·피드백 판정&#10;④ decisions/{id}.json 저장&#10;⑤ 히스토리 탭 반영 → Pages 재배포">
+      <span class="tip" data-tip="제안 처리 파이프라인&#10;① R2 폴링 → suggestions/inbox/ 저장 (멱등)&#10;② wiki-classifier: Type A(주제 요청) / B(편집 제안) 분류&#10;③ suggestion-judge: MCP 조회 후 자동 승인·거부·부분 판정&#10;④ approved면 wiki-writer → source-sanitizer 실행&#10;⑤ 통과한 위키 변경만 commit/push">
         <button class="btn btn-success" onclick="triggerPipeline(2)">파이프라인 2 실행</button>
       </span>
     </div>
@@ -435,9 +435,9 @@
 
   <!-- 섹션 5.5: 제안 검토 -->
   <div class="card full-card">
-    <h2>제안 검토 <span id="sugg-inbox-badge" style="font-size:12px;color:#f0883e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
+    <h2>제안 자동 처리 <span id="sugg-inbox-badge" style="font-size:12px;color:#f0883e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
     <div id="sugg-body" style="color:#484f58;font-size:12px">확인 중...</div>
-    <p class="refresh-hint">30초마다 자동 갱신</p>
+    <p class="refresh-hint">파이프라인 2가 자동 판정하고, 승인된 제안은 위키 작성 에이전트로 전달합니다. 30초마다 자동 갱신</p>
   </div>
 
   <!-- 섹션 6: 에이전트 로그 -->
@@ -488,25 +488,6 @@
           <h3>Markdown</h3>
           <pre class="preview" id="preview-content"></pre>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="sugg-approve-modal" onclick="closeSuggApprove(event)">
-  <div class="modal-panel" onclick="event.stopPropagation()" style="max-width:520px">
-    <div class="modal-head">
-      <h2>제안 승인</h2>
-      <button class="btn btn-small" style="margin-left:auto" onclick="closeSuggApprove()">닫기</button>
-    </div>
-    <div class="modal-body" style="padding:20px">
-      <label style="display:block;margin-bottom:8px;color:#8b949e;font-size:12px">
-        처리 지시사항 <span style="color:#484f58">(선택 — 위키 수정 방향, 참고 사항 등)</span>
-      </label>
-      <textarea id="sugg-instruction" rows="5" placeholder="예: amane-suzuha 페이지 #_10 섹션에서 '존 티터' → '존 타이터'로 수정" style="width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:13px;resize:vertical;outline:none"></textarea>
-      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-        <button class="btn" onclick="closeSuggApprove()">취소</button>
-        <button class="btn btn-success" onclick="confirmSuggApprove()">승인 확정</button>
       </div>
     </div>
   </div>
@@ -845,10 +826,75 @@
   function clearLog() { document.getElementById('log-terminal').innerHTML = ''; }
 
   // ── Suggestions ───────────────────────────────────────────────────────────
-  let _suggApproveTarget = null;
-
   function formatDateTime(value) {
     return value ? String(value).slice(0, 16).replace('T', ' ') : '-';
+  }
+
+  function decisionAction(dec) {
+    return dec?.verdict || dec?.action || '';
+  }
+
+  function decisionLabel(dec) {
+    const action = decisionAction(dec);
+    if (!dec) return '자동 대기';
+    if (dec.automated !== true) {
+      if (action === 'approved') return '수동 승인 · 자동 대기';
+      if (action === 'rejected') return '수동 거부 · 자동 대기';
+      return '수동 기록 · 자동 대기';
+    }
+    if (action === 'approved') return '자동 승인';
+    if (action === 'rejected') return '자동 거부';
+    if (action === 'partial') return '부분 수용';
+    return '자동 처리됨';
+  }
+
+  function decisionBadge(dec) {
+    const action = decisionAction(dec);
+    if (!dec || dec.automated !== true) {
+      return `<span class="status-badge" style="font-size:10px;background:#1c2129;color:#8b949e;border:1px solid #30363d">${escapeHtml(decisionLabel(dec))}</span>`;
+    }
+    if (action === 'approved') {
+      return `<span class="status-badge on" style="font-size:10px">${escapeHtml(decisionLabel(dec))}</span>`;
+    }
+    if (action === 'rejected') {
+      return `<span class="status-badge off" style="font-size:10px">${escapeHtml(decisionLabel(dec))}</span>`;
+    }
+    return `<span class="status-badge" style="font-size:10px;background:#2a210d;color:#f0883e;border:1px solid #9e6a03">${escapeHtml(decisionLabel(dec))}</span>`;
+  }
+
+  function renderDecisionBlock(dec) {
+    if (!dec) return '';
+    const feedback = dec.feedback || dec.instruction || dec.reason || '';
+    const classification = dec.classification || {};
+    const files = Array.isArray(dec.updated_files) ? dec.updated_files : [];
+    return `
+      <div style="margin-top:8px;padding:8px;background:#0d1117;border-radius:4px;font-size:11px">
+        <span style="color:#8b949e">${escapeHtml(formatDateTime(dec.decided_at))} · ${escapeHtml(decisionLabel(dec))}</span>
+        ${classification.type || classification.topic ? `<div style="color:#8b949e;margin-top:4px">
+          분류: ${escapeHtml(classification.type || '-')} · ${escapeHtml(classification.topic || '-')}
+        </div>` : ''}
+        ${feedback ? `<div style="color:#c9d1d9;margin-top:4px;white-space:pre-wrap">${escapeHtml(feedback)}</div>` : ''}
+        ${dec.writer_status ? `<div style="color:#8b949e;margin-top:4px">
+          writer: ${escapeHtml(dec.writer_status)}${dec.writer_summary ? ` · ${escapeHtml(dec.writer_summary)}` : ''}
+        </div>` : ''}
+        ${files.length ? `<div style="color:#8b949e;margin-top:4px">변경 파일: ${files.map(escapeHtml).join(', ')}</div>` : ''}
+      </div>`;
+  }
+
+  function formatDecisionText(dec) {
+    if (!dec) return '자동 처리 대기';
+    const classification = dec.classification || {};
+    const files = Array.isArray(dec.updated_files) ? dec.updated_files.join(', ') : '';
+    return [
+      `[${decisionLabel(dec)}] ${formatDateTime(dec.decided_at)}`,
+      `자동 처리: ${dec.automated === true ? 'yes' : 'no'}`,
+      classification.type || classification.topic ? `분류: ${classification.type || '-'} · ${classification.topic || '-'}` : '',
+      dec.feedback ? `피드백:\n${dec.feedback}` : '',
+      dec.instruction || dec.reason ? `기존 수동 지시/사유:\n${dec.instruction || dec.reason}` : '',
+      dec.writer_status ? `writer: ${dec.writer_status}` : '',
+      dec.writer_summary ? `writer 요약:\n${dec.writer_summary}` : '',
+      files ? `변경 파일: ${files}` : '',
+    ].filter(Boolean).join('\n');
   }
 
   function pipelineLogResultLabel(result) {
@@ -901,8 +947,8 @@
       const items = data.items ?? [];
       const el    = document.getElementById('sugg-body');
       const badge = document.getElementById('sugg-inbox-badge');
-      const pending = items.filter(s => !s.decision).length;
-      badge.textContent = pending > 0 ? `(미결 ${pending}건)` : '';
+      const pending = items.filter(s => s.decision?.automated !== true).length;
+      badge.textContent = pending > 0 ? `(자동 대기 ${pending}건)` : '';
       if (items.length === 0) {
         el.innerHTML = '<span style="color:#484f58">대기 중인 제안 없음</span>';
         return;
@@ -912,19 +958,8 @@
         const date    = (s.created_at ?? '').slice(0, 16).replace('T', ' ');
         const contact = s.contact ? `<span style="color:#8b949e;font-size:11px"> · ${escapeHtml(s.contact)}</span>` : '';
         const dec     = s.decision;
-        const statusBadge = dec
-          ? (dec.action === 'approved'
-              ? `<span class="status-badge on" style="font-size:10px">승인</span>`
-              : `<span class="status-badge off" style="font-size:10px">거부</span>`)
-          : `<span class="status-badge" style="font-size:10px;background:#1c2129;color:#8b949e;border:1px solid #30363d">미결</span>`;
-        const actions = dec ? '' : `
-          <button class="btn btn-small btn-success" onclick="openSuggApprove('${escapeAttr(sid)}')">승인</button>
-          <button class="btn btn-small btn-danger"  onclick="rejectSugg('${escapeAttr(sid)}')">거부</button>`;
-        const decBlock = dec ? `
-          <div style="margin-top:8px;padding:8px;background:#0d1117;border-radius:4px;font-size:11px">
-            <span style="color:#8b949e">${dec.decided_at?.slice(0,16).replace('T',' ')} · ${dec.action === 'approved' ? '승인' : '거부'}</span>
-            ${(dec.instruction || dec.reason) ? `<div style="color:#c9d1d9;margin-top:4px;white-space:pre-wrap">${escapeHtml(dec.instruction || dec.reason)}</div>` : ''}
-          </div>` : '';
+        const statusBadge = decisionBadge(dec);
+        const decBlock = renderDecisionBlock(dec);
         const logBlock = renderSuggestionLogs(s.pipeline_logs ?? []);
         return `<div style="padding:14px 0;border-bottom:1px solid #21262d">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
@@ -934,7 +969,6 @@
             ${contact}
             <span style="margin-left:auto;display:flex;gap:6px">
               <button class="btn btn-small" onclick="viewSugg('${escapeAttr(sid)}')">보기</button>
-              ${actions}
             </span>
           </div>
           <div style="color:#c9d1d9;line-height:1.6;white-space:pre-wrap;word-break:break-all">${escapeHtml(s.content ?? '')}</div>
@@ -953,10 +987,7 @@
       const s    = await res.json();
       const dec  = s.decision;
       document.getElementById('preview-title').textContent = `제안 상세 — ${sid.slice(0,8)}`;
-      document.getElementById('preview-diff').textContent =
-        dec ? `[${dec.action}] ${dec.decided_at?.slice(0,16).replace('T',' ')}\n` +
-              (dec.instruction || dec.reason ? `\n지시/사유:\n${dec.instruction || dec.reason}` : '(없음)')
-            : '(미결)';
+      document.getElementById('preview-diff').textContent = formatDecisionText(dec);
       document.getElementById('preview-content').textContent =
         `접수: ${(s.created_at ?? '').slice(0,16).replace('T',' ')}\n` +
         (s.contact ? `연락처: ${s.contact}\n` : '') +
@@ -965,46 +996,6 @@
     } catch(e) {
       alert('로드 실패: ' + e.message);
     }
-  }
-
-  function openSuggApprove(sid) {
-    _suggApproveTarget = sid;
-    document.getElementById('sugg-instruction').value = '';
-    document.getElementById('sugg-approve-modal').classList.add('show');
-    document.getElementById('sugg-instruction').focus();
-  }
-
-  function closeSuggApprove(event) {
-    if (event && event.target.id !== 'sugg-approve-modal') return;
-    document.getElementById('sugg-approve-modal').classList.remove('show');
-  }
-
-  async function confirmSuggApprove() {
-    const sid = _suggApproveTarget;
-    if (!sid) return;
-    const instruction = document.getElementById('sugg-instruction').value.trim();
-    document.getElementById('sugg-approve-modal').classList.remove('show');
-    try {
-      await fetch(`/suggestions/${sid}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instruction: instruction || null }),
-      });
-      await loadSuggestions();
-    } catch(e) { alert('승인 실패: ' + e.message); }
-  }
-
-  async function rejectSugg(sid) {
-    const reason = prompt('거부 사유 (선택 사항):') ?? null;
-    if (reason === null && !confirm('사유 없이 거부하시겠습니까?')) return;
-    try {
-      await fetch(`/suggestions/${sid}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instruction: reason || null }),
-      });
-      await loadSuggestions();
-    } catch(e) { alert('거부 실패: ' + e.message); }
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────

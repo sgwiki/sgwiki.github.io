@@ -60,9 +60,9 @@ function parseArgs(argv) {
   }
 
   if (!args.command) {
-    throw new Error('Usage: run_holyclaude_pipeline.mjs p1 --run-id <id> [--dry-run]');
+    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2> --run-id <id> [--dry-run]');
   }
-  if (args.command !== 'p1') {
+  if (!['p1', 'p2'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
@@ -123,6 +123,61 @@ MCP 커버리지 게이트:
 - dataforge qaset source_filter의 정확한 이름은 qaset_with_rag입니다. 하이픈이 들어간 변형을 사용하지 마세요.
 - 내부 경로, chunk ID, source_filter 이름, 배제 소스 내용은 공개 위키에 노출하지 마세요.
 - 완료 시 작성/수정 파일, sanitizer 결과, commit hash 또는 미커밋 사유를 요약하세요.`;
+}
+
+function buildP2Prompt(runId) {
+  return `파이프라인 2 - 제안 자동 처리를 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요.
+
+목표:
+1. /workspace/scripts/poll_suggestions.py를 실행해 R2/mock R2 제안을 /workspace/suggestions/inbox/로 동기화하세요.
+2. /workspace/suggestions/inbox/*.json을 모두 확인하세요.
+3. 사용자의 수동 승인/거부 여부는 자동 처리 여부를 결정하지 않습니다. suggestions/decisions/{id}.json이 있어도 automated=true가 아니면 파이프라인 2가 다시 판단하세요.
+4. suggestions/decisions/{id}.json에 automated=true가 이미 있으면 해당 제안은 스킵하고, 완료 요약에 스킵 사유를 남기세요.
+5. 자동 처리 대상 제안마다 wiki-classifier 에이전트로 Type A/B와 관련 문서를 분류하세요.
+6. suggestion-judge 에이전트로 MCP를 조회해 approved/rejected/partial 판정을 받으세요.
+7. 판정 결과를 /workspace/suggestions/decisions/{id}.json에 저장하세요.
+8. 판정이 approved이면 즉시 위키 작성 에이전트에게 넘겨 실행하세요. Type A는 필요하면 wiki-planner로 기획서를 먼저 만들고 wiki-writer에 전달하세요. Type B는 관련 기존 문서를 대상으로 반영 기획서를 작성해 wiki-writer에 전달하세요.
+9. wiki-writer가 파일을 만들거나 수정하면 source-sanitizer를 실행하세요. sanitizer fail이면 최대 2회 재작성 요청 후 중단하고 decision의 writer_status를 failed로 갱신하세요.
+10. sanitizer pass인 approved 반영분만 git add/commit/push 하세요. suggestions/ 디렉토리는 로컬 런타임 큐이므로 git add하지 마세요.
+
+decision JSON 필수 형식:
+{
+  "id": "{id}",
+  "action": "approved|rejected|partial",
+  "verdict": "approved|rejected|partial",
+  "automated": true,
+  "decided_by_pipeline": "p2",
+  "run_id": "${runId}",
+  "decided_at": "{ISO-8601 timestamp}",
+  "classification": { "type": "A|B", "topic": "...", "related_doc": "wiki/... 또는 null", "summary": "..." },
+  "feedback": "공개 UI에 표시할 한국어 피드백. 내부 경로, chunk ID, source_filter 이름 금지.",
+  "link": "wiki/... 또는 null",
+  "next_action": "wiki-planner|wiki-writer|direct-edit|none",
+  "writer_status": "not_applicable|pending|completed|failed|blocked",
+  "writer_summary": "승인 반영 결과 또는 실패/차단 사유",
+  "updated_files": ["wiki/..."]
+}
+
+운영 제약:
+- 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- 동일 파일을 동시에 수정하지 마세요.
+- approved가 아닌 rejected/partial 제안은 위키 파일을 수정하지 마세요.
+- Type B 직접 수정도 wiki-writer/source-sanitizer 경로를 거치세요.
+- decisions 파일은 자동 처리 상태 표시용 런타임 산출물입니다. 반드시 저장하되 commit 대상에는 포함하지 마세요.
+- 내부 경로, chunk ID, source_filter 이름, 배제 소스 내용은 공개 위키와 feedback에 노출하지 마세요.
+- 완료 시 처리/스킵/오류 제안 ID, 각 판정, writer_status, sanitizer 결과, commit hash 또는 미커밋 사유를 요약하세요.`;
+}
+
+function buildPrompt(command, runId) {
+  if (command === 'p1') {
+    return buildP1Prompt(runId);
+  }
+  return buildP2Prompt(runId);
 }
 
 function truncate(value, limit = 1200) {
@@ -289,23 +344,25 @@ function emitMessage(message, coverage) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const prompt = buildP1Prompt(args.runId);
+  const prompt = buildPrompt(args.command, args.runId);
   const mcpServers = await loadMcpServers(DEFAULT_CWD);
   const mcpNames = Object.keys(mcpServers);
   const missingServers = missingConfiguredMcpServers(mcpServers);
 
-  console.log(`[p1:${args.runId}] starting holyclaude pipeline`);
-  console.log(`[p1:${args.runId}] cwd=${DEFAULT_CWD}`);
-  console.log(`[p1:${args.runId}] mcpServers=${mcpNames.length ? mcpNames.join(',') : '(none configured)'}`);
+  console.log(`[${args.command}:${args.runId}] starting holyclaude pipeline`);
+  console.log(`[${args.command}:${args.runId}] cwd=${DEFAULT_CWD}`);
+  console.log(
+    `[${args.command}:${args.runId}] mcpServers=${mcpNames.length ? mcpNames.join(',') : '(none configured)'}`,
+  );
 
   if (args.dryRun) {
-    console.log(`[p1:${args.runId}] dry-run prompt:`);
+    console.log(`[${args.command}:${args.runId}] dry-run prompt:`);
     console.log(prompt);
     return;
   }
 
   if (missingServers.length > 0) {
-    console.error(`[p1:${args.runId}] missing required MCP server config: ${missingServers.join(', ')}`);
+    console.error(`[${args.command}:${args.runId}] missing required MCP server config: ${missingServers.join(', ')}`);
     process.exitCode = 1;
     return;
   }
@@ -331,7 +388,7 @@ async function main() {
   }
 
   let exitCode = 0;
-  const coverage = createMcpCoverageTracker();
+  const coverage = args.command === 'p1' ? createMcpCoverageTracker() : null;
   const stream = query({ prompt, options });
   for await (const message of stream) {
     emitMessage(message, coverage);
@@ -340,34 +397,36 @@ async function main() {
     }
   }
 
-  emitMcpCoverage(args.runId, coverage);
+  if (args.command === 'p1') {
+    emitMcpCoverage(args.runId, coverage);
 
-  const missingCoverage = missingMcpCoverage(coverage);
-  if (missingCoverage.length > 0) {
-    console.log(
-      `[p1:${args.runId}] missing required MCP coverage: ${missingCoverage
-        .map((item) => item.label)
-        .join(', ')}`,
-    );
-    exitCode = 1;
-  }
+    const missingCoverage = missingMcpCoverage(coverage);
+    if (missingCoverage.length > 0) {
+      console.log(
+        `[p1:${args.runId}] missing required MCP coverage: ${missingCoverage
+          .map((item) => item.label)
+          .join(', ')}`,
+      );
+      exitCode = 1;
+    }
 
-  if (coverage.successfulCoverageToolIds.size < REQUIRED_MCP_COVERAGE.length) {
-    console.log(
-      `[p1:${args.runId}] insufficient distinct MCP coverage calls: ${coverage.successfulCoverageToolIds.size}/${REQUIRED_MCP_COVERAGE.length}`,
-    );
-    exitCode = 1;
+    if (coverage.successfulCoverageToolIds.size < REQUIRED_MCP_COVERAGE.length) {
+      console.log(
+        `[p1:${args.runId}] insufficient distinct MCP coverage calls: ${coverage.successfulCoverageToolIds.size}/${REQUIRED_MCP_COVERAGE.length}`,
+      );
+      exitCode = 1;
+    }
   }
 
   if (exitCode === 0) {
-    console.log(`[p1:${args.runId}] completed`);
+    console.log(`[${args.command}:${args.runId}] completed`);
   } else {
-    console.log(`[p1:${args.runId}] finished with non-success result`);
+    console.log(`[${args.command}:${args.runId}] finished with non-success result`);
   }
   process.exitCode = exitCode;
 }
 
 main().catch((error) => {
-  console.error(`[p1] failed: ${error.stack || error.message || error}`);
+  console.error(`[pipeline] failed: ${error.stack || error.message || error}`);
   process.exitCode = 1;
 });

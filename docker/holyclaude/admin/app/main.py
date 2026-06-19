@@ -5,7 +5,6 @@ import os
 import re
 import shlex
 import subprocess
-import sys
 import threading
 import uuid
 from contextlib import asynccontextmanager
@@ -24,7 +23,7 @@ WORKSPACE = Path(os.getenv("WORKSPACE", "/workspace"))
 WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "holyclaude")
-P1_SCRIPT = os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs")
+PIPELINE_SCRIPT = os.getenv("PIPELINE_SCRIPT", os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs"))
 RUN_OUTPUT_LIMIT = int(os.getenv("ADMIN_RUN_OUTPUT_LIMIT", "30000"))
 SUGGESTION_LOG_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_LIMIT", "5"))
 SUGGESTION_LOG_OUTPUT_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_OUTPUT_LIMIT", "1200"))
@@ -447,11 +446,60 @@ def _load_decision(sid: str) -> dict | None:
     return None
 
 
-def _save_decision(sid: str, data: dict) -> None:
-    DECISIONS_DIR.mkdir(parents=True, exist_ok=True)
-    (DECISIONS_DIR / f"{sid}.json").write_text(
-        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+def _inbox_suggestion_ids() -> list[str]:
+    inbox_dir = WORKSPACE / "suggestions" / "inbox"
+    if not inbox_dir.exists():
+        return []
+    return sorted(path.stem for path in inbox_dir.glob("*.json"))
+
+
+def _automated_decision_snapshot() -> dict[str, dict]:
+    if not DECISIONS_DIR.exists():
+        return {}
+
+    snapshot: dict[str, dict] = {}
+    for path in DECISIONS_DIR.glob("*.json"):
+        try:
+            raw = path.read_bytes()
+            data = json.loads(raw.decode("utf-8"))
+        except Exception:
+            continue
+        if data.get("automated") is not True:
+            continue
+        action = data.get("verdict") or data.get("action") or "unknown"
+        snapshot[path.stem] = {
+            "hash": hashlib.sha256(raw).hexdigest(),
+            "action": action,
+            "writer_status": data.get("writer_status"),
+        }
+    return snapshot
+
+
+def _p2_decision_run_summary(before: dict[str, dict]) -> dict:
+    after = _automated_decision_snapshot()
+    processed = sorted(
+        sid for sid, state in after.items()
+        if before.get(sid, {}).get("hash") != state.get("hash")
     )
+    skipped = sorted(
+        sid for sid in _inbox_suggestion_ids()
+        if sid in before and sid not in processed
+    )
+
+    decision_counts: dict[str, int] = {}
+    writer_counts: dict[str, int] = {}
+    for state in after.values():
+        action = str(state.get("action") or "unknown")
+        writer_status = str(state.get("writer_status") or "unknown")
+        decision_counts[action] = decision_counts.get(action, 0) + 1
+        writer_counts[writer_status] = writer_counts.get(writer_status, 0) + 1
+
+    return {
+        "processed": processed,
+        "skipped": skipped,
+        "decision_counts": decision_counts,
+        "writer_counts": writer_counts,
+    }
 
 
 def _read_run_file(path: Path) -> dict | None:
@@ -607,10 +655,6 @@ def _suggestion_pipeline_logs() -> dict[str, list[dict]]:
     return logs
 
 
-class SuggestionActionBody(BaseModel):
-    instruction: str | None = None
-
-
 @app.get("/suggestions")
 async def get_suggestions():
     inbox_dir = WORKSPACE / "suggestions" / "inbox"
@@ -638,30 +682,6 @@ async def get_suggestion(sid: str):
     item["decision"] = _load_decision(sid)
     item["pipeline_logs"] = _suggestion_pipeline_logs().get(sid, [])
     return item
-
-
-@app.post("/suggestions/{sid}/approve")
-async def approve_suggestion(sid: str, body: SuggestionActionBody):
-    if not (WORKSPACE / "suggestions" / "inbox" / f"{sid}.json").exists():
-        raise HTTPException(status_code=404, detail="not found")
-    _save_decision(sid, {
-        "id": sid, "action": "approved",
-        "instruction": body.instruction or "",
-        "decided_at": datetime.now().isoformat(),
-    })
-    return {"status": "approved", "id": sid}
-
-
-@app.post("/suggestions/{sid}/reject")
-async def reject_suggestion(sid: str, body: SuggestionActionBody):
-    if not (WORKSPACE / "suggestions" / "inbox" / f"{sid}.json").exists():
-        raise HTTPException(status_code=404, detail="not found")
-    _save_decision(sid, {
-        "id": sid, "action": "rejected",
-        "reason": body.instruction or "",
-        "decided_at": datetime.now().isoformat(),
-    })
-    return {"status": "rejected", "id": sid}
 
 
 @app.get("/schedule")
@@ -702,29 +722,31 @@ async def _run_p1(run_id: str) -> None:
         "last_line": "holyclaude 컨테이너 실행 준비 중",
     }
     try:
-        log = await asyncio.to_thread(_run_holyclaude_p1, run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p1", run_id, started_at)
         _save_run(log)
     finally:
         active_jobs.pop(run_id, None)
 
 
-def _run_holyclaude_p1(run_id: str, started_at: str) -> dict:
+def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dict:
+    before_decisions = _automated_decision_snapshot() if pipeline == "p2" else {}
     try:
         import docker as docker_sdk
     except Exception as exc:
-        return _run_error_log(run_id, started_at, f"Docker SDK import failed: {exc}")
+        return _run_error_log(pipeline, run_id, started_at, f"Docker SDK import failed: {exc}")
 
     client = docker_sdk.from_env()
     try:
         container = client.containers.get(HOLYCLAUDE_CONTAINER)
     except Exception as exc:
         return _run_error_log(
+            pipeline,
             run_id,
             started_at,
             f"컨테이너를 찾을 수 없습니다: {HOLYCLAUDE_CONTAINER} ({exc})",
         )
 
-    inner = f"cd /workspace && node {shlex.quote(P1_SCRIPT)} p1 --run-id {shlex.quote(run_id)}"
+    inner = f"cd /workspace && node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
     command = [
         "bash",
         "-lc",
@@ -754,19 +776,19 @@ def _run_holyclaude_p1(run_id: str, started_at: str) -> dict:
         inspect = client.api.exec_inspect(exec_id)
         exit_code = inspect.get("ExitCode")
     except Exception as exc:
-        return _run_error_log(run_id, started_at, f"holyclaude 실행 실패: {exc}", "".join(output))
+        return _run_error_log(pipeline, run_id, started_at, f"holyclaude 실행 실패: {exc}", "".join(output))
 
     stdout_tail = _tail_text("".join(output), RUN_OUTPUT_LIMIT)
     completed_at = datetime.now().isoformat()
     ok = exit_code == 0
-    return {
+    log = {
         "run_id": run_id,
-        "pipeline": "p1",
+        "pipeline": pipeline,
         "timestamp": completed_at,
         "started_at": started_at,
         "completed_at": completed_at,
         "status": "completed" if ok else "failed",
-        "message": "파이프라인 1 실행 완료" if ok else "파이프라인 1 실행 실패",
+        "message": _pipeline_message(pipeline, ok),
         "container": HOLYCLAUDE_CONTAINER,
         "exit_code": exit_code,
         "processed": 1 if ok else 0,
@@ -774,13 +796,21 @@ def _run_holyclaude_p1(run_id: str, started_at: str) -> dict:
         "errors": [] if ok else [f"holyclaude exit_code={exit_code}"],
         "stdout_tail": stdout_tail,
     }
+    if pipeline == "p2":
+        log.update(_p2_decision_run_summary(before_decisions))
+    return log
 
 
-def _run_error_log(run_id: str, started_at: str, message: str, stdout: str = "") -> dict:
+def _pipeline_message(pipeline: str, ok: bool) -> str:
+    number = pipeline.replace("p", "")
+    return f"파이프라인 {number} 실행 완료" if ok else f"파이프라인 {number} 실행 실패"
+
+
+def _run_error_log(pipeline: str, run_id: str, started_at: str, message: str, stdout: str = "") -> dict:
     completed_at = datetime.now().isoformat()
     return {
         "run_id": run_id,
-        "pipeline": "p1",
+        "pipeline": pipeline,
         "timestamp": completed_at,
         "started_at": started_at,
         "completed_at": completed_at,
@@ -808,52 +838,13 @@ async def _run_p2(run_id: str) -> None:
         "pipeline": "p2",
         "started_at": started_at,
         "status": "running",
-        "last_line": "poll_suggestions.py 실행 중",
+        "last_line": "holyclaude 제안 처리 파이프라인 실행 준비 중",
     }
-    script = WORKSPACE / "scripts" / "poll_suggestions.py"
-    log: dict = {}
     try:
-        proc = await asyncio.create_subprocess_exec(
-            sys.executable, str(script),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            env={**os.environ},
-        )
-        stdout, stderr = await proc.communicate()
-        exit_code = proc.returncode
-        output = stdout.decode("utf-8", errors="replace") + stderr.decode("utf-8", errors="replace")
-        completed_at = datetime.now().isoformat()
-        ok = exit_code == 0
-        log = {
-            "run_id": run_id,
-            "pipeline": "p2",
-            "timestamp": completed_at,
-            "started_at": started_at,
-            "completed_at": completed_at,
-            "status": "completed" if ok else "failed",
-            "message": "제안 폴링 완료" if ok else "제안 폴링 실패",
-            "exit_code": exit_code,
-            "errors": [] if ok else [f"exit_code={exit_code}"],
-            "stdout_tail": _tail_text(output, RUN_OUTPUT_LIMIT),
-        }
-    except Exception as exc:
-        completed_at = datetime.now().isoformat()
-        log = {
-            "run_id": run_id,
-            "pipeline": "p2",
-            "timestamp": completed_at,
-            "started_at": started_at,
-            "completed_at": completed_at,
-            "status": "failed",
-            "message": str(exc),
-            "exit_code": None,
-            "errors": [str(exc)],
-            "stdout_tail": "",
-        }
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p2", run_id, started_at)
+        _save_run(log)
     finally:
         active_jobs.pop(run_id, None)
-        if log:
-            _save_run(log)
 
 
 def _save_run(data: dict) -> None:
