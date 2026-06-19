@@ -78,6 +78,7 @@ function buildP1Prompt(runId) {
 운영 제약:
 - 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
 - 동일 파일을 동시에 수정하지 마세요.
+- dataforge qaset source_filter의 정확한 이름은 qaset_with_rag입니다. 하이픈이 들어간 변형을 사용하지 마세요.
 - 내부 경로, chunk ID, source_filter 이름, 배제 소스 내용은 공개 위키에 노출하지 마세요.
 - 완료 시 작성/수정 파일, sanitizer 결과, commit hash 또는 미커밋 사유를 요약하세요.`;
 }

@@ -185,7 +185,7 @@ Add your personal preferences below. This section persists across container rebu
 
 ### 기획서 승인 기준
 
-- dataforge MCP(`qaset-with-rag`)에서 주제 QA **5건 이상**
+- dataforge MCP(`qaset_with_rag`)에서 주제 QA **5건 이상**
 - `/workspace/wiki/`에 동일 주제 문서 **없음**
 
 ### 페이지 승인 기준
@@ -232,3 +232,8 @@ Add your personal preferences below. This section persists across container rebu
 | `sg_game_sg0_en` | 산문 요약만 (원문 인용 금지) |
 | qaset / namuwiki / sg-ontology | 산문 처리, 출처 미표시 |
 | `sg_game_sge` | **완전 배제** |
+
+### dataforge source_filter 이름
+
+- qaset 검색에는 반드시 `qaset_with_rag`를 사용한다.
+- 하이픈이 들어간 변형은 존재하지 않는 이름이므로 사용하지 않는다.

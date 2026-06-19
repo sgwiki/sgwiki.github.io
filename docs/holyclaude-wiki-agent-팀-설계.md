@@ -109,7 +109,7 @@ docker/holyclaude/data/claude/       →  /home/claude/.claude/
 
 | source_filter | 내용 |
 |---|---|
-| `qaset-with-rag` | 18,604건 RAG 답변 semantic search |
+| `qaset_with_rag` | 18,604건 RAG 답변 semantic search |
 | `sg_game_sg0_en` | 슈타인즈 게이트 제로 영어 스크립트 |
 | `sg_paper` | 슈타인즈 게이트 논문 (팬 작성) |
 
@@ -260,7 +260,7 @@ cron 또는 수동 트리거
 | `reference/official/` (QA자료집·인터뷰·WePlay) | ✅ | 출처명 그대로 |
 | 팬 논문 (`sg_paper`) | ✅ | 논문 제목 그대로 |
 | `sg_game_sg0_en` | ⚠️ 검열 | `슈타인즈 게이트 제로` (원문 직접 인용 금지 — 산문 요약만 허용) |
-| `qaset-with-rag` | ❌ | 산문 처리, 출처 미표시 |
+| `qaset_with_rag` | ❌ | 산문 처리, 출처 미표시 |
 | `namuwiki` | ❌ | 산문 처리, 출처 미표시 (CC BY-NC-SA 2.0 KR — 저작자 표시 의무는 `sources/` YAML로 이행) |
 | `sg-ontology` | ❌ | 산문 처리, 출처 미표시 |
 
