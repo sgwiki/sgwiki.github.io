@@ -56,3 +56,18 @@ wiki/
 - **WePlay Expo 2025 개발자 토크** 전문
 - **The Mechanics of Steins Gate v1.0.3** — 영문 팬 해설 (Mechanics, Theory, Misconceptions)
 - **어트랙터 필드 이론과 그 외 등등** — 한국어 팬 해설
+
+---
+
+## 면책 문구
+
+이 위키는 MAGES./5pb. 및 관련 권리자와 **무관한 팬 제작 비공식 사이트**입니다.
+모든 상표 및 저작권은 각 권리자에게 귀속됩니다.
+게임 스크립트 원문은 게재하지 않으며, 공개 QA자료 및 팬 분석을 토대로 작성합니다.
+
+나무위키 파생 콘텐츠는 [CC BY-NC-SA 2.0 KR](https://creativecommons.org/licenses/by-nc-sa/2.0/kr/) 조건으로 이용합니다.
+귀속 정보: [`sources/namuwiki.yaml`](../sources/namuwiki.yaml)
+
+## 라이선스
+
+위키 텍스트 원저작 부분: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)

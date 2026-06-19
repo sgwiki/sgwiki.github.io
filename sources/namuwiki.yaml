@@ -1,0 +1,17 @@
+# CC BY-NC-SA 2.0 KR 귀속 정보
+# 나무위키 콘텐츠 사용 시 이 파일의 정보를 기반으로 저작자 표시 의무를 이행한다.
+# 공개 위키 페이지에는 직접 표시하지 않으나, 이 파일이 법적 귀속 근거로 기능한다.
+
+source: namuwiki
+license: CC BY-NC-SA 2.0 KR
+license_url: https://creativecommons.org/licenses/by-nc-sa/2.0/kr/
+attribution: "나무위키 (https://namu.wiki) — CC BY-NC-SA 2.0 KR"
+usage_policy:
+  display: 산문 처리 (출처 직접 표시 없음)
+  internal_attribution: 이 파일로 이행
+  commercial_use: 금지 (NC 조항)
+  derivative_works: 동일 조건 변경 허락 (SA 조항)
+  notes: >
+    나무위키 내용을 산문으로 가공하여 사용.
+    원문 직접 인용 금지. 정보 참조 및 재서술만 허용.
+    source-sanitizer는 나무위키 URL·문단 구조 직접 노출 여부를 검사할 것.

@@ -1,0 +1,47 @@
+site_name: Steins;Gate 한국어 위키
+site_url: https://sg-wiki.pages.dev
+site_description: 슈타인즈 게이트 공식·팬 분석 한국어 위키
+
+theme:
+  name: material
+  language: ko
+  features:
+    - content.code.copy
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+  palette:
+    - scheme: slate
+      primary: deep orange
+      accent: orange
+
+plugins:
+  - search:
+      lang:
+        - en
+        - ja  # 한국어 형태소 분석 미지원 — ja가 가장 유사한 동작
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+docs_dir: wiki
+site_dir: site
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/flaglow/sg-wiki

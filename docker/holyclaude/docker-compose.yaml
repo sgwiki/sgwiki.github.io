@@ -1,0 +1,40 @@
+# ==============================================================================
+# HolyClaude — ZAI GLM-5.2
+# Build:  docker compose --env-file ../../.env up -d --build
+# UI:     http://localhost:3001
+# ==============================================================================
+
+services:
+  holyclaude:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: holyclaude
+    hostname: holyclaude
+    restart: unless-stopped
+    shm_size: 2g                           # Chromium needs this — don't remove
+    network_mode: bridge
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Linux에서 MCP HTTP 연결 필수
+    cap_add:
+      - SYS_ADMIN                          # Required: Chromium sandboxing
+      - SYS_PTRACE                         # Required: debugging tools
+    security_opt:
+      - seccomp=unconfined                 # Required: Chromium in Docker
+    ports:
+      - "127.0.0.1:3001:3001"              # CloudCLI web UI — localhost only
+    volumes:
+      - ./data/claude:/home/claude/.claude # Credentials & settings — never delete
+      - ../../:/workspace                  # Project root mounted as workspace
+      - /mnt/f/agent-hub:/mnt/f/agent-hub:ro # namuwiki MCP 스크립트 경로
+    environment:
+      - TZ=Asia/Seoul
+
+      # ZAI GLM-5.2 — passed from .env at project root
+      - ZAI_API_KEY=${ZAI_API_KEY}
+      - QA_WIKI_BASE_URL=https://api.z.ai/api/coding/paas/v4
+      - QA_WIKI_MODEL=glm-5.2
+      - QA_WIKI_TEMPERATURE=0.1
+      - QA_WIKI_TIMEOUT=360
+      - QA_WIKI_MAX_RETRIES=1
+      - QA_WIKI_MAX_CONCURRENCY=8
