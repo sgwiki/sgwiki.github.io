@@ -9,8 +9,8 @@
       "url": "http://host.docker.internal:8093/mcp"
     },
     "namuwiki": {
-      "command": "python3",
-      "args": ["/mnt/f/agent-hub/agents/WebScraper/namuwiki_mcp_server.py"]
+      "type": "http",
+      "url": "http://host.docker.internal:8091/mcp/"
     }
   },
   "permissions": {
