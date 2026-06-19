@@ -431,6 +431,30 @@ class ScheduleBody(BaseModel):
     enabled: bool = True
 
 
+DECISIONS_DIR = WORKSPACE / "suggestions" / "decisions"
+
+
+def _load_decision(sid: str) -> dict | None:
+    path = DECISIONS_DIR / f"{sid}.json"
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return None
+
+
+def _save_decision(sid: str, data: dict) -> None:
+    DECISIONS_DIR.mkdir(parents=True, exist_ok=True)
+    (DECISIONS_DIR / f"{sid}.json").write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
+class SuggestionActionBody(BaseModel):
+    instruction: str | None = None
+
+
 @app.get("/suggestions")
 async def get_suggestions():
     inbox_dir = WORKSPACE / "suggestions" / "inbox"
@@ -438,10 +462,46 @@ async def get_suggestions():
     if inbox_dir.exists():
         for f in sorted(inbox_dir.glob("*.json"), reverse=True):
             try:
-                items.append(json.loads(f.read_text(encoding="utf-8")))
+                item = json.loads(f.read_text(encoding="utf-8"))
+                item["decision"] = _load_decision(item.get("id", f.stem))
+                items.append(item)
             except Exception:
                 pass
     return {"items": items}
+
+
+@app.get("/suggestions/{sid}")
+async def get_suggestion(sid: str):
+    path = WORKSPACE / "suggestions" / "inbox" / f"{sid}.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="not found")
+    item = json.loads(path.read_text(encoding="utf-8"))
+    item["decision"] = _load_decision(sid)
+    return item
+
+
+@app.post("/suggestions/{sid}/approve")
+async def approve_suggestion(sid: str, body: SuggestionActionBody):
+    if not (WORKSPACE / "suggestions" / "inbox" / f"{sid}.json").exists():
+        raise HTTPException(status_code=404, detail="not found")
+    _save_decision(sid, {
+        "id": sid, "action": "approved",
+        "instruction": body.instruction or "",
+        "decided_at": datetime.now().isoformat(),
+    })
+    return {"status": "approved", "id": sid}
+
+
+@app.post("/suggestions/{sid}/reject")
+async def reject_suggestion(sid: str, body: SuggestionActionBody):
+    if not (WORKSPACE / "suggestions" / "inbox" / f"{sid}.json").exists():
+        raise HTTPException(status_code=404, detail="not found")
+    _save_decision(sid, {
+        "id": sid, "action": "rejected",
+        "reason": body.instruction or "",
+        "decided_at": datetime.now().isoformat(),
+    })
+    return {"status": "rejected", "id": sid}
 
 
 @app.get("/schedule")

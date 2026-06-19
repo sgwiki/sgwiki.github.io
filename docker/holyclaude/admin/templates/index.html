@@ -460,6 +460,25 @@
   </div>
 </div>
 
+<div class="modal" id="sugg-approve-modal" onclick="closeSuggApprove(event)">
+  <div class="modal-panel" onclick="event.stopPropagation()" style="max-width:520px">
+    <div class="modal-head">
+      <h2>제안 승인</h2>
+      <button class="btn btn-small" style="margin-left:auto" onclick="closeSuggApprove()">닫기</button>
+    </div>
+    <div class="modal-body" style="padding:20px">
+      <label style="display:block;margin-bottom:8px;color:#8b949e;font-size:12px">
+        처리 지시사항 <span style="color:#484f58">(선택 — 위키 수정 방향, 참고 사항 등)</span>
+      </label>
+      <textarea id="sugg-instruction" rows="5" placeholder="예: amane-suzuha 페이지 #_10 섹션에서 '존 티터' → '존 타이터'로 수정" style="width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:13px;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+        <button class="btn" onclick="closeSuggApprove()">취소</button>
+        <button class="btn btn-success" onclick="confirmSuggApprove()">승인 확정</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   // ── Trigger ──────────────────────────────────────────────────────────────
   async function triggerPipeline(n) {
@@ -793,33 +812,117 @@
   function clearLog() { document.getElementById('log-terminal').innerHTML = ''; }
 
   // ── Suggestions ───────────────────────────────────────────────────────────
+  let _suggApproveTarget = null;
+
   async function loadSuggestions() {
     try {
-      const res  = await fetch('/suggestions');
-      const data = await res.json();
+      const res   = await fetch('/suggestions');
+      const data  = await res.json();
       const items = data.items ?? [];
-      const el = document.getElementById('sugg-body');
+      const el    = document.getElementById('sugg-body');
       const badge = document.getElementById('sugg-inbox-badge');
-      badge.textContent = items.length > 0 ? `(${items.length}건 대기)` : '';
+      const pending = items.filter(s => !s.decision).length;
+      badge.textContent = pending > 0 ? `(미결 ${pending}건)` : '';
       if (items.length === 0) {
         el.innerHTML = '<span style="color:#484f58">대기 중인 제안 없음</span>';
         return;
       }
       el.innerHTML = items.map(s => {
-        const date = (s.created_at ?? '').slice(0, 10);
+        const sid     = s.id ?? '';
+        const date    = (s.created_at ?? '').slice(0, 16).replace('T', ' ');
         const contact = s.contact ? `<span style="color:#8b949e;font-size:11px"> · ${escapeHtml(s.contact)}</span>` : '';
-        return `<div style="padding:12px 0;border-bottom:1px solid #21262d">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">
-            <code style="color:#8b949e;font-size:11px">${s.id?.slice(0,8) ?? ''}</code>
+        const dec     = s.decision;
+        const statusBadge = dec
+          ? (dec.action === 'approved'
+              ? `<span class="status-badge on" style="font-size:10px">승인</span>`
+              : `<span class="status-badge off" style="font-size:10px">거부</span>`)
+          : `<span class="status-badge" style="font-size:10px;background:#1c2129;color:#8b949e;border:1px solid #30363d">미결</span>`;
+        const actions = dec ? '' : `
+          <button class="btn btn-small btn-success" onclick="openSuggApprove('${escapeAttr(sid)}')">승인</button>
+          <button class="btn btn-small btn-danger"  onclick="rejectSugg('${escapeAttr(sid)}')">거부</button>`;
+        const decBlock = dec ? `
+          <div style="margin-top:8px;padding:8px;background:#0d1117;border-radius:4px;font-size:11px">
+            <span style="color:#8b949e">${dec.decided_at?.slice(0,16).replace('T',' ')} · ${dec.action === 'approved' ? '승인' : '거부'}</span>
+            ${(dec.instruction || dec.reason) ? `<div style="color:#c9d1d9;margin-top:4px;white-space:pre-wrap">${escapeHtml(dec.instruction || dec.reason)}</div>` : ''}
+          </div>` : '';
+        return `<div style="padding:14px 0;border-bottom:1px solid #21262d">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            ${statusBadge}
+            <code style="color:#8b949e;font-size:11px">${sid.slice(0,8)}</code>
             <span style="color:#484f58;font-size:11px">${date}</span>
             ${contact}
+            <span style="margin-left:auto;display:flex;gap:6px">
+              <button class="btn btn-small" onclick="viewSugg('${escapeAttr(sid)}')">보기</button>
+              ${actions}
+            </span>
           </div>
           <div style="color:#c9d1d9;line-height:1.6;white-space:pre-wrap;word-break:break-all">${escapeHtml(s.content ?? '')}</div>
+          ${decBlock}
         </div>`;
       }).join('');
     } catch (e) {
       document.getElementById('sugg-body').textContent = '로드 실패: ' + e.message;
     }
+  }
+
+  async function viewSugg(sid) {
+    try {
+      const res  = await fetch(`/suggestions/${sid}`);
+      const s    = await res.json();
+      const dec  = s.decision;
+      document.getElementById('preview-title').textContent = `제안 상세 — ${sid.slice(0,8)}`;
+      document.getElementById('preview-diff').textContent =
+        dec ? `[${dec.action}] ${dec.decided_at?.slice(0,16).replace('T',' ')}\n` +
+              (dec.instruction || dec.reason ? `\n지시/사유:\n${dec.instruction || dec.reason}` : '(없음)')
+            : '(미결)';
+      document.getElementById('preview-content').textContent =
+        `접수: ${(s.created_at ?? '').slice(0,16).replace('T',' ')}\n` +
+        (s.contact ? `연락처: ${s.contact}\n` : '') +
+        `\n${s.content ?? ''}`;
+      document.getElementById('wiki-preview-modal').classList.add('show');
+    } catch(e) {
+      alert('로드 실패: ' + e.message);
+    }
+  }
+
+  function openSuggApprove(sid) {
+    _suggApproveTarget = sid;
+    document.getElementById('sugg-instruction').value = '';
+    document.getElementById('sugg-approve-modal').classList.add('show');
+    document.getElementById('sugg-instruction').focus();
+  }
+
+  function closeSuggApprove(event) {
+    if (event && event.target.id !== 'sugg-approve-modal') return;
+    document.getElementById('sugg-approve-modal').classList.remove('show');
+  }
+
+  async function confirmSuggApprove() {
+    const sid = _suggApproveTarget;
+    if (!sid) return;
+    const instruction = document.getElementById('sugg-instruction').value.trim();
+    document.getElementById('sugg-approve-modal').classList.remove('show');
+    try {
+      await fetch(`/suggestions/${sid}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instruction: instruction || null }),
+      });
+      await loadSuggestions();
+    } catch(e) { alert('승인 실패: ' + e.message); }
+  }
+
+  async function rejectSugg(sid) {
+    const reason = prompt('거부 사유 (선택 사항):') ?? null;
+    if (reason === null && !confirm('사유 없이 거부하시겠습니까?')) return;
+    try {
+      await fetch(`/suggestions/${sid}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instruction: reason || null }),
+      });
+      await loadSuggestions();
+    } catch(e) { alert('거부 실패: ' + e.message); }
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
