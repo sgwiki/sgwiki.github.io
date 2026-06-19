@@ -15,12 +15,13 @@ description: wiki-writer가 작성한 마크다운 초안을 스캔하여 내부
 |---|---|---|
 | 1 | chunk ID 본문 노출 | `qs-`, `sge_`, `sg0_`, `sp_` 등 |
 | 2 | source_filter 이름 노출 | `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge` 등 |
-| 3 | 내부 파일 경로 노출 | `data/qaset_with_rag/`, `reference/user/` 등; `[reference/user/경로.md]` 인라인 브래킷 형태 포함 |
+| 3 | 내부 파일 경로 노출 | `data/qaset_with_rag/`, `reference/user/`, `reference/official/` 등; `[reference/user/경로.md]`, `[reference/official/파일.md]` 인라인 브래킷 형태 포함 |
 | 4 | `sg_game_sg0_en` 원문 직접 인용 | 영어 게임 대사 블록 인용 |
 | 5 | 배제 소스(`sg_game_sge`) 내용 유출 | 한글 패치 텍스트 흔적 |
 | 6 | 스포일러 배지 누락 | 문서 상단 `!!! warning "스포일러"` 없음 |
 | 7 | 나무위키 URL·문단 구조 직접 노출 | `namu.wiki`, `[[문서명]]` 형식 |
 | 8 | dcinside 청크를 `## 인용 출처`에 각주로 표시 | `[^n]: dcinside / <uuid>` 형태 |
+| 9 | 공식자료집을 내부 링크 없이 평문 인용 | `슈타게 공식 QA자료집, Q1` (링크 없음) — `[슈타게 공식 QA자료집](../공식자료/qa-자료집.md)` 형태여야 함 |
 
 ## 작업 순서
 

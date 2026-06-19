@@ -44,18 +44,26 @@ spoiler: {none|early_story|main_story|zero_story|endgame}
 
 | 소스 유형 | 표시 형식 |
 |---|---|
-| 공식 QA자료집, 인터뷰 등 | `> **[공식]** "원문" — 출처명, QN` |
+| 공식 QA자료집 | `> **[공식]** "원문" — [슈타게 공식 QA자료집](../공식자료/qa-자료집.md), QN` |
+| 공식 인터뷰 등 기타 공식 출처 | `> **[공식]** "원문" — 출처명` |
 | 팬 논문 | `> **[팬 분석]** "..." — 논문 제목[^N]` |
 | `sg_game_sg0_en` | 산문 요약만. 원문 직접 인용 금지 |
 | qaset, namuwiki, sg-ontology | 산문 처리. 출처 미표시 |
+| dcinside 청크 | 산문 근거로만 사용. 각주(`[^N]`) 표시 금지 |
+
+공식자료집을 각주(`[^N]: ...`)로 쓸 때도 반드시 내부 링크 사용:
+`[^1]: [슈타게 공식 QA자료집](../공식자료/qa-자료집.md) — QN 요약`
 
 ## 절대 금지
 
 - chunk ID(`qs-`, `sge_`, `sg0_` 등) 본문 기재
 - source_filter 이름 기재
-- 내부 파일 경로(`data/qaset_with_rag/`, `reference/user/` 등) 기재
+- 내부 파일 경로(`data/qaset_with_rag/`, `reference/user/`, `reference/official/` 등) 기재
+- `[reference/user/...]`, `[reference/official/...]` 형식의 경로 브래킷 기재
 - `sg_game_sge` 내용 사용
 - `sg_game_sg0_en` 원문 직접 인용
+- 공식자료집을 내부 링크 없이 평문으로 인용 출처 표시
+- dcinside 청크를 `[^N]` 각주로 인용 출처에 표시
 - MCP 커버리지 fail 상태에서 초안 작성
 - 팀장 `APPROVED PLAN` 및 registry 예약 확인 없이 초안 작성
 - 기존 문서 덮어쓰기
