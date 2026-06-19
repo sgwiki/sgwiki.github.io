@@ -8,6 +8,7 @@ import subprocess
 import threading
 import time
 import uuid
+from collections import deque
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
@@ -25,6 +26,7 @@ WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admi
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "holyclaude")
 PIPELINE_SCRIPT = os.getenv("PIPELINE_SCRIPT", os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs"))
+MAX_CONCURRENT_RUNS = int(os.getenv("ADMIN_MAX_CONCURRENT_RUNS", "10"))
 RUN_OUTPUT_LIMIT = int(os.getenv("ADMIN_RUN_OUTPUT_LIMIT", "30000"))
 SUGGESTION_LOG_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_LIMIT", "5"))
 SUGGESTION_LOG_OUTPUT_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_OUTPUT_LIMIT", "1200"))
@@ -35,6 +37,7 @@ ADMIN_STATUS_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_STATUS_CACHE_TTL_SECONDS
 
 active_jobs: dict[str, dict] = {}
 active_jobs_lock = threading.RLock()
+run_queue: deque[str] = deque()
 response_cache: dict[str, tuple[float, object]] = {}
 response_cache_lock = threading.RLock()
 
@@ -91,22 +94,65 @@ async def index(request: Request):
 
 @app.post("/trigger/p1")
 async def trigger_p1():
-    run_id = str(uuid.uuid4())[:8]
-    asyncio.create_task(_run_p1(run_id))
-    return {"status": "started", "pipeline": "p1", "run_id": run_id}
+    run_id, started_at, status = _start_active_job("p1", "holyclaude 콘텐츠 생성 파이프라인 실행 준비 중")
+    if status == "running":
+        asyncio.create_task(_run_p1(run_id, started_at))
+        return {"status": "started", "pipeline": "p1", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p1", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
 @app.post("/trigger/p2")
 async def trigger_p2():
-    run_id = str(uuid.uuid4())[:8]
-    asyncio.create_task(_run_p2(run_id))
-    return {"status": "started", "pipeline": "p2", "run_id": run_id}
+    run_id, started_at, status = _start_active_job("p2", "holyclaude 제안 처리 파이프라인 실행 준비 중")
+    if status == "running":
+        asyncio.create_task(_run_p2(run_id, started_at))
+        return {"status": "started", "pipeline": "p2", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p2", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
 @app.get("/running")
 async def get_running():
     with active_jobs_lock:
-        return {"jobs": [dict(job) for job in active_jobs.values()]}
+        running = [dict(j) for j in active_jobs.values() if j.get("status") == "running"]
+        queued = []
+        position = 1
+        for rid in run_queue:
+            job = active_jobs.get(rid)
+            if job is None:
+                continue  # tombstone (cancelled while queued)
+            item = dict(job)
+            item["queue_position"] = position
+            queued.append(item)
+            position += 1
+        return {
+            "jobs": running + queued,
+            "limit": MAX_CONCURRENT_RUNS,
+            "running": len(running),
+            "queued": len(queued),
+        }
+
+
+@app.delete("/run/{run_id}")
+async def cancel_run(run_id: str):
+    with active_jobs_lock:
+        job = active_jobs.get(run_id)
+        if job is None:
+            raise HTTPException(
+                status_code=404,
+                detail={"status": "not_found", "run_id": run_id},
+            )
+        if job.get("status") == "running":
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "status": "running",
+                    "run_id": run_id,
+                    "message": "실행 중인 작업은 취소할 수 없습니다",
+                },
+            )
+        # queued → remove from active_jobs; deque keeps a tombstone that dispatch will skip
+        active_jobs.pop(run_id, None)
+    return {"status": "cancelled", "run_id": run_id}
 
 
 _ANSI = re.compile(r'\x1b\[[0-9;]*[A-Za-z]|\x1b\][^\x07]*\x07|\x1b[()][AB012]')
@@ -817,9 +863,7 @@ def _load_status_response() -> dict:
     return {"runs": runs}
 
 
-async def _run_p1(run_id: str) -> None:
-    started_at = datetime.now().isoformat()
-    _set_active_job(run_id, "p1", started_at, "holyclaude 컨테이너 실행 준비 중")
+async def _run_p1(run_id: str, started_at: str) -> None:
     try:
         log = await asyncio.to_thread(_run_holyclaude_pipeline, "p1", run_id, started_at)
         _save_run(log)
@@ -827,15 +871,54 @@ async def _run_p1(run_id: str) -> None:
         _pop_active_job(run_id)
 
 
-def _set_active_job(run_id: str, pipeline: str, started_at: str, last_line: str) -> None:
+def _start_active_job(pipeline: str, last_line: str) -> tuple[str, str, str]:
+    """Register a job. Returns (run_id, started_at, status).
+
+    When running slots are available the job is immediately 'running' and a task
+    should be scheduled by the caller. Otherwise it is enqueued ('queued').
+    Per-pipeline dedup is intentionally removed; the team-lead agent owns that.
+    """
+    now = datetime.now().isoformat()
+    run_id = str(uuid.uuid4())[:8]
     with active_jobs_lock:
-        active_jobs[run_id] = {
-            "run_id": run_id,
-            "pipeline": pipeline,
-            "started_at": started_at,
-            "status": "running",
-            "last_line": last_line,
-        }
+        running_count = sum(1 for j in active_jobs.values() if j.get("status") == "running")
+        if running_count < MAX_CONCURRENT_RUNS:
+            status = "running"
+            started_at = now
+            active_jobs[run_id] = {
+                "run_id": run_id,
+                "pipeline": pipeline,
+                "started_at": started_at,
+                "status": "running",
+                "last_line": last_line,
+                "updated_at": started_at,
+            }
+        else:
+            status = "queued"
+            started_at = now
+            active_jobs[run_id] = {
+                "run_id": run_id,
+                "pipeline": pipeline,
+                "started_at": None,
+                "queued_at": now,
+                "status": "queued",
+                "last_line": last_line,
+                "updated_at": now,
+            }
+            run_queue.append(run_id)
+        return run_id, started_at, status
+
+
+def _queue_position(run_id: str):
+    with active_jobs_lock:
+        position = 1
+        for rid in run_queue:
+            if active_jobs.get(rid) is None:
+                continue  # tombstone (cancelled while queued)
+            if rid == run_id:
+                return position
+            position += 1
+    return None
 
 
 def _update_active_job(run_id: str, **values) -> None:
@@ -847,6 +930,38 @@ def _update_active_job(run_id: str, **values) -> None:
 def _pop_active_job(run_id: str) -> None:
     with active_jobs_lock:
         active_jobs.pop(run_id, None)
+    _dispatch_next_job()
+
+
+def _dispatch_next_job() -> None:
+    """Promote queued jobs to running when capacity frees.
+
+    Called from the event-loop thread (async _run_p* finally blocks), so
+    asyncio.create_task is safe. A single lock acquisition batches promotions;
+    task scheduling happens after the lock is released.
+    """
+    to_start: list[tuple[str, str, str]] = []
+    with active_jobs_lock:
+        while run_queue:
+            running_count = (
+                sum(1 for j in active_jobs.values() if j.get("status") == "running")
+                + len(to_start)
+            )
+            if running_count >= MAX_CONCURRENT_RUNS:
+                break
+            rid = run_queue.popleft()
+            job = active_jobs.get(rid)
+            if job is None or job.get("status") != "queued":
+                continue  # tombstone / unexpected state
+            pipeline = job.get("pipeline")
+            started_at = datetime.now().isoformat()
+            job.update(status="running", started_at=started_at, updated_at=started_at)
+            to_start.append((pipeline, rid, started_at))
+    for pipeline, rid, started_at in to_start:
+        if pipeline == "p1":
+            asyncio.create_task(_run_p1(rid, started_at))
+        elif pipeline == "p2":
+            asyncio.create_task(_run_p2(rid, started_at))
 
 
 def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dict:
@@ -955,9 +1070,7 @@ def _tail_text(value: str, limit: int) -> str:
     return value[-limit:]
 
 
-async def _run_p2(run_id: str) -> None:
-    started_at = datetime.now().isoformat()
-    _set_active_job(run_id, "p2", started_at, "holyclaude 제안 처리 파이프라인 실행 준비 중")
+async def _run_p2(run_id: str, started_at: str) -> None:
     try:
         log = await asyncio.to_thread(_run_holyclaude_pipeline, "p2", run_id, started_at)
         _save_run(log)

@@ -413,7 +413,7 @@
 
   <!-- 섹션 3: 진행 중인 작업 -->
   <div class="card">
-    <h2>진행 중인 작업</h2>
+    <h2>진행 중 / 대기 중 작업</h2>
     <div id="running-body" style="color:#484f58;font-size:12px">확인 중...</div>
     <p class="refresh-hint">3초마다 자동 갱신</p>
   </div>
@@ -502,12 +502,31 @@
       const res = await fetch('/trigger/p' + n, { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
-        showMsg(msg, 'ok', JSON.stringify(data, null, 2));
+        if (data.status === 'queued') {
+          showMsg(msg, 'ok', '파이프라인 ' + n + ' 대기열 추가 (대기 ' + (data.queue_position ?? '?') + '번째) · run_id: ' + data.run_id);
+        } else {
+          showMsg(msg, 'ok', '파이프라인 ' + n + ' 실행 시작 · run_id: ' + data.run_id);
+        }
       } else {
         showMsg(msg, 'err', JSON.stringify(data, null, 2));
       }
+      loadRunning();
     } catch (e) {
       showMsg(msg, 'err', '요청 실패: ' + e.message);
+    }
+  }
+
+  async function cancelRun(runId) {
+    try {
+      const res = await fetch('/run/' + encodeURIComponent(runId), { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        loadRunning();
+      } else {
+        alert('취소 실패: ' + JSON.stringify(data));
+      }
+    } catch (e) {
+      alert('취소 요청 실패: ' + e.message);
     }
   }
 
@@ -556,21 +575,44 @@
       const res  = await fetch('/running');
       const data = await res.json();
       const jobs = data.jobs ?? [];
+      const limit = data.limit ?? '?';
+      const runningCount = data.running ?? 0;
+      const queuedCount = data.queued ?? 0;
       const el   = document.getElementById('running-body');
       if (jobs.length === 0) {
         el.innerHTML = '<span style="color:#484f58">실행 중인 작업 없음</span>';
         return;
       }
-      el.innerHTML = jobs.map(j => `
-        <div style="display:grid;grid-template-columns:16px 1fr;gap:8px;margin-bottom:8px">
+      const cards = jobs.map(j => {
+        const name  = '파이프라인 ' + (j.pipeline?.replace('p','') ?? '?');
+        const runId = escapeHtml(j.run_id ?? '');
+        const lastLine = escapeHtml(j.last_line ?? '');
+        if (j.status === 'queued') {
+          return `
+        <div style="display:grid;grid-template-columns:16px 1fr auto;gap:8px;margin-bottom:8px">
+          <span style="margin-top:2px;color:#f0883e">⏳</span>
+          <div>
+            <div><b style="color:#c9d1d9">${name}</b>
+            &nbsp;<span style="color:#484f58">${runId}</span>
+            &nbsp;<span class="status-badge off" style="font-size:10px;text-transform:none;letter-spacing:0">대기 ${escapeHtml(j.queue_position ?? '?')}번째</span></div>
+            <div style="color:#8b949e;font-size:11px;line-height:1.5">${lastLine}</div>
+          </div>
+          <button class="btn btn-danger" style="font-size:11px;padding:4px 10px" onclick="cancelRun('${runId}')">취소</button>
+        </div>`;
+        }
+        return `
+        <div style="display:grid;grid-template-columns:16px 1fr auto;gap:8px;margin-bottom:8px">
           <span class="spinner" style="margin-top:2px"></span>
           <div>
-            <div><b style="color:#c9d1d9">파이프라인 ${j.pipeline?.replace('p','')}</b>
-            &nbsp;<span style="color:#484f58">${j.run_id}</span>
-            &nbsp;<span style="color:#8b949e">${j.started_at?.slice(11,19) ?? ''}</span></div>
-            <div style="color:#8b949e;font-size:11px;line-height:1.5">${j.last_line ?? ''}</div>
+            <div><b style="color:#c9d1d9">${name}</b>
+            &nbsp;<span style="color:#484f58">${runId}</span>
+            &nbsp;<span style="color:#8b949e">${escapeHtml(j.started_at?.slice(11,19) ?? '')}</span></div>
+            <div style="color:#8b949e;font-size:11px;line-height:1.5">${lastLine}</div>
           </div>
-        </div>`).join('');
+          <span></span>
+        </div>`;
+      }).join('');
+      el.innerHTML = '<div style="margin-bottom:8px;color:#8b949e;font-size:11px">실행 ' + runningCount + '/' + limit + ' · 대기 ' + queuedCount + '</div>' + cards;
     } catch (e) {
       document.getElementById('running-body').textContent = '로드 실패: ' + e.message;
     }
