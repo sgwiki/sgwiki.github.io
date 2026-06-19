@@ -6,8 +6,7 @@ const SDK_PATH =
   '/usr/local/lib/node_modules/@siteboon/claude-code-ui/node_modules/@anthropic-ai/claude-agent-sdk/sdk.mjs';
 
 const DEFAULT_CWD = '/workspace';
-const DEFAULT_MODEL = 'sonnet';
-
+const DEFAULT_MODEL = 'glm-5.2';
 const REQUIRED_MCP_SERVERS = ['dataforge', 'namuwiki', 'sg-ontology'];
 const REQUIRED_MCP_COVERAGE = [
   {
@@ -98,12 +97,37 @@ function buildP1Prompt(runId) {
 
 반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요.
 
+당신은 파이프라인 1의 wiki-team-lead(위키작성 팀장)입니다.
+
 목표:
-1. /workspace/wiki/ 현황과 qaset 근거를 비교해 아직 작성되지 않은 주제를 선정하세요.
-2. wiki-planner, wiki-writer, source-sanitizer 에이전트를 사용해 최대 1개 문서를 완성하세요.
-3. source-sanitizer 통과 전에는 commit/push하지 마세요.
+1. /workspace/wiki/ 현황과 qaset 근거를 비교해 아직 작성되지 않은 주제 후보를 선정하세요.
+2. wiki-planner가 기획서를 반환하면 팀장이 승인 / 거부 / 피드백(재작성 요청) 중 하나를 명시적으로 결정하세요.
+3. 승인된 기획서만 wiki-writer에 전달하고, source-sanitizer 통과 전에는 commit/push하지 마세요.
 4. 통과한 경우에만 git add, commit, push까지 수행하세요.
 5. 막히면 무엇이 막혔는지 명확히 보고하고, 검증되지 않은 초안은 commit하지 마세요.
+
+중복 주제 방지 (병렬 실행 필수):
+- 파이프라인은 이제 동시에 여러 실행이 들어올 수 있습니다. 동일 주제/파일 중복 작성은 작업 현황 memory로 막습니다.
+- 후보를 선정하기 전에 반드시 memory를 읽어 현재 진행 중인 주제/파일을 확인하세요:
+  node /workspace/scripts/wiki_work_registry.mjs list
+- 반환된 registry.active에 이미 들어 있는 topic 또는 file은 후보에서 제외하세요. 이 게이트를 통과한 주제만 planner에 전달합니다.
+- planner 기획서를 받은 뒤에도 reserve로 최종 점유 확인(아래)을 거쳐야 합니다. 다른 실행이 먼저 점유했다면 reserve가 실패하므로 그 주제는 포기하고 다른 주제를 고르거나 중단하세요.
+
+팀장 작업 메모리:
+- 팀장은 /workspace/.admin/p1-work-registry.json을 파이프라인 1 작업 현황 memory로 사용해야 합니다.
+- writer를 호출하기 전에 반드시 다음 명령으로 출력 파일을 예약하세요:
+  node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file wiki/{category}/{slug}.md --topic "{주제명}"
+- reserve가 실패하면 기획서를 거부하고 writer를 호출하지 마세요. 동일 주제/동일 문서가 있으면 다른 주제를 고르거나 중단하세요.
+- writer/sanitizer/commit 단계 진입 시 status 명령으로 상태를 갱신하세요:
+  node /workspace/scripts/wiki_work_registry.mjs status --run-id ${runId} --file wiki/{category}/{slug}.md --status writing|sanitizing|committing
+- commit/push 완료 시 complete, 폐기/거부/중단 시 release를 호출하세요.
+
+팀장 승인 게이트:
+1. planner 기획서의 출력 파일이 /workspace/wiki/에 이미 존재하면 reject.
+2. qaset QA 5건 미만이면 reject.
+3. MCP 커버리지 6개 항목 중 하나라도 fail/missing이면 feedback으로 재작성 요청 또는 reject.
+4. 기획서가 통과하면 "APPROVED PLAN"과 승인 사유를 로그에 남긴 뒤 writer를 호출.
+5. writer 초안이 sanitizer fail이면 위반 항목을 명시해 최대 2회 재작성 요청. 2회 초과 시 release 후 중단.
 
 MCP 커버리지 게이트:
 - 파이프라인 1 작업 중 아래 6개 항목을 각각 별도 MCP 호출로 최소 1회 이상 성공시켜야 합니다.
