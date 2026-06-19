@@ -1,5 +1,5 @@
 [project]
-name = "fg-lab-kr"
+name = "sg-wiki"
 version = "0.1.0"
 description = "Steins;Gate Korean QA wiki extraction pipeline"
 readme = "README.md"

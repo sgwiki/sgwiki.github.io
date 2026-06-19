@@ -101,7 +101,7 @@ needs_human_review: true 774건 (48%), false 831건 (52%)
 ## 4. 디렉토리 구조
 
 ```
-fg-lab-kr/
+sg-wiki/
 ├── wiki/                        ← 위키 산출물
 │   ├── README.md
 │   ├── _template/               ← main.md, depth.md

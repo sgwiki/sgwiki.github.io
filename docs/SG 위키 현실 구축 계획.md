@@ -93,7 +93,7 @@
 ### 2.1 디렉토리 구조 (신규/변경)
 
 ```
-fg-lab-kr/
+sg-wiki/
 ├── wiki/                         # (기존) 마크다운 위키 — 그대로 서빙 소스
 │   ├── README.md, _template/, lore/   # 1차 완성
 │   ├── characters/, faq/, game/       # 2차 확장 (phase2-wiki-expansion.md)
