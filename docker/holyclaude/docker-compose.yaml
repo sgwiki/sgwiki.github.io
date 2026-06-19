@@ -41,5 +41,5 @@ services:
 
       # Claude Code → Z.AI 라우팅 (docs.z.ai/devpack/quick-start#claude-code)
       - ANTHROPIC_AUTH_TOKEN=${ZAI_API_KEY}
-      - ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
+      - ANTHROPIC_BASE_URL=https://api.z.ai/api/coding/paas/v4
       - API_TIMEOUT_MS=3000000
