@@ -67,7 +67,7 @@ spoiler: endgame
 중요한 점은, 크리스 사망 수속의 관측 대상이 "오카베가 피웅덩이에 쓰러진 크리스를 목격하는 것"이라는 해석이다. 오카베가 크리스의 실제 사망을 확정적으로 관측하지 않은 상태에서 알파로 이동했기 때문에, 이 수속은 마유리 사망 수속보다 약간 더 유연하며, 이것이 오퍼레이션 스쿨드의 성립 근거가 된다.
 
 > **[공식]** "스쿨드 1차 이동에서 오카베가 크리스를 죽인 것은 가능성의 하나일 뿐이다. 오카베가 죽이지 않았더라도 마유리 구출 루프처럼 같은 결과로 수속된다. 크리스를 한 번 죽인 것이 타임머신 개발의 필요조건이 아니라 가능성 중 하나이며, 끊임없이 저항한 끝에 최종 성공한 과정만이 본편에 묘사된 것이다."
-> — [공식 자료집 Q&A](../공식자료/qa-자료집.md), Q30
+> — [공식 자료집 Q&A](../근거자료/공식/qa-자료집.md), Q30
 
 이 해설은 크리스 사망이라는 수속이 오카베의 행위에 의해 발생한 것이 아니라, 이미 수속된 결과를 향해 세계선이 수렴하는 과정에서 오카베의 행위가 하나의 경로로 편입된 것임을 시사한다. 부트스트랩 패러독스의 한 형태로 볼 수 있다.
 
@@ -94,7 +94,7 @@ spoiler: endgame
 세계선이 변동하면, 과거부터 미래까지의 전체 역사가 새로운 세계선의 역사로 재구성된다. 이 재구성은 모순을 피하기 위해 진행되며, 가능한 한 최소한의 변경으로 이루어지는 것이 원칙이다.
 
 > **[팬 분석]** "세계선이 변할 때, 모든 인과가 모순을 방지하기 위해 과거에서 미래로 재구성된다. 이 이론은 2036년에 증명되었다. 따라서 본질적으로 다른 세계선의 기억이 변하지 않은 상태로 남을 것이라 기대할 수 없다."
-> — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
+> — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)[^1]
 
 재구성이 최소한으로 이루어진다는 점이 수속의 강도와 직결된다. 수속점에 해당하는 사건은 재구성 과정에서도 제거되지 않고 유지되는데, 그 이유는 수속점을 제거하려면 전체 역사를 훨씬 더 큰 규모로 재구성해야 하기 때문이다. 세계는 가장 작은 변경을 선호하므로, 수속점을 보존하는 쪽의 세계선이 새로운 활성 세계선으로 선택된다.
 
@@ -134,7 +134,7 @@ spoiler: endgame
 구체적으로 오카베는 과거의 자신이 "피웅덩이에 쓰러진 크리스"를 목격했다는 사건을 유지하되, 크리스가 실제로는 살아 있도록 만든다. 과거 자신이 본 것이 "죽은 크리스"가 아니라 "죽은 것처럼 보이는 크리스"였다는 정보를 덮어씌움으로써, 수속의 관측 내용을 변경하면서도 수속 자체를 위반하지 않는다. 이 방식은 루프의 자기 일관성을 보존하므로 세계선 재구성에 의한 강한 저항을 피할 수 있다.
 
 > **[팬 분석]** "오퍼레이션 스쿨드의 해결책은 과거의 자신을 속여 크리스가 죽었다고 생각하게 만드는 것이다. 사실 그녀는 죽지 않았다. 이것은 시간 여행 루프의 존재와 모순되지 않으므로, 재구성에 의해 강하게 저항받지 않을 것이다."
-> — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^2]
+> — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)[^2]
 
 이 접근이 성공하면 슈타인즈 게이트 세계선에 도달한다. 슈타인즈 게이트 세계선은 알파와 베타 어트랙터 필드의 경계에 위치하며, 양쪽 어느 쪽의 수속에도 속하지 않는다. 따라서 마유리 사망도, 크리스 사망도, SERN 디스토피아도, 제3차 세계대전도 발생하지 않는다.
 
@@ -174,5 +174,5 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), "2.1.1 World Lines" - 존 타이타의 세계선 변동 시 인과 재구성 설명
-[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), "3.1.3 Operation Skuld" - 스쿨드 작전의 "세계를 속이는" 접근 원리
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), "2.1.1 World Lines" - 존 타이타의 세계선 변동 시 인과 재구성 설명
+[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), "3.1.3 Operation Skuld" - 스쿨드 작전의 "세계를 속이는" 접근 원리

@@ -50,7 +50,7 @@ spoiler: main_story
 
 크리스의 생존 여부는 세계선의 변화를 결정하는 중요한 요소입니다. 알파 세계선에서는 생존하지만, 베타 세계선에서는 7월 28일 나카바치 회의 도중 사망하는 것으로 수속됩니다. 오카베가 크리스를 구하면 제3차 세계대전을 막을 수 있는 슈타인즈 게이트 세계선에 도달할 수 있습니다.
 
-> **[팬 분석]** "슈타인즈 게이트에 도달하기 위한 두 가지 요구 사항이 있어. 하나는 마키세 크리스의 생명을 구하는 것이고, 다른 하나는 나카바치 박사가 러시아로 가져가는 나카바치 논문을 망각 속으로 보내는 것이야." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》
+> **[팬 분석]** "슈타인즈 게이트에 도달하기 위한 두 가지 요구 사항이 있어. 하나는 마키세 크리스의 생명을 구하는 것이고, 다른 하나는 나카바치 박사가 러시아로 가져가는 나카바치 논문을 망각 속으로 보내는 것이야." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》
 
 ## 주요 사건
 
@@ -104,9 +104,9 @@ spoiler: main_story
 
 크리스는 타임 리프 머신이 기억 데이터만 전송하고 '성격'은 전송하지 않기 때문에, 자신에게만 보내야 하며 최근 버전의 자신으로 제한된다는 점을 지적했습니다.
 
-> **[팬 분석]** "성격이 기억만으로 형성되는 것은 아니야. 그래서 기억을 보내더라도, 모든 것은 여전히 수신자의 의식과 성격에 달려 있어." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》
+> **[팬 분석]** "성격이 기억만으로 형성되는 것은 아니야. 그래서 기억을 보내더라도, 모든 것은 여전히 수신자의 의식과 성격에 달려 있어." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^2]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 3.2.1 타임 리프 제한, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 3.2.1 타임 리프 제한, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5

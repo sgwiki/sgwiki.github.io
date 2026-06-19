@@ -37,7 +37,7 @@ spoiler: main_story
 
 스트래트포는 공식적으로는 미국 소속이지만, 작중에서는 레스키넨의 **개인적 목적(타임머신 독점)**이 조직의 행동과 결합되어 DURPA·러시아와의 3파전을 형성한다. 즉 미국 내에서도 스트래트포와 DURPA가 서로 다른 이해관계로 대립하며, 단순한 국가 간 대립이 아닌 **다층적 정보 전쟁** 구조를 띤다.
 
-> **[팬 분석]** "...이야기가 전개되면서, 스트래트포(Stratfo)와 DURPA는 아마데우스를 확보하려 시도한다. 이는 아마데우스가 크리스의 뇌파 패턴을 보유하고 있었기 때문에 크리스의 타임 트래블 논문에 접근할 수 있기 때문이다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
+> **[팬 분석]** "...이야기가 전개되면서, 스트래트포(Stratfo)와 DURPA는 아마데우스를 확보하려 시도한다. 이는 아마데우스가 크리스의 뇌파 패턴을 보유하고 있었기 때문에 크리스의 타임 트래블 논문에 접근할 수 있기 때문이다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)[^1]
 
 ## 주요 소속 인물
 
@@ -73,4 +73,4 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — Steins;Gate 세계선 역학을 체계적으로 정리한 팬 작성 논문. 본 문서에서는 작중 3파전 구도와 아마데우스 확보 경쟁에 대한 요약적 서술을 참고용으로 인용했다.
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md) — Steins;Gate 세계선 역학을 체계적으로 정리한 팬 작성 논문. 본 문서에서는 작중 3파전 구도와 아마데우스 확보 경쟁에 대한 요약적 서술을 참고용으로 인용했다.

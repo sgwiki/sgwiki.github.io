@@ -37,7 +37,7 @@
 "재구성"이라는 표현은 기존 구조가 이미 있었음을 시사합니다.
 
 > **[팬 분석]** "세계선이 미리 존재하는 실체가 아니라면 수렴에 대한 설명이 없습니다. 마법적인 플롯 편의성 외에는 말이죠. 반면에, 세계선이 이미 존재한다면 수렴은 완벽하게 이해할 수 있습니다."
-> — 출처: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), 4. Misconceptions §4.2
+> — 출처: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md), 4. Misconceptions §4.2
 
 수속(수렴) 개념은 세계선이 미리 결정되어 있다는 전제 위에서만 자연스럽게 설명됩니다. 생성설에서는 "왜 특정 사건이 반드시 일어나는가"를 설명할 근거가 부족합니다.
 

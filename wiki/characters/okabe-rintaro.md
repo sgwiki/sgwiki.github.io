@@ -59,7 +59,7 @@ spoiler: endgame
 
 리딩 슈타이너는 오카베만의 고유 능력이 아니라, 잠재적으로는 모든 사람이 어느 정도 가진 것으로 설정됩니다. 다만 오카베의 발현 정도가 유독 강해서 이전 세계선의 기억을 선명하게 보존하는 반면, 다른 인물들은 데자뷰·백일몽·환지통 형태로만 미약하게 경험합니다. 본편에서는 페이리스, 루카, 크리스가 이런 형태의 기억 보유를 보여주고, 제0편에서는 광범위한 인물에게서 나타나 '기억 이상을 동반한 신형 뇌염'으로 오해받습니다.
 
-> **[팬 분석]** "리딩 슈타이너는 오카베만의 것이 아니라 모든 사람이 잠재적으로 가진 능력이며, 오카베의 발현 정도가 특별히 강한 것일 뿐이다. 이는 다른 인물들이 꿈이나 데자뷰 형태로 이전 세계선을 떠올리는 묘사로 뒷받침된다." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》[^1]
+> **[팬 분석]** "리딩 슈타이너는 오카베만의 것이 아니라 모든 사람이 잠재적으로 가진 능력이며, 오카베의 발현 정도가 특별히 강한 것일 뿐이다. 이는 다른 인물들이 꿈이나 데자뷰 형태로 이전 세계선을 떠올리는 묘사로 뒷받침된다." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》[^1]
 
 ### 각성 배경 — 공식 불명, 추측 다수
 
@@ -69,7 +69,7 @@ spoiler: endgame
 
 리딩 슈타이너는 D메일에 의한 세계선 재구성에는 발동하지만, 타임리프에는 특이한 예외를 보입니다. 오카베가 직접 타임리프를 수행할 때는 리딩 슈타이너 감각이 발생하지 않는데, 이는 우주가 과거에 도착한 오카베를 진짜로 인식하며 D메일과 달리 타임리프가 현재를 이동시킨다는 해석을 뒷받침합니다. 또한 다이버전스 미터 판독값을 바꿀 만큼 크지 않은 미세 이동에서도 특유의 감각 없이 기억만 유지되는 현상이 관찰됩니다.
 
-> **[팬 분석]** "오카베이 타임리프를 하거나 타임리프 발신 시점으로 돌아올 때 리딩 슈타이너 감각을 느끼지 않는다. 만약 타임리프가 D메일과 동일하게 작동했다면 발신을 누른 오카베의 기억이 현재 오카베을 덮어써야 하지만, 실제로는 그렇게 되지 않는다. 우주가 도착한 오카베을 '진짜'로 인식하기 때문으로, 이는 D메일과 타임리프의 작동 방식이 본질적으로 다르다는 증거가 된다." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》[^2]
+> **[팬 분석]** "오카베이 타임리프를 하거나 타임리프 발신 시점으로 돌아올 때 리딩 슈타이너 감각을 느끼지 않는다. 만약 타임리프가 D메일과 동일하게 작동했다면 발신을 누른 오카베의 기억이 현재 오카베을 덮어써야 하지만, 실제로는 그렇게 되지 않는다. 우주가 도착한 오카베을 '진짜'로 인식하기 때문으로, 이는 D메일과 타임리프의 작동 방식이 본질적으로 다르다는 증거가 된다." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》[^2]
 
 ## 주요 인간관계
 
@@ -115,7 +115,7 @@ spoiler: endgame
 
 오퍼레이션 스쿨드의 두 가지 요구 사항은 (1) 마키세 크리스의 생명을 구할 것, (2) 나카바치 논문을 소멸시킬 것입니다. 두 조건이 충족되면 알파와 베타 어트랙터 필드의 수속 미래 어느 쪽으로도 흐르지 않는 경계 세계선 — 슈타인즈 게이트(1.048596%) — 에 도달합니다.
 
-> **[팬 분석]** "오퍼레이션 스쿨드는 오카베이 크리스를 구하기 위한 계획으로, '확정된 과거를 바꾸지 않고 결과를 바꾸라'는 모순적 지시에 기반한다. 처음의 자신을 속여 크리스가 죽었다고 믿게 함으로써 시간 역설을 피하고, 동시에 나카바치 논문을 소멸시켜 제3차 세계대전을 막는다." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》[^3]
+> **[팬 분석]** "오퍼레이션 스쿨드는 오카베이 크리스를 구하기 위한 계획으로, '확정된 과거를 바꾸지 않고 결과를 바꾸라'는 모순적 지시에 기반한다. 처음의 자신을 속여 크리스가 죽었다고 믿게 함으로써 시간 역설을 피하고, 동시에 나카바치 논문을 소멸시켜 제3차 세계대전을 막는다." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》[^3]
 
 ### 슈타인즈 게이트 0 — 크리스 사망 이후의 오카베
 
@@ -163,6 +163,6 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 2.3 Reading Steiner
-[^2]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 2.3.3 Other Manifestations
-[^3]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 3.1.3 Operation Skuld
+[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.3 Reading Steiner
+[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.3.3 Other Manifestations
+[^3]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 3.1.3 Operation Skuld

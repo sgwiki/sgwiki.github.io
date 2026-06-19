@@ -46,7 +46,7 @@ spoiler: main_story
 
 2000년대 초반 인터넷论坛 '애키하바라 채널'에 '존 티터'라는 필명으로 시간여행자임을 밝히며 활동합니다. 시간여행의 원리와 미래의 정보를 공유하면서도, SERN의 추적을 피하기 위해 거짓 정보를 섞어 정보를 흐리는 작전을 사용합니다.
 
-> **[팬 분석]** "SERN이 나를 표적으로 삼지 못하게 하기 위해서야. 진실 한 가장에 거짓말 한 가장을 섞어서, 전체를 오염시키는 거라고." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》
+> **[팬 분석]** "SERN이 나를 표적으로 삼지 못하게 하기 위해서야. 진실 한 가장에 거짓말 한 가장을 섞어서, 전체를 오염시키는 거라고." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》
 
 ### 미래 가제트 연구소 합류
 
@@ -70,7 +70,7 @@ spoiler: main_story
 - **역할**: 2000년 문제(Y2K) 해결을 위해 1975년에서 2000년까지 활동
 - **특징**: 1975년에서 기억상실증에 걸려 25년간 머물며 2000년에 인터넷에 글을 작성
 
-> **[팬 분석]** "알파 세계선에서는 아마네 스즈하가 인과에 영향을 끼치는 일이 거의 없었습니다. 그에 비해 베타 세계선에서는 타임머신이 알파 세계선 때보다 정교해져 1975년, 2000년, 2010년을 오가며 활동합니다." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》
+> **[팬 분석]** "알파 세계선에서는 아마네 스즈하가 인과에 영향을 끼치는 일이 거의 없었습니다. 그에 비해 베타 세계선에서는 타임머신이 알파 세계선 때보다 정교해져 1975년, 2000년, 2010년을 오가며 활동합니다." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》
 
 ### 슈타인즈 게이트 세계선 (1.048596%)
 
@@ -78,7 +78,7 @@ spoiler: main_story
 - **특징**: 타임머신과 함께 사라지며, 2036년에 평화롭게 살게 됨
 - **의미**: 슈타인즈 게이트 도달의 증거로서 스즈하의 희생이 필요했음
 
-> **[팬 분석]** "원인과 결과가 재구성될 거야. 여기 앉아 있는 나는 사라질 거야. 왜냐하면 나는 아마도 2036년에 평화롭게 살고 있을 테니까." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》
+> **[팬 분석]** "원인과 결과가 재구성될 거야. 여기 앉아 있는 나는 사라질 거야. 왜냐하면 나는 아마도 2036년에 평화롭게 살고 있을 테니까." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》
 
 ## 주요 사건
 
@@ -98,7 +98,7 @@ spoiler: main_story
 
 스즈하는 오카베가 크리스를 구하기 위해 계획한 '스쿨드 작전'에 함께 참여합니다. 2010년 7월 28일로 타임여행하여 크리스를 구출하고 나카바치 논문을 파괴하는 작전을 수행합니다.
 
-> **[팬 분석]** "슈타인즈 게이트에 도달하기 위한 두 가지 요구 사항이 있어. 하나는 마키세 크리스의 생명을 구하는 것이고, 다른 하나는 나카바치 박사가 러시아로 가져가는 나카바치 논문을 망각 속으로 보내는 것이야." — 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》
+> **[팬 분석]** "슈타인즈 게이트에 도달하기 위한 두 가지 요구 사항이 있어. 하나는 마키세 크리스의 생명을 구하는 것이고, 다른 하나는 나카바치 박사가 러시아로 가져가는 나카바치 논문을 망각 속으로 보내는 것이야." — 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》
 
 ## 인물 관계
 
@@ -132,7 +132,7 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 2.2.4 Physical Time Travel, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^2]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^3]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 4.3.3 Why Suzuha Disappears, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^4]: 《[The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)》, 2.6.1 Series Chronology, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.2.4 Physical Time Travel, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^3]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 4.3.3 Why Suzuha Disappears, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+[^4]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)》, 2.6.1 Series Chronology, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5

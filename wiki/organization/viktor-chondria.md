@@ -48,11 +48,11 @@ spoiler: zero_story
 
 타임 리프 머신의 구체적 메커니즘은 다음과 같이 요약된다. 헤드셋으로 사용자의 뇌 구조를 읽어 데이터로 변환하고, 블랙홀 근처를 통과시켜 초압축한 뒤(이때 데이터는 D메일과 같은 36바이트급 크기까지 줄어든다), D메일 기술로 과거의 자기 자신에게 전화 메시지 형태로 전송한다. 메시지를 받는 순간 전자기 방사선이 수신자의 뇌에 기억을 덮어쓴다. 송신자와 수신자는 같은 사람이어야 하며(뇌 구조 호환성), 한 번에 도약 가능한 시간은 48시간이 한계로 설정된다.
 
-> **[팬 분석]** "타임 리프 머신은 헤드셋을 사용하여 사용자의 뇌 구조를 읽고 데이터로 변환하며, 블랙홀에 가깝게 통과시켜 작은 크기로 압축한다. 메모리 데이터와 디코딩 프로그램은 D-메일 기술을 사용하여 과거로 전화 메시지로 전송된다. 기억은 전화 메시지에 응답할 때 전자기 방사선을 사용하여 수신자의 뇌에 기록된다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
+> **[팬 분석]** "타임 리프 머신은 헤드셋을 사용하여 사용자의 뇌 구조를 읽고 데이터로 변환하며, 블랙홀에 가깝게 통과시켜 작은 크기로 압축한다. 메모리 데이터와 디코딩 프로그램은 D-메일 기술을 사용하여 과거로 전화 메시지로 전송된다. 기억은 전화 메시지에 응답할 때 전자기 방사선을 사용하여 수신자의 뇌에 기록된다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)[^1]
 
 팬 분석에 따르면, 타임 리프의 48시간 한계는 단일 요인이 아니라 (1) 기억 데이터의 품질, (2) 전송 중 데이터 손상 정도, (3) 수신자 뇌와의 호환성, (4) 뇌 덮어쓰기 방식의 한계가 복합적으로 작용한 결과로 해석된다.[^1] 《Steins;Gate 0》에서 마호가 이 머신을 개선해 한 번에 2주까지 도약할 수 있게 만드는 것도, 한계가 부분적으로는 하드웨어 설정의 결과였음을 뒷받침한다.
 
-> **[팬 분석]** "《Steins;Gate 0》에서 마호는 타임 리프 머신을 개선하여 한 번에 2주를 도약할 수 있게 한다. 이것은 제한이 부분적으로 하드웨어 설정의 결과였음을 확인시켜 준다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf)[^1]
+> **[팬 분석]** "《Steins;Gate 0》에서 마호는 타임 리프 머신을 개선하여 한 번에 2주를 도약할 수 있게 한다. 이것은 제한이 부분적으로 하드웨어 설정의 결과였음을 확인시켜 준다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md)[^1]
 
 ## Steins;Gate 0 내 역할
 
@@ -108,4 +108,4 @@ spoiler: zero_story
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) (유저번역). 타임 리프 메커니즘, 블랙홀 압축, 36바이트 제한, 송신자=수신자 원칙, 48시간 한계의 기원, Steins;Gate 0에서의 2주 도약 개량 등을 해설한 팬 분석 문서. 본 문서의 타임 리프 메커니즘 서술은 이 문서의 산문 요약에 기반한다.
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md) (유저번역). 타임 리프 메커니즘, 블랙홀 압축, 36바이트 제한, 송신자=수신자 원칙, 48시간 한계의 기원, Steins;Gate 0에서의 2주 도약 개량 등을 해설한 팬 분석 문서. 본 문서의 타임 리프 메커니즘 서술은 이 문서의 산문 요약에 기반한다.
