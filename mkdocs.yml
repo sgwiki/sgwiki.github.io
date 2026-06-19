@@ -40,6 +40,8 @@ markdown_extensions:
 
 docs_dir: wiki
 site_dir: site
+exclude_docs: |
+  _template/
 
 extra:
   social:

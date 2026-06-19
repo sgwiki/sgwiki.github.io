@@ -66,7 +66,6 @@ wiki/
 게임 스크립트 원문은 게재하지 않으며, 공개 QA자료 및 팬 분석을 토대로 작성합니다.
 
 나무위키 파생 콘텐츠는 [CC BY-NC-SA 2.0 KR](https://creativecommons.org/licenses/by-nc-sa/2.0/kr/) 조건으로 이용합니다.
-귀속 정보: [`sources/namuwiki.yaml`](../sources/namuwiki.yaml)
 
 ## 라이선스
 
