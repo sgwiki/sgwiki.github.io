@@ -266,6 +266,39 @@
       justify-content: flex-end;
     }
     .review-actions .btn { margin-left: 0; }
+    .suggestion-log-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .suggestion-log-item {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+    .suggestion-log-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      color: #c9d1d9;
+    }
+    .suggestion-log-meta {
+      color: #8b949e;
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+    }
+    .suggestion-log-output {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid #21262d;
+      color: #8b949e;
+      font-family: 'Consolas', 'Menlo', monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
 
     .modal {
       position: fixed;
@@ -814,6 +847,53 @@
   // ── Suggestions ───────────────────────────────────────────────────────────
   let _suggApproveTarget = null;
 
+  function formatDateTime(value) {
+    return value ? String(value).slice(0, 16).replace('T', ' ') : '-';
+  }
+
+  function pipelineLogResultLabel(result) {
+    if (result === 'processed') return '처리됨';
+    if (result === 'skipped') return '스킵됨';
+    if (result === 'error') return '오류';
+    return result || '-';
+  }
+
+  function renderSuggestionLogs(logs) {
+    if (!Array.isArray(logs) || logs.length === 0) {
+      return `<div class="suggestion-log-list">
+        <div class="suggestion-log-item" style="color:#484f58">파이프라인 2 실행 로그 없음</div>
+      </div>`;
+    }
+    return `<div class="suggestion-log-list">${logs.map(log => `
+      <div class="suggestion-log-item">
+        <div class="suggestion-log-title">
+          <b>파이프라인 ${escapeHtml(String(log.pipeline || 'p2').replace('p', ''))}</b>
+          <code style="color:#8b949e">${escapeHtml(log.run_id || '-')}</code>
+          <span class="status-badge ${log.status === 'failed' ? 'off' : 'on'}" style="font-size:10px">${escapeHtml(log.status || '-')}</span>
+          <span style="color:#8b949e">${escapeHtml(formatDateTime(log.timestamp))}</span>
+          <span style="color:#58a6ff">${escapeHtml(pipelineLogResultLabel(log.result))}</span>
+        </div>
+        <div class="suggestion-log-meta">
+          ${escapeHtml(log.message || '')}
+          · processed=${escapeHtml(log.processed_count ?? 0)}
+          skipped=${escapeHtml(log.skipped_count ?? 0)}
+          errors=${escapeHtml(log.error_count ?? 0)}
+        </div>
+        ${log.stdout_tail ? `<div class="suggestion-log-output">${escapeHtml(log.stdout_tail)}</div>` : ''}
+      </div>`).join('')}</div>`;
+  }
+
+  function formatSuggestionLogsText(logs) {
+    if (!Array.isArray(logs) || logs.length === 0) return '파이프라인 2 실행 로그 없음';
+    return logs.map(log => [
+      `파이프라인 ${String(log.pipeline || 'p2').replace('p', '')} · ${log.run_id || '-'}`,
+      `시각: ${formatDateTime(log.timestamp)}`,
+      `상태: ${log.status || '-'} / ${pipelineLogResultLabel(log.result)}`,
+      `요약: ${log.message || ''} · processed=${log.processed_count ?? 0} skipped=${log.skipped_count ?? 0} errors=${log.error_count ?? 0}`,
+      log.stdout_tail ? `로그:\n${log.stdout_tail}` : '',
+    ].filter(Boolean).join('\n')).join('\n\n');
+  }
+
   async function loadSuggestions() {
     try {
       const res   = await fetch('/suggestions');
@@ -845,6 +925,7 @@
             <span style="color:#8b949e">${dec.decided_at?.slice(0,16).replace('T',' ')} · ${dec.action === 'approved' ? '승인' : '거부'}</span>
             ${(dec.instruction || dec.reason) ? `<div style="color:#c9d1d9;margin-top:4px;white-space:pre-wrap">${escapeHtml(dec.instruction || dec.reason)}</div>` : ''}
           </div>` : '';
+        const logBlock = renderSuggestionLogs(s.pipeline_logs ?? []);
         return `<div style="padding:14px 0;border-bottom:1px solid #21262d">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
             ${statusBadge}
@@ -858,6 +939,7 @@
           </div>
           <div style="color:#c9d1d9;line-height:1.6;white-space:pre-wrap;word-break:break-all">${escapeHtml(s.content ?? '')}</div>
           ${decBlock}
+          ${logBlock}
         </div>`;
       }).join('');
     } catch (e) {
@@ -878,7 +960,7 @@
       document.getElementById('preview-content').textContent =
         `접수: ${(s.created_at ?? '').slice(0,16).replace('T',' ')}\n` +
         (s.contact ? `연락처: ${s.contact}\n` : '') +
-        `\n${s.content ?? ''}`;
+        `\n${s.content ?? ''}\n\n--- 파이프라인 2 실행 로그 ---\n${formatSuggestionLogsText(s.pipeline_logs ?? [])}`;
       document.getElementById('wiki-preview-modal').classList.add('show');
     } catch(e) {
       alert('로드 실패: ' + e.message);

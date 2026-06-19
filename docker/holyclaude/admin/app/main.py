@@ -26,6 +26,9 @@ TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "holyclaude")
 P1_SCRIPT = os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs")
 RUN_OUTPUT_LIMIT = int(os.getenv("ADMIN_RUN_OUTPUT_LIMIT", "30000"))
+SUGGESTION_LOG_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_LIMIT", "5"))
+SUGGESTION_LOG_OUTPUT_LIMIT = int(os.getenv("ADMIN_SUGGESTION_LOG_OUTPUT_LIMIT", "1200"))
+P2_POLL_MATCH_WINDOW_SECONDS = int(os.getenv("ADMIN_P2_POLL_MATCH_WINDOW_SECONDS", "10"))
 
 active_jobs: dict[str, dict] = {}
 
@@ -451,6 +454,159 @@ def _save_decision(sid: str, data: dict) -> None:
     )
 
 
+def _read_run_file(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _ids_from_run_field(value) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        sid = value.get("id")
+        return [sid] if isinstance(sid, str) and sid else []
+    if not isinstance(value, list):
+        return []
+
+    ids: list[str] = []
+    for item in value:
+        if isinstance(item, str) and item:
+            ids.append(item)
+        elif isinstance(item, dict):
+            sid = item.get("id")
+            if isinstance(sid, str) and sid:
+                ids.append(sid)
+    return ids
+
+
+def _has_suggestion_result_lists(data: dict) -> bool:
+    return bool(
+        _ids_from_run_field(data.get("processed"))
+        or _ids_from_run_field(data.get("skipped"))
+        or _ids_from_run_field(data.get("errors"))
+    )
+
+
+def _timestamp_seconds(value: str | None) -> float | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return None
+
+
+def _matching_p2_run(poll: dict, p2_runs: list[dict]) -> dict | None:
+    poll_ts = _timestamp_seconds(poll.get("timestamp"))
+    if poll_ts is None:
+        return None
+
+    best: tuple[float, dict] | None = None
+    for run in p2_runs:
+        run_ts = _timestamp_seconds(run["data"].get("timestamp") or run["data"].get("completed_at"))
+        if run_ts is None:
+            continue
+        delta = abs(run_ts - poll_ts)
+        if delta <= P2_POLL_MATCH_WINDOW_SECONDS and (best is None or delta < best[0]):
+            best = (delta, run)
+    return best[1] if best else None
+
+
+def _poll_summary(data: dict) -> str:
+    processed = _ids_from_run_field(data.get("processed"))
+    skipped = _ids_from_run_field(data.get("skipped"))
+    errors = data.get("errors") if isinstance(data.get("errors"), list) else []
+    return f"processed={len(processed)} skipped={len(skipped)} errors={len(errors)}"
+
+
+def _append_suggestion_log(
+    logs: dict[str, list[dict]],
+    seen: set[tuple[str, str, str, str]],
+    sid: str,
+    result: str,
+    run_entry: dict,
+    poll_entry: dict,
+) -> None:
+    run_data = run_entry["data"]
+    poll_data = poll_entry["data"]
+    timestamp = run_data.get("timestamp") or run_data.get("completed_at") or poll_data.get("timestamp")
+    run_id = run_data.get("run_id") or run_entry["path"].stem
+    key = (sid, str(run_id), result, str(timestamp))
+    if key in seen:
+        return
+    seen.add(key)
+
+    errors = poll_data.get("errors") if isinstance(poll_data.get("errors"), list) else []
+    stdout_tail = run_data.get("stdout_tail") or _poll_summary(poll_data)
+    logs.setdefault(sid, []).append({
+        "pipeline": "p2",
+        "run_id": run_id,
+        "result": result,
+        "timestamp": timestamp,
+        "started_at": run_data.get("started_at"),
+        "completed_at": run_data.get("completed_at") or poll_data.get("timestamp"),
+        "status": run_data.get("status") or ("failed" if errors else "completed"),
+        "message": run_data.get("message") or ("제안 폴링 실패" if errors else "제안 폴링 완료"),
+        "processed_count": len(_ids_from_run_field(poll_data.get("processed"))),
+        "skipped_count": len(_ids_from_run_field(poll_data.get("skipped"))),
+        "error_count": len(errors),
+        "stdout_tail": _tail_text(str(stdout_tail), SUGGESTION_LOG_OUTPUT_LIMIT),
+        "source_file": run_entry["path"].name,
+        "poll_file": poll_entry["path"].name,
+    })
+
+
+def _index_suggestion_result_logs(
+    logs: dict[str, list[dict]],
+    seen: set[tuple[str, str, str, str]],
+    run_entry: dict,
+    poll_entry: dict,
+) -> None:
+    data = poll_entry["data"]
+    for sid in _ids_from_run_field(data.get("processed")):
+        _append_suggestion_log(logs, seen, sid, "processed", run_entry, poll_entry)
+    for sid in _ids_from_run_field(data.get("skipped")):
+        _append_suggestion_log(logs, seen, sid, "skipped", run_entry, poll_entry)
+    for sid in _ids_from_run_field(data.get("errors")):
+        _append_suggestion_log(logs, seen, sid, "error", run_entry, poll_entry)
+
+
+def _suggestion_pipeline_logs() -> dict[str, list[dict]]:
+    logs: dict[str, list[dict]] = {}
+    if not RUNS_DIR.exists():
+        return logs
+
+    p2_runs: list[dict] = []
+    poll_runs: list[dict] = []
+    for path in sorted(RUNS_DIR.glob("*.json"), reverse=True):
+        data = _read_run_file(path)
+        if not isinstance(data, dict):
+            continue
+        entry = {"path": path, "data": data}
+        if data.get("pipeline") == "p2":
+            p2_runs.append(entry)
+        elif path.name.endswith("-poll.json") and _has_suggestion_result_lists(data):
+            poll_runs.append(entry)
+
+    seen: set[tuple[str, str, str, str]] = set()
+    for poll_entry in poll_runs:
+        run_entry = _matching_p2_run(poll_entry["data"], p2_runs) or poll_entry
+        _index_suggestion_result_logs(logs, seen, run_entry, poll_entry)
+
+    for run_entry in p2_runs:
+        if _has_suggestion_result_lists(run_entry["data"]):
+            _index_suggestion_result_logs(logs, seen, run_entry, run_entry)
+
+    for sid, sid_logs in list(logs.items()):
+        sid_logs.sort(key=lambda item: item.get("timestamp") or "", reverse=True)
+        logs[sid] = sid_logs[:SUGGESTION_LOG_LIMIT]
+    return logs
+
+
 class SuggestionActionBody(BaseModel):
     instruction: str | None = None
 
@@ -458,12 +614,15 @@ class SuggestionActionBody(BaseModel):
 @app.get("/suggestions")
 async def get_suggestions():
     inbox_dir = WORKSPACE / "suggestions" / "inbox"
+    logs_by_sid = _suggestion_pipeline_logs()
     items = []
     if inbox_dir.exists():
         for f in sorted(inbox_dir.glob("*.json"), reverse=True):
             try:
                 item = json.loads(f.read_text(encoding="utf-8"))
-                item["decision"] = _load_decision(item.get("id", f.stem))
+                sid = item.get("id", f.stem)
+                item["decision"] = _load_decision(sid)
+                item["pipeline_logs"] = logs_by_sid.get(sid, [])
                 items.append(item)
             except Exception:
                 pass
@@ -477,6 +636,7 @@ async def get_suggestion(sid: str):
         raise HTTPException(status_code=404, detail="not found")
     item = json.loads(path.read_text(encoding="utf-8"))
     item["decision"] = _load_decision(sid)
+    item["pipeline_logs"] = _suggestion_pipeline_logs().get(sid, [])
     return item
 
 

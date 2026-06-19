@@ -43,9 +43,8 @@ reference/
 # MkDocs build output
 site/
 
-# Runtime: R2 폴링 수신함 및 처리 완료 마커
-suggestions/inbox/
-suggestions/processed/
+# Runtime: R2 폴링 수신함, 처리 완료 마커, 결정 로그
+suggestions/
 
 # Temp
 tmp/
