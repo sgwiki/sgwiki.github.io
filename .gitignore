@@ -37,6 +37,9 @@ data/qaset_with_rag_index*.csv
 data/공식 자료집/
 data/아카이브.zip
 
+# Reference material — local RAG 소스, 서버 불필요
+reference/
+
 # MkDocs build output
 site/
 

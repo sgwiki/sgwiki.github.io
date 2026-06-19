@@ -35,7 +35,7 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
-          "Access-Control-Allow-Origin": "https://sg-wiki.pages.dev",
+          "Access-Control-Allow-Origin": "https://sgwiki.github.io",
           "Access-Control-Allow-Methods": "POST",
           "Access-Control-Allow-Headers": "Content-Type",
         },

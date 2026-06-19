@@ -17,7 +17,7 @@
 ├── data/
 │   ├── mock-r2/            로컬 개발용 R2 모의 제안 데이터
 │   └── QA 탬플릿.md
-├── reference/
+├── reference/             ← 로컬 전용 (gitignored)
 │   ├── official/          공식 인터뷰, 공식 Q&A 자료 번역/정리
 │   └── user/              유저 작성 해설 자료
 ├── wiki/
@@ -50,7 +50,7 @@
 - `scripts/qa_wiki_pipeline.py`: CSV 파싱, 수동 프롬프트 생성, SLM 출력 검증, 위키 초안 그룹핑을 담당하는 후처리 도구입니다.
 - `prompts/`: 시스템 프롬프트, 유저 템플릿, 로컬 completion wrapper를 분리해 프롬프트 수정이 쉽도록 구성했습니다.
 - `data/`: 원본 게시판 데이터는 저작권·개인정보 이슈로 저장소에 포함하지 않습니다 (대용량/민감 데이터는 `.gitignore`에서 제외).
-- `reference/`: 위키 집필 근거 자료(공식 + 팬 해설)를 정리한 디렉터리입니다.
+- `reference/`: 위키 집필 근거 자료(공식 + 팬 해설). 로컬 전용 — git 추적 제외.
 - `wiki/`: SLM으로 생성한 한국어 슈타인즈 게이트 설정 해설 위키입니다.
 - `prompts/wiki_writing_*.md`: 위키 집필용 시스템 프롬프트와 유저 템플릿입니다.
 - `artifacts/qa-wiki/runs/`: LangChain 추출 실행 결과가 실행 단위로 저장됩니다.

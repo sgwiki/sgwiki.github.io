@@ -14,10 +14,10 @@
 
 ## 2. 인프라 구조
 
-### 서버 레이어 (Cloudflare — 비용 0)
+### 서버 레이어 (GitHub Pages + Cloudflare Worker — 비용 0)
 
 ```
-Cloudflare Pages
+GitHub Pages (sgwiki.github.io/sg-wiki/)
   └── wiki/ 정적 사이트 (MkDocs Material)
         ├── 한국어 검색, Mermaid 다이어그램
         ├── 스포일러 배지
@@ -203,7 +203,7 @@ def main() -> None:
   ⑧ git commit + push
        → .github/workflows/deploy.yml
        → mkdocs build
-       → Cloudflare Pages 배포
+       → GitHub Pages 배포 (sgwiki.github.io/sg-wiki/)
 ```
 
 ### 파이프라인 2 — 제안 처리
@@ -228,7 +228,7 @@ cron 또는 수동 트리거
   │
   ④ suggestions/decisions/{id}.json 저장
   │
-  ⑤ 히스토리 탭 반영 (Pages 재배포)
+  ⑤ 히스토리 탭 반영 (GitHub Pages 재배포)
 ```
 
 ### suggestion-judge 출력 형식
