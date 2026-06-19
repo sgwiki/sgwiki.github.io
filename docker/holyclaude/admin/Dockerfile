@@ -1,5 +1,10 @@
 FROM python:3.12-slim
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git \
+ && git config --system --add safe.directory /workspace \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN pip install uv
 
 WORKDIR /app

@@ -81,6 +81,11 @@
     }
     .btn-success:hover { background: #3fb950; }
 
+    .btn-small {
+      padding: 4px 9px;
+      font-size: 11px;
+    }
+
     .btn + .btn { margin-left: 8px; }
 
     .msg {
@@ -231,6 +236,108 @@
       margin-right: 4px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Wiki review */
+    .review-list { display: grid; gap: 8px; }
+    .review-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #21262d;
+    }
+    .review-item:last-child { border-bottom: 0; }
+    .review-title {
+      color: #c9d1d9;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    .review-meta {
+      color: #8b949e;
+      font-size: 11px;
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+    }
+    .review-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .review-actions .btn { margin-left: 0; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(1, 4, 9, 0.78);
+      z-index: 50;
+    }
+    .modal.show { display: grid; }
+    .modal-panel {
+      width: min(1100px, 100%);
+      max-height: 88vh;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.45);
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #21262d;
+    }
+    .modal-head h2 {
+      margin: 0;
+      color: #58a6ff;
+      font-size: 14px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .modal-body {
+      max-height: calc(88vh - 58px);
+      overflow: auto;
+      padding: 16px;
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .preview-block h3 {
+      color: #8b949e;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    pre.preview {
+      min-height: 260px;
+      max-height: 62vh;
+      overflow: auto;
+      background: #010409;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      padding: 12px;
+      font-family: 'Consolas', 'Menlo', monospace;
+      font-size: 11px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    @media (max-width: 760px) {
+      .review-item { grid-template-columns: 1fr; }
+      .review-actions { justify-content: flex-start; }
+      .preview-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -285,7 +392,15 @@
     <p class="refresh-hint">30초마다 자동 갱신</p>
   </div>
 
-  <!-- 섹션 5: 에이전트 로그 -->
+  <!-- 섹션 5: 새/변경 위키 페이지 검토 -->
+  <div class="card full-card">
+    <h2>위키 페이지 검토</h2>
+    <div id="review-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <div id="review-msg" class="msg"></div>
+    <p class="refresh-hint">새로 작성되거나 변경된 wiki/*.md 페이지를 표시합니다. 승인하면 현재 파일 해시가 승인 기록에 저장되고, 거부하면 해당 파일 변경을 되돌립니다.</p>
+  </div>
+
+  <!-- 섹션 6: 에이전트 로그 -->
   <div class="card full-card">
     <div class="log-controls">
       <span class="dot" id="log-dot"></span>
@@ -296,7 +411,7 @@
     <div class="terminal" id="log-terminal"></div>
   </div>
 
-  <!-- 섹션 6: 실행 현황 -->
+  <!-- 섹션 7: 실행 현황 -->
   <div class="card full-card">
     <h2>실행 현황</h2>
     <table>
@@ -315,6 +430,27 @@
     <p class="refresh-hint">10초마다 자동 갱신</p>
   </div>
 
+</div>
+
+<div class="modal" id="wiki-preview-modal" onclick="closePreview(event)">
+  <div class="modal-panel" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h2 id="preview-title">위키 페이지 보기</h2>
+      <button class="btn btn-small" style="margin-left:auto" onclick="closePreview()">닫기</button>
+    </div>
+    <div class="modal-body">
+      <div class="preview-grid">
+        <div class="preview-block">
+          <h3>Diff</h3>
+          <pre class="preview" id="preview-diff"></pre>
+        </div>
+        <div class="preview-block">
+          <h3>Markdown</h3>
+          <pre class="preview" id="preview-content"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -430,6 +566,125 @@
     }
   }
 
+  // ── Wiki page review ─────────────────────────────────────────────────────
+  async function loadWikiReviews() {
+    try {
+      const res = await fetch('/wiki-reviews');
+      const data = await res.json();
+      const items = data.items ?? [];
+      const el = document.getElementById('review-body');
+      if (items.length === 0) {
+        el.innerHTML = '<span style="color:#484f58">검토 대기 중인 위키 페이지 없음</span>';
+        return;
+      }
+
+      el.innerHTML = '<div class="review-list">' + items.map(renderReviewItem).join('') + '</div>';
+      document.querySelectorAll('[data-review-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.getAttribute('data-review-action');
+          const path = btn.getAttribute('data-path');
+          if (action === 'view') viewWikiPage(path);
+          if (action === 'approve') approveWikiPage(path);
+          if (action === 'reject') rejectWikiPage(path);
+        });
+      });
+    } catch (e) {
+      document.getElementById('review-body').textContent = '로드 실패: ' + e.message;
+    }
+  }
+
+  function renderReviewItem(item) {
+    const status = item.status === 'A' || item.status === '??' ? '신규' : '변경';
+    const source = item.source === 'working-tree' ? '미커밋' :
+      item.source === 'committed+working-tree' ? '커밋+미커밋' : '커밋됨';
+    return `
+      <div class="review-item">
+        <div>
+          <div class="review-title">${escapeHtml(item.title || item.path)}</div>
+          <div class="review-meta">${escapeHtml(item.path)} · ${status} · ${source} · ${escapeHtml(item.updated_at || '')}</div>
+        </div>
+        <div class="review-actions">
+          <button class="btn btn-small" data-review-action="view" data-path="${escapeAttr(item.path)}">보기</button>
+          <button class="btn btn-success btn-small" data-review-action="approve" data-path="${escapeAttr(item.path)}">승인</button>
+          <button class="btn btn-danger btn-small" data-review-action="reject" data-path="${escapeAttr(item.path)}">거부</button>
+        </div>
+      </div>`;
+  }
+
+  async function viewWikiPage(path) {
+    const modal = document.getElementById('wiki-preview-modal');
+    const title = document.getElementById('preview-title');
+    const diff = document.getElementById('preview-diff');
+    const content = document.getElementById('preview-content');
+    title.textContent = path;
+    diff.textContent = '불러오는 중...';
+    content.textContent = '';
+    modal.classList.add('show');
+    try {
+      const res = await fetch('/wiki-review?path=' + encodeURIComponent(path));
+      const data = await res.json();
+      if (!res.ok || data.status !== 'ok') {
+        diff.textContent = JSON.stringify(data, null, 2);
+        return;
+      }
+      title.textContent = data.item.title + ' — ' + data.item.path;
+      diff.textContent = data.diff || '(diff 없음)';
+      content.textContent = data.content || '';
+    } catch (e) {
+      diff.textContent = '로드 실패: ' + e.message;
+    }
+  }
+
+  async function approveWikiPage(path) {
+    const msg = document.getElementById('review-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>승인 처리 중...');
+    try {
+      const res = await fetch('/wiki-review/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path })
+      });
+      const data = await res.json();
+      if (res.ok && data.status === 'approved') {
+        showMsg(msg, 'ok', path + ' 승인 완료');
+        await loadWikiReviews();
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '승인 실패: ' + e.message);
+    }
+  }
+
+  async function rejectWikiPage(path) {
+    if (!confirm(path + ' 변경을 거부하고 되돌릴까요?')) return;
+    const msg = document.getElementById('review-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>거부 처리 중...');
+    try {
+      const res = await fetch('/wiki-review/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path })
+      });
+      const data = await res.json();
+      if (res.ok && data.status === 'rejected') {
+        showMsg(msg, 'ok', path + ' 거부 완료');
+        await loadWikiReviews();
+        await loadWikiStatus();
+        await loadStatus();
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '거부 실패: ' + e.message);
+    }
+  }
+
+  function closePreview(event) {
+    if (event && event.target.id !== 'wiki-preview-modal') return;
+    document.getElementById('wiki-preview-modal').classList.remove('show');
+  }
+
   // ── Status table ─────────────────────────────────────────────────────────
   async function loadStatus() {
     try {
@@ -463,6 +718,19 @@
   function showMsg(el, type, html) {
     el.className = 'msg show ' + type;
     el.innerHTML = html;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function escapeAttr(value) {
+    return escapeHtml(value).replaceAll('`', '&#96;');
   }
 
   // ── Log stream ────────────────────────────────────────────────────────────
@@ -508,10 +776,12 @@
   loadStatus();
   loadRunning();
   loadWikiStatus();
+  loadWikiReviews();
   connectLog();
   setInterval(loadStatus,     10000);
   setInterval(loadRunning,     3000);
   setInterval(loadWikiStatus, 30000);
+  setInterval(loadWikiReviews, 10000);
 </script>
 
 </body>

@@ -232,6 +232,7 @@ docker compose --env-file ../../.env up -d --build
 - 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) 수동 실행
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
+- 새로 작성되거나 변경된 `wiki/*.md` 페이지 검토: 보기, 승인, 거부
 
 파이프라인 1은 `sg-wiki-admin`이 Docker socket을 통해 `holyclaude`
 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다.
@@ -242,6 +243,10 @@ P1 실행 래퍼는 팀장/하위 에이전트가 실제로 사용한 MCP tool_r
 커밋 전에 아래 6개 항목이 각각 별도 성공 호출로 확인되어야 하며, 하나라도 빠지면
 P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_rag`,
 `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`(배제 감사 전용), `namuwiki`, `sg-ontology`.
+
+위키 페이지 검토 패널은 upstream 이후 변경된 `wiki/*.md`와 아직 커밋되지 않은
+`wiki/*.md`를 표시합니다. 승인하면 현재 파일 해시가 `.admin/wiki_reviews.json`에
+기록되고, 거부하면 해당 파일을 upstream 기준으로 되돌리거나 새 파일을 제거합니다.
 
 관련 환경 변수:
 

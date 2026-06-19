@@ -1,8 +1,10 @@
 import asyncio
+import hashlib
 import json
 import os
 import re
 import shlex
+import subprocess
 import sys
 import threading
 import uuid
@@ -10,7 +12,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -19,6 +21,7 @@ from app.scheduler import add_p2_job, get_jobs, remove_p2_job, scheduler
 
 RUNS_DIR = Path(os.getenv("ADMIN_RUNS_DIR", ".admin/runs"))
 WORKSPACE = Path(os.getenv("WORKSPACE", "/workspace"))
+WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "holyclaude")
 P1_SCRIPT = os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs")
@@ -30,6 +33,7 @@ active_jobs: dict[str, dict] = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    WIKI_REVIEW_STATE.parent.mkdir(parents=True, exist_ok=True)
     scheduler.start()
     yield
     scheduler.shutdown(wait=False)
@@ -127,6 +131,289 @@ async def wiki_status():
             "processed": len(processed),
         },
     }
+
+
+class WikiReviewBody(BaseModel):
+    path: str
+    reason: str | None = None
+
+
+@app.get("/wiki-reviews")
+async def wiki_reviews():
+    return {"items": _pending_wiki_review_items()}
+
+
+@app.get("/wiki-review")
+async def wiki_review_detail(path: str):
+    rel = _safe_wiki_relpath(path)
+    abs_path = WORKSPACE / rel
+    if not abs_path.exists():
+        return {"status": "missing", "path": rel}
+
+    item = _wiki_review_item(rel)
+    return {
+        "status": "ok",
+        "item": item,
+        "content": abs_path.read_text(encoding="utf-8", errors="replace"),
+        "diff": _wiki_review_diff(rel),
+    }
+
+
+@app.post("/wiki-review/approve")
+async def approve_wiki_review(body: WikiReviewBody):
+    rel = _safe_wiki_relpath(body.path)
+    item = _wiki_review_item(rel)
+    if item is None:
+        return {"status": "not_found", "path": rel}
+
+    state = _load_review_state()
+    key = _review_key(rel, item["hash"])
+    state[key] = {
+        "path": rel,
+        "hash": item["hash"],
+        "decision": "approved",
+        "reason": body.reason or "",
+        "reviewed_at": datetime.now().isoformat(),
+    }
+    _save_review_state(state)
+    return {"status": "approved", "path": rel}
+
+
+@app.post("/wiki-review/reject")
+async def reject_wiki_review(body: WikiReviewBody):
+    rel = _safe_wiki_relpath(body.path)
+    item = _wiki_review_item(rel)
+    if item is None:
+        return {"status": "not_found", "path": rel}
+
+    base_ref = _git_base_ref()
+    was_committed = item["source"] in {"committed", "committed+working-tree"}
+    exists_in_base = _git(["cat-file", "-e", f"{base_ref}:{rel}"], check=False).returncode == 0
+
+    if was_committed:
+        if exists_in_base:
+            _git(["checkout", base_ref, "--", rel])
+        else:
+            _git(["rm", "-f", "--", rel])
+        _git(["add", "-A", "--", rel])
+        if _has_staged_changes(rel):
+            _git([
+                "commit",
+                "-m",
+                "Remove wiki output rejected in admin review",
+                "-m",
+                f"The admin review UI rejected {rel}, so this restores the file to the upstream baseline or removes it when no baseline version exists.",
+                "-m",
+                "Constraint: Rejection was requested from sg-wiki-admin",
+                "-m",
+                "Confidence: medium",
+                "-m",
+                "Scope-risk: narrow",
+                "-m",
+                "Directive: Do not reintroduce this page without a fresh review",
+                "-m",
+                "Tested: sg-wiki-admin reject action completed git restore/rm",
+                "-m",
+                "Not-tested: Cloudflare Pages deploy after rejection",
+            ])
+    else:
+        if _git(["cat-file", "-e", f"HEAD:{rel}"], check=False).returncode == 0:
+            _git(["restore", "--", rel])
+        else:
+            target = WORKSPACE / rel
+            if target.exists():
+                target.unlink()
+
+    state = _load_review_state()
+    state[_review_key(rel, item["hash"])] = {
+        "path": rel,
+        "hash": item["hash"],
+        "decision": "rejected",
+        "reason": body.reason or "",
+        "reviewed_at": datetime.now().isoformat(),
+    }
+    _save_review_state(state)
+    return {"status": "rejected", "path": rel, "committed_revert": was_committed}
+
+
+def _git(args: list[str], check: bool = True) -> subprocess.CompletedProcess[str]:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=WORKSPACE,
+        text=True,
+        capture_output=True,
+    )
+    if check and result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or f"git {' '.join(args)} failed")
+    return result
+
+
+def _git_base_ref() -> str:
+    upstream = _git(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"], check=False)
+    if upstream.returncode == 0 and upstream.stdout.strip():
+        return upstream.stdout.strip()
+    previous = _git(["rev-parse", "--verify", "HEAD~1"], check=False)
+    if previous.returncode == 0 and previous.stdout.strip():
+        return previous.stdout.strip()
+    return "HEAD"
+
+
+def _safe_wiki_relpath(value: str) -> str:
+    rel = value.strip().replace("\\", "/")
+    if rel.startswith("/"):
+        rel = rel[1:]
+    if not rel.startswith("wiki/") or not rel.endswith(".md") or ".." in Path(rel).parts:
+        raise HTTPException(status_code=400, detail=f"Invalid wiki path: {value}")
+    abs_path = (WORKSPACE / rel).resolve()
+    wiki_root = (WORKSPACE / "wiki").resolve()
+    if not abs_path.is_relative_to(wiki_root):
+        raise HTTPException(status_code=400, detail=f"Invalid wiki path: {value}")
+    return rel
+
+
+def _load_review_state() -> dict:
+    if not WIKI_REVIEW_STATE.exists():
+        return {}
+    try:
+        return json.loads(WIKI_REVIEW_STATE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_review_state(state: dict) -> None:
+    WIKI_REVIEW_STATE.parent.mkdir(parents=True, exist_ok=True)
+    WIKI_REVIEW_STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _review_key(rel: str, digest: str) -> str:
+    return f"{rel}:{digest}"
+
+
+def _file_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+
+
+def _page_title(path: Path) -> str:
+    try:
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("# "):
+                return line[2:].strip()
+    except Exception:
+        pass
+    return path.stem
+
+
+def _parse_name_status_z(output: str) -> dict[str, str]:
+    items: dict[str, str] = {}
+    parts = output.split("\0")
+    index = 0
+    while index + 1 < len(parts):
+        status = parts[index]
+        index += 1
+        if not status:
+            continue
+        path = parts[index]
+        index += 1
+        if status.startswith(("R", "C")) and index < len(parts):
+            path = parts[index]
+            index += 1
+        if path.startswith("wiki/") and path.endswith(".md"):
+            items[path] = status[:1]
+    return items
+
+
+def _working_tree_wiki_changes() -> dict[str, str]:
+    result = _git(["status", "--porcelain=v1", "-z", "--", "wiki"], check=False)
+    if result.returncode != 0:
+        return {}
+
+    items: dict[str, str] = {}
+    parts = result.stdout.split("\0")
+    index = 0
+    while index < len(parts):
+        record = parts[index]
+        index += 1
+        if not record:
+            continue
+        status = record[:2]
+        path = record[3:]
+        if status.strip().startswith(("R", "C")) and index < len(parts):
+            path = parts[index]
+            index += 1
+        if path.startswith("wiki/") and path.endswith(".md"):
+            items[path] = status.strip() or "M"
+    return items
+
+
+def _committed_wiki_changes() -> dict[str, str]:
+    base_ref = _git_base_ref()
+    result = _git(["diff", "--name-status", "-z", f"{base_ref}..HEAD", "--", "wiki"], check=False)
+    if result.returncode != 0:
+        return {}
+    return _parse_name_status_z(result.stdout)
+
+
+def _wiki_review_item(rel: str) -> dict | None:
+    rel = _safe_wiki_relpath(rel)
+    path = WORKSPACE / rel
+    if not path.exists() or not path.is_file():
+        return None
+
+    working = _working_tree_wiki_changes()
+    committed = _committed_wiki_changes()
+    source = None
+    status = working.get(rel) or committed.get(rel) or "M"
+    if rel in committed and rel in working:
+        source = "committed+working-tree"
+    elif rel in committed:
+        source = "committed"
+    elif rel in working:
+        source = "working-tree"
+
+    digest = _file_hash(path)
+    state = _load_review_state().get(_review_key(rel, digest), {})
+    return {
+        "path": rel,
+        "title": _page_title(path),
+        "status": status,
+        "source": source or "current",
+        "hash": digest,
+        "decision": state.get("decision", "pending"),
+        "reviewed_at": state.get("reviewed_at"),
+        "updated_at": datetime.fromtimestamp(path.stat().st_mtime).isoformat(),
+        "size": path.stat().st_size,
+    }
+
+
+def _pending_wiki_review_items() -> list[dict]:
+    candidates = set(_committed_wiki_changes()) | set(_working_tree_wiki_changes())
+    items = []
+    for rel in sorted(candidates):
+        try:
+            item = _wiki_review_item(rel)
+        except Exception:
+            continue
+        if item and item["decision"] != "approved":
+            items.append(item)
+    return items
+
+
+def _wiki_review_diff(rel: str) -> str:
+    rel = _safe_wiki_relpath(rel)
+    base_ref = _git_base_ref()
+    chunks = []
+    committed = _git(["diff", f"{base_ref}..HEAD", "--", rel], check=False)
+    if committed.returncode == 0 and committed.stdout.strip():
+        chunks.append(committed.stdout)
+    working = _git(["diff", "--", rel], check=False)
+    if working.returncode == 0 and working.stdout.strip():
+        chunks.append(working.stdout)
+    return "\n".join(chunks)
+
+
+def _has_staged_changes(rel: str) -> bool:
+    result = _git(["diff", "--cached", "--quiet", "--", rel], check=False)
+    return result.returncode == 1
 
 
 class ScheduleBody(BaseModel):
