@@ -622,7 +622,7 @@
     modal.classList.add('show');
     try {
       const res = await fetch('/wiki-review?path=' + encodeURIComponent(path));
-      const data = await res.json();
+      const data = await readResponseJson(res);
       if (!res.ok || data.status !== 'ok') {
         diff.textContent = JSON.stringify(data, null, 2);
         return;
@@ -644,7 +644,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path })
       });
-      const data = await res.json();
+      const data = await readResponseJson(res);
       if (res.ok && data.status === 'approved') {
         showMsg(msg, 'ok', path + ' 승인 완료');
         await loadWikiReviews();
@@ -666,7 +666,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path })
       });
-      const data = await res.json();
+      const data = await readResponseJson(res);
       if (res.ok && data.status === 'rejected') {
         showMsg(msg, 'ok', path + ' 거부 완료');
         await loadWikiReviews();
@@ -731,6 +731,20 @@
 
   function escapeAttr(value) {
     return escapeHtml(value).replaceAll('`', '&#96;');
+  }
+
+  async function readResponseJson(res) {
+    const text = await res.text();
+    if (!text) return {};
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      return {
+        status: 'error',
+        detail: text,
+        http_status: res.status
+      };
+    }
   }
 
   // ── Log stream ────────────────────────────────────────────────────────────

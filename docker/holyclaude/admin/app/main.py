@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
@@ -41,6 +41,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="sg-wiki Admin", lifespan=lifespan)
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+
+@app.exception_handler(RuntimeError)
+async def runtime_error_handler(_request: Request, exc: RuntimeError):
+    return JSONResponse(
+        status_code=500,
+        content={"status": "error", "detail": str(exc)},
+    )
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -193,9 +201,9 @@ async def reject_wiki_review(body: WikiReviewBody):
     if was_committed:
         if exists_in_base:
             _git(["checkout", base_ref, "--", rel])
+            _git(["add", "-A", "--", rel])
         else:
             _git(["rm", "-f", "--", rel])
-        _git(["add", "-A", "--", rel])
         if _has_staged_changes(rel):
             _git([
                 "commit",
@@ -215,6 +223,8 @@ async def reject_wiki_review(body: WikiReviewBody):
                 "Tested: sg-wiki-admin reject action completed git restore/rm",
                 "-m",
                 "Not-tested: Cloudflare Pages deploy after rejection",
+                "--",
+                rel,
             ])
     else:
         if _git(["cat-file", "-e", f"HEAD:{rel}"], check=False).returncode == 0:
