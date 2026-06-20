@@ -30,14 +30,10 @@ Both managed by s6-overlay — they auto-restart on failure.
 - **Package managers:** pnpm, npm (built-in)
 - **Build tools:** vite, esbuild
 - **Code quality:** eslint, prettier
-- **Dev servers:** serve, nodemon, http-server
 - **Utilities:** concurrently, dotenv-cli
-- **Deployment:** wrangler (Cloudflare), vercel, netlify-cli, @cloudflare/next-on-pages, az (Azure)
 - **Databases:** prisma, drizzle-kit
 - **Process management:** pm2
-- **Mobile:** eas-cli (Expo)
 - **Performance:** lighthouse, @lhci/cli
-- **Media:** sharp-cli, @marp-team/marp-cli
 - **Mock APIs:** json-server
 
 ### Installing additional packages:
@@ -47,6 +43,8 @@ npm i <package>           # Project-local install
 ```
 
 ## Python 3
+
+use uv env. e.g. uv pip, uv add, uv run, uv python 
 
 ### Installed packages:
 - **HTTP:** requests, httpx, httpie
@@ -63,7 +61,7 @@ npm i <package>           # Project-local install
 
 ### Installing additional packages:
 ```bash
-pip install --break-system-packages <package>
+uv pip install --break-system-packages <package>
 ```
 The `--break-system-packages` flag is required (no venv in container context).
 
@@ -72,33 +70,22 @@ The `--break-system-packages` flag is required (no venv in container context).
 | CLI | Command | Notes |
 |-----|---------|-------|
 | **Claude Code** | `claude` | Primary — you are running inside this |
-| **Gemini CLI** | `gemini` | Requires `GEMINI_API_KEY` env var. Config persists across rebuilds. Notifications via Apprise. |
-| **OpenAI Codex** | `codex` | `OPENAI_API_KEY` or ChatGPT subscription (`codex login --device-auth`). Pre-configured with on-request approval. Auth persists across rebuilds. Notifications via Apprise. |
-| **Cursor** | `cursor` | Requires `CURSOR_API_KEY` env var. Config persists across rebuilds. |
 | **TaskMaster AI** | `task-master` | Task planning and management |
-| **Junie** | `junie` | JetBrains AI coding agent (requires JetBrains account) |
-| **OpenCode** | `opencode` | Open source AI agent (supports multiple providers) |
 
 ## System Tools
 
 ### Command-line utilities:
-- **Search:** ripgrep (`rg`), fd (`fdfind`), fzf, grep
+- **Search:** ripgrep (`rg`), fd (`fdfind`), fzf
 - **Files:** tree, bat (`batcat` or `bat`), jq, zip/unzip
 - **Network:** curl, wget, httpie, openssh-client
 - **Process:** htop, lsof, strace, iproute2 (`ip`, `ss`)
 - **Terminal:** tmux
-- **Version control:** git, gh (GitHub CLI)
+- **Version control:** git, gh
 
 ### Database CLIs:
 - **PostgreSQL:** `psql`
 - **Redis:** `redis-cli`
 - **SQLite:** `sqlite3`
-
-### Media & document processing:
-- **Images:** imagemagick (`convert`, `identify`, `mogrify`)
-- **Video/Audio:** ffmpeg
-- **Documents:** pandoc (convert between formats)
-- **Image processing:** libvips (via `vips` command or sharp)
 
 ### Browser:
 - **Chromium** at `/usr/bin/chromium` — headless by default
@@ -238,6 +225,7 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 - 공식/팬 논문 인용 블록에 출처 표시
 - 문서 상단 스포일러 배지 (`!!! warning "스포일러"`)
 - source-sanitizer 통과 (chunk ID·source_filter·내부 경로 미노출)
+- wiki-linker 통과 (내부 링크 정합성·외부 URL 유효성 확인)
 
 ### 파이프라인 1 — 콘텐츠 생성
 
@@ -247,7 +235,8 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 ③ 팀장 기획서 검토 → APPROVED PLAN / REJECTED PLAN / REVISION REQUESTED 판정
 ④ APPROVED PLAN인 경우에만 registry reserve 성공 후 Agent(wiki-writer, 기획서) 스폰
 ⑤ Agent(source-sanitizer, 초안) → 위반 시 팀장이 writer에게 피드백 재작성 요청 최대 2회, 초과 시 release 후 폐기
-⑥ 팀장 내용 검토 + MCP 커버리지 최종 확인 + registry status committing
+⑤-b Agent(wiki-linker, 초안) → broken link fail 시 writer에게 링크 수정 요청 최대 1회
+⑥ 팀장 내용 검토 + orphan_warning 검토 + MCP 커버리지 최종 확인 + registry status committing
 ⑦ git add <file> && git commit -m "wiki: <제목>" && git push
 ⑧ registry complete 또는 release
 ```
@@ -260,11 +249,11 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 ③ Agent(wiki-classifier) → Type A/B 분류
 ④ Agent(suggestion-judge) → 승인/거부/partial 판정
 ⑤ 판정 처리 → suggestions/decisions/{id}.json 저장(automated=true, 런타임 산출물)
-⑥ approved 판정만 wiki-planner/wiki-writer/source-sanitizer 경로로 자동 반영
-⑦ sanitizer pass인 wiki 변경만 git add/commit/push. suggestions/는 commit 금지
+⑥ approved 판정만 wiki-planner/wiki-writer/source-sanitizer/wiki-linker 경로로 자동 반영
+⑦ sanitizer·linker pass인 wiki 변경만 git add/commit/push. suggestions/는 commit 금지
 ```
 
-### MCP 연결
+### MCP 연결 및 소스 정책
 
 | MCP | 방식 | 용도 |
 |---|---|---|
@@ -272,18 +261,20 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 | `sg-ontology` | HTTP :8093 | 세계선·인과관계 SPARQL |
 | `namuwiki` | stdio | 나무위키 스크래핑 |
 
-### 소스 정책 요약
+**dataforge** — P1 커버리지 4개 소스 각각 별도 호출 (`top_k` ≤ 30 필수):
 
-| 소스 | 위키 표시 |
-|---|---|
-| `reference/official/` | `[공식]` 태그 + 출처명 |
-| `sg_paper` | `[팬 분석]` 태그 + 논문 제목 |
-| `sg_game_sg0_en` | 간접 사용 허용 (파라프레이즈·풀어쓰기). 원문 블록 인용·소스명·청크ID 노출 금지 |
-| qaset / namuwiki / sg-ontology | 산문 처리, 출처 미표시 |
-| `sg_game_sge` | 간접 사용 허용 (파라프레이즈·풀어쓰기). 원문 블록 인용·소스명·청크ID 노출 금지 |
+```
+mcp__dataforge__search_with_filters(query="<주제>", source_names=["qaset_with_rag"],  top_k=30)
+mcp__dataforge__search_with_filters(query="<주제>", source_names=["sg_game_sg0_en"], top_k=30)
+mcp__dataforge__search_with_filters(query="<주제>", source_names=["sg_paper"],        top_k=30)
+mcp__dataforge__search_with_filters(query="<주제>", source_names=["sg_game_sge"],     top_k=30)
+```
 
-### dataforge source_filter 이름
+**namuwiki** — 검색 후 본문 조회 (모든 도구에 `page`, `page_size` 지원):
 
-- qaset 검색에는 반드시 `qaset_with_rag`를 사용한다.
-- 하이픈이 들어간 변형은 존재하지 않는 이름이므로 사용하지 않는다.
-- P1 커버리지에는 `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`를 각각 별도 호출로 사용한다.
+```
+mcp__namuwiki__search_namu_wiki(keyword="<주제>", page=1, page_size=10)
+mcp__namuwiki__get_namu_wiki_markdown(link="<doc_link>", page=1, page_size=5)  # 섹션 단위 분할, 초과 시 page 증가
+mcp__namuwiki__get_related_docs(doc_link="<doc_link>", page=1, page_size=20)
+```
+

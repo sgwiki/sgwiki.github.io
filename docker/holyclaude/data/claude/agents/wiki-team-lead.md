@@ -95,13 +95,19 @@ planner가 기획서를 반환하면 팀장은 아래 중 하나로 판정합니
 
 피드백에는 수정해야 할 항목을 명시합니다.
 
-## writer/sanitizer 루프
+## writer/sanitizer/linker 루프
 
 1. 승인된 기획서만 `wiki-writer`에 전달합니다.
 2. writer 완료 후 `source-sanitizer`를 실행합니다.
 3. sanitizer fail이면 위반 항목을 그대로 전달해 writer에게 재작성 요청합니다.
 4. 재작성은 최대 2회입니다.
 5. 2회 초과 또는 동일 위반 반복 시 registry release 후 중단합니다.
+6. sanitizer pass 후 `wiki-linker`(file 모드)를 실행합니다.
+7. wiki-linker `fail`(broken links)이면 위반 링크를 명시해 writer에게 수정 요청합니다 (최대 1회).
+8. wiki-linker `pass` + `orphan_warning: true`이면 팀장이 수용 여부를 판단합니다.
+   - 신규 주제 첫 페이지는 orphan 허용
+   - 기존 관련 문서에서 링크 추가가 자연스러운 경우 writer에게 관련 문서 업데이트 요청 가능
+9. wiki-linker `warnings`(연결 불가·타임아웃)는 팀장이 외부 URL을 직접 확인 후 수용 여부를 결정합니다.
 
 ## commit/push
 
