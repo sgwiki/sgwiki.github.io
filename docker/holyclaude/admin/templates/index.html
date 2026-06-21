@@ -80,6 +80,11 @@
       color: #fff;
     }
     .btn-success:hover { background: #3fb950; }
+    .btn-warning {
+      background: #d97706;
+      color: #fff;
+    }
+    .btn-warning:hover { background: #b45309; }
 
     .btn-small {
       padding: 4px 9px;
@@ -384,10 +389,13 @@
     <h2>수동 실행</h2>
     <div>
       <span class="tip" data-tip="콘텐츠 생성 파이프라인&#10;① wiki/ 현황 vs qaset 비교 → 미작성 주제 선정&#10;② wiki-planner: 기획서 작성 (병렬)&#10;③ wiki-writer: 페이지 초안 작성 (병렬)&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
-        <button class="btn btn-primary" onclick="triggerPipeline(1)">파이프라인 1 실행</button>
+        <button class="btn btn-primary" onclick="triggerPipeline(1)">위키 작성 팀 실행</button>
       </span>
       <span class="tip" data-tip="제안 처리 파이프라인&#10;① R2 폴링 → suggestions/inbox/ 저장 (멱등)&#10;② wiki-classifier: Type A(주제 요청) / B(편집 제안) 분류&#10;③ suggestion-judge: MCP 조회 후 자동 승인·거부·부분 판정&#10;④ approved면 wiki-writer → source-sanitizer 실행&#10;⑤ 통과한 위키 변경만 commit/push">
-        <button class="btn btn-success" onclick="triggerPipeline(2)">파이프라인 2 실행</button>
+        <button class="btn btn-success" onclick="triggerPipeline(2)">제안 처리 팀 실행</button>
+      </span>
+      <span class="tip" data-tip="온톨로지 저작 파이프라인&#10;① 시리즈 선정 (기본 S;G0) + sg-ontology MCP로 누락 인스턴스 식별&#10;② registry 예약 (p3-work, 동일 시리즈/범위 중복 방지)&#10;③ ontology-author: TTL facts 저작 (SHACL 스키마·MCP 6종·정책 준수)&#10;④ ontology-validator: SHACL + 참조 무결성 + 정책 검증 (최대 2회 재시도)&#10;⑤ 팀장 검토 → git commit → 온톨로지 TTL push">
+        <button class="btn btn-warning" onclick="triggerPipeline(3)">온톨로지 저작 팀 실행</button>
       </span>
     </div>
     <div id="trigger-msg" class="msg"></div>
@@ -409,6 +417,27 @@
       <button class="btn btn-danger"  onclick="setSchedule(false)">비활성화</button>
     </div>
     <div id="sched-msg" class="msg"></div>
+  </div>
+
+  <!-- 섹션 2.5: 리소스 제한 -->
+  <div class="card">
+    <h2>리소스 제한</h2>
+    <div class="row">
+      <label for="cfg-concurrent">동시 실행 상한</label>
+      <input type="number" id="cfg-concurrent" min="1" max="20" value="3" style="width:80px">
+    </div>
+    <div class="row">
+      <label for="cfg-mem">메모리 제한 (GB)</label>
+      <input type="number" id="cfg-mem" min="4" max="256" placeholder="현재값" style="width:80px">
+    </div>
+    <div class="row">
+      <label for="cfg-pids">프로세스 제한 (pids)</label>
+      <input type="number" id="cfg-pids" min="64" max="4096" placeholder="현재값" style="width:80px">
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-success" onclick="applyConfig()">적용</button>
+    </div>
+    <div id="cfg-msg" class="msg"></div>
   </div>
 
   <!-- 섹션 3: 진행 중인 작업 -->
@@ -437,14 +466,14 @@
   <div class="card full-card">
     <h2>제안 자동 처리 <span id="sugg-inbox-badge" style="font-size:12px;color:#f0883e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
     <div id="sugg-body" style="color:#484f58;font-size:12px">확인 중...</div>
-    <p class="refresh-hint">파이프라인 2가 자동 판정하고, 승인된 제안은 위키 작성 에이전트로 전달합니다. 30초마다 자동 갱신</p>
+    <p class="refresh-hint">제안 처리 팀이 자동 판정하고, 승인된 제안은 위키 작성 에이전트로 전달합니다. 30초마다 자동 갱신</p>
   </div>
 
   <!-- 섹션 6: 에이전트 로그 -->
   <div class="card full-card">
     <div class="log-controls">
       <span class="dot" id="log-dot"></span>
-      <h2 style="margin-bottom:0">에이전트 로그 <span style="color:#484f58;font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0">(holyclaude)</span></h2>
+      <h2 style="margin-bottom:0">에이전트 로그 <span style="color:#484f58;font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0">(sg-wiki-holyclaude)</span></h2>
       <button class="btn" style="margin-left:auto;font-size:11px;padding:4px 10px" onclick="reconnectLog()">재연결</button>
       <button class="btn" style="font-size:11px;padding:4px 10px" onclick="clearLog()">지우기</button>
     </div>
@@ -494,18 +523,22 @@
 </div>
 
 <script>
+  // ── Pipeline name map ─────────────────────────────────────────────────────
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀' };
+  function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
+
   // ── Trigger ──────────────────────────────────────────────────────────────
   async function triggerPipeline(n) {
     const msg = document.getElementById('trigger-msg');
-    showMsg(msg, 'info', '<span class="spinner"></span>파이프라인 ' + n + ' 실행 중...');
+    showMsg(msg, 'info', '<span class="spinner"></span>' + pipelineName(n) + ' 실행 중...');
     try {
       const res = await fetch('/trigger/p' + n, { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
         if (data.status === 'queued') {
-          showMsg(msg, 'ok', '파이프라인 ' + n + ' 대기열 추가 (대기 ' + (data.queue_position ?? '?') + '번째) · run_id: ' + data.run_id);
+          showMsg(msg, 'ok', pipelineName(n) + ' 대기열 추가 (대기 ' + (data.queue_position ?? '?') + '번째) · run_id: ' + data.run_id);
         } else {
-          showMsg(msg, 'ok', '파이프라인 ' + n + ' 실행 시작 · run_id: ' + data.run_id);
+          showMsg(msg, 'ok', pipelineName(n) + ' 실행 시작 · run_id: ' + data.run_id);
         }
       } else {
         showMsg(msg, 'err', JSON.stringify(data, null, 2));
@@ -569,6 +602,47 @@
     b.className   = 'status-badge ' + (on ? 'on' : 'off');
   }
 
+  // ── Resource config ───────────────────────────────────────────────────────
+  async function loadConfig() {
+    try {
+      const res  = await fetch('/config');
+      const data = await res.json();
+      if (data.max_concurrent_runs != null)
+        document.getElementById('cfg-concurrent').value = data.max_concurrent_runs;
+      if (data.mem_limit_gb != null)
+        document.getElementById('cfg-mem').value = data.mem_limit_gb;
+      if (data.pids_limit != null)
+        document.getElementById('cfg-pids').value = data.pids_limit;
+    } catch (_) {}
+  }
+
+  async function applyConfig() {
+    const msg = document.getElementById('cfg-msg');
+    const concurrent = parseInt(document.getElementById('cfg-concurrent').value, 10);
+    const memRaw  = document.getElementById('cfg-mem').value.trim();
+    const pidsRaw = document.getElementById('cfg-pids').value.trim();
+    const body = { max_concurrent_runs: concurrent };
+    if (memRaw)  body.mem_limit_gb = parseInt(memRaw, 10);
+    if (pidsRaw) body.pids_limit   = parseInt(pidsRaw, 10);
+    showMsg(msg, 'info', '<span class="spinner"></span>적용 중...');
+    try {
+      const res  = await fetch('/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showMsg(msg, 'ok', '적용 완료: ' + JSON.stringify(data));
+        loadConfig();
+      } else {
+        showMsg(msg, 'err', data.detail ?? JSON.stringify(data));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '요청 실패: ' + e.message);
+    }
+  }
+
   // ── Running jobs ─────────────────────────────────────────────────────────
   async function loadRunning() {
     try {
@@ -584,7 +658,7 @@
         return;
       }
       const cards = jobs.map(j => {
-        const name  = '파이프라인 ' + (j.pipeline?.replace('p','') ?? '?');
+        const name  = pipelineName(j.pipeline?.replace('p','') ?? '?');
         const runId = escapeHtml(j.run_id ?? '');
         const lastLine = escapeHtml(j.last_line ?? '');
         if (j.status === 'queued') {
@@ -989,13 +1063,13 @@
   function renderSuggestionLogs(logs) {
     if (!Array.isArray(logs) || logs.length === 0) {
       return `<div class="suggestion-log-list">
-        <div class="suggestion-log-item" style="color:#484f58">파이프라인 2 실행 로그 없음</div>
+        <div class="suggestion-log-item" style="color:#484f58">${pipelineName('2')} 실행 로그 없음</div>
       </div>`;
     }
     return `<div class="suggestion-log-list">${logs.map(log => `
       <div class="suggestion-log-item">
         <div class="suggestion-log-title">
-          <b>파이프라인 ${escapeHtml(String(log.pipeline || 'p2').replace('p', ''))}</b>
+          <b>${escapeHtml(pipelineName(String(log.pipeline || 'p2').replace('p', '')))}</b>
           <code style="color:#8b949e">${escapeHtml(log.run_id || '-')}</code>
           <span class="status-badge ${log.status === 'failed' ? 'off' : 'on'}" style="font-size:10px">${escapeHtml(log.status || '-')}</span>
           <span style="color:#8b949e">${escapeHtml(formatDateTime(log.timestamp))}</span>
@@ -1012,9 +1086,9 @@
   }
 
   function formatSuggestionLogsText(logs) {
-    if (!Array.isArray(logs) || logs.length === 0) return '파이프라인 2 실행 로그 없음';
+    if (!Array.isArray(logs) || logs.length === 0) return pipelineName('2') + ' 실행 로그 없음';
     return logs.map(log => [
-      `파이프라인 ${String(log.pipeline || 'p2').replace('p', '')} · ${log.run_id || '-'}`,
+      `${pipelineName(String(log.pipeline || 'p2').replace('p', ''))} · ${log.run_id || '-'}`,
       `시각: ${formatDateTime(log.timestamp)}`,
       `상태: ${log.status || '-'} / ${pipelineLogResultLabel(log.result)}`,
       `요약: ${log.message || ''} · processed=${log.processed_count ?? 0} skipped=${log.skipped_count ?? 0} errors=${log.error_count ?? 0}`,
@@ -1073,7 +1147,7 @@
       document.getElementById('preview-content').textContent =
         `접수: ${(s.created_at ?? '').slice(0,16).replace('T',' ')}\n` +
         (s.contact ? `연락처: ${s.contact}\n` : '') +
-        `\n${s.content ?? ''}\n\n--- 파이프라인 2 실행 로그 ---\n${formatSuggestionLogsText(s.pipeline_logs ?? [])}`;
+        `\n${s.content ?? ''}\n\n--- ${pipelineName('2')} 실행 로그 ---\n${formatSuggestionLogsText(s.pipeline_logs ?? [])}`;
       document.getElementById('wiki-preview-modal').classList.add('show');
     } catch(e) {
       alert('로드 실패: ' + e.message);
@@ -1082,6 +1156,7 @@
 
   // ── Init ──────────────────────────────────────────────────────────────────
   runPoll('schedule', loadSchedule);
+  runPoll('config', loadConfig);
   refreshVisibleData();
   connectLog();
   schedulePoll('status',       loadStatus,       10000);
