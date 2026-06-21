@@ -26,6 +26,7 @@ markdown_extensions:
   - admonition
   - attr_list
   - def_list
+  - footnotes  # [^1] 인라인 각주 + [^1]: 내용 하단 정의 — demun.github.io/mkdocs-tuts 가이드 참고
   - pymdownx.details
   - pymdownx.superfences:
       custom_fences:
