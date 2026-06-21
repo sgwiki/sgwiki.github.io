@@ -28,7 +28,7 @@ wiki/
 ├── docs/                 설계 문서 · 저작권 검토 · 계획
 ├── mkdocs.yml            MkDocs Material 설정
 ├── scripts/
-│   ├── run_holyclaude_pipeline.mjs   P1/P2 파이프라인 실행 래퍼
+│   ├── run_holyclaude_pipeline.mjs   P1~P5 파이프라인 실행 래퍼
 │   ├── wiki_work_registry.mjs        병렬 실행 중복 주제 방지용 작업 현황 registry
 │   └── poll_suggestions.py           R2에서 제안 수신 → suggestions/inbox/
 ├── worker/               "제안하기" 폼을 받는 Cloudflare Worker (R2 + KV)
@@ -74,7 +74,7 @@ make shell           # 컨테이너 bash 접속
 
 ### 관리 UI (`http://localhost:3002`)
 
-- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) 수동 실행
+- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) 수동 실행
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 - **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 대기 작업 순번·취소

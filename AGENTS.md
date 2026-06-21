@@ -12,7 +12,7 @@
 |---|---|---|
 | `wiki/` | 위키 마크다운 본문 (배포 대상) | tracked |
 | `docs/` | 설계·계획·저작권 검토 문서 | tracked |
-| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4 파이프라인 실행 래퍼 | tracked |
+| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
 | `worker/` | "제안하기" 폼 Cloudflare Worker | tracked |
@@ -74,6 +74,26 @@ wiki/*.md 전체 → wiki-format-inspector(형식) → wiki-completeness-checker
 
 - **읽기 전용**: 파일 수정·commit 없음. 감사 리포트만 생성.
 - **gate 모드도 지원**: 파이프라인 1에서 wiki-linker 통과 후 단일 파일 대상으로 자동 실행됨 (consistency-checker 제외).
+
+### 파이프라인 5 (위키 정비)
+
+전체 `wiki/*.md` 대상 구조·문체 일관성 개선 전용. wiki-maintenance-lead가 조율:
+
+```
+wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-rewriter(문체·표현) → source-sanitizer → commit/push
+```
+
+- **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
+
+### 파이프라인 5 (위키 정비)
+
+전체 `wiki/*.md` 대상 구조·문체 일관성 개선 전용. wiki-maintenance-lead가 조율:
+
+```
+wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-rewriter(문체·표현) → source-sanitizer → commit/push
+```
+
+- **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
 
 ### 동시 실행과 중복 주제 방지
 
