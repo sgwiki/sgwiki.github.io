@@ -27,6 +27,7 @@ export function useD3Zoom<SVGSVG extends SVGSVGElement>(
     const zoom = d3
       .zoom<SVGSVG, unknown>()
       .scaleExtent(opts.scaleExtent ?? [0.3, 8])
+      .filter((event) => event.type !== 'wheel')
       .on('zoom', (event) => {
         setTransform({
           x: event.transform.x,
