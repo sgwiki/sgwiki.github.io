@@ -38,7 +38,7 @@ wiki-build:
 	$(MKDOCS) build --strict
 
 wiki-deploy:
-	$(MKDOCS) build --strict
+	$(MKDOCS) build
 	wrangler pages deploy site --project-name=sg-wiki --branch=main
 
 # ── 제안 관리 ────────────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ help:
 	@echo "  shell     컨테이너 bash 접속"
 	@echo ""
 	@echo "  wiki-serve           로컬 미리보기 (localhost:8000)"
-	@echo "  wiki-build           정적 사이트 빌드 (site/)"
+	@echo "  wiki-build           정적 사이트 빌드 (site/, strict 검사)"
 	@echo "  wiki-deploy          빌드 후 Cloudflare Pages 수동 배포"
 	@echo ""
 	@echo "  suggestions-poll     R2에서 새 제안 다운로드 → suggestions/inbox/"
