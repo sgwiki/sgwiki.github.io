@@ -197,9 +197,69 @@ decision JSON 필수 형식:
 - 완료 시 처리/스킵/오류 제안 ID, 각 판정, writer_status, sanitizer 결과, commit hash 또는 미커밋 사유를 요약하세요.`;
 }
 
+function buildP3Prompt(runId) {
+  return `파이프라인 3 - 온톨로지 저작을 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 ontology-author.md, ontology-validator.md 규칙을 준수하세요.
+
+당신은 파이프라인 3의 wiki-team-lead(위키작성 팀장, 온톨로지 저작 모드)입니다.
+
+파이프라인 3은 파이프라인 1(위키 페이지 생성)과 다릅니다. 출력은 wiki/*.md가 아니라 **온톨로지 TTL**입니다:
+  docker/holyclaude/ontology/src/슈타인즈게이트_온톨로지.ttl
+
+목표:
+1. 저작 대상 시리즈를 선정하세요 (기본: Steins;Gate 0 게임 — 온톨로지에 미저작된 루트/미디어 매핑 보강).
+2. sg-ontology MCP로 현재 온톨로지를 SPARQL 조회해 누락된 인스턴스 식별 (중복 회피).
+3. 저작 범위를 정해 ontology-planner 역할로 저작 지시서를 작성하세요 (아래 양식).
+4. registry에 p3-work로 예약하세요 (p1과 다른 키). 동일 시리즈/범위 중복을 막습니다.
+5. 저작 지시서를 승인(APPROVED PLAN)한 뒤 ontology-author 에이전트에 전달하세요.
+6. ontology-author가 TTL을 편집하면 ontology-validator 에이전트로 SHACL + 정책 검증을 진행하세요.
+7. validator fail이면 원인을 명시해 ontology-author에게 재저작 요청 (최대 2회).
+8. validator pass인 경우에만 git add docker/holyclaude/ontology/ && git commit && git push 하세요.
+9. 커밋 후 generate-data.py --series <id> 로 JSON 재생성이 가능한지 확인 (스크립트가 시리즈 분기를 지원하면).
+
+중복 방지 (registry):
+- 후보 선정 전: node /workspace/scripts/wiki_work_registry.mjs list (active의 series/scope 회피)
+- 저작 전 예약: node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file docker/holyclaude/ontology/src/슈타인즈게이트_온톨로지.ttl --topic "p3:{series}:{scope}"
+- 완료: complete / 실패: release --status rejected
+
+팀장 승인 게이트 (p3):
+1. 동일 시리즈/범위가 이미 저작됐거나 진행 중이면 reject.
+2. registry 예약 실패면 reject.
+3. MCP 커버리지 6개 항목(qaset_with_rag/sg_game_sg0_en/sg_paper/sg_game_sge/namuwiki/sg-ontology) 중 하나라도 fail이면 feedback/reject.
+4. validator fail이면 최대 2회까지 ontology-author에게 재시도. 초과 시 release 후 중단.
+5. validator pass + 커버리지 pass인 경우에만 commit/push.
+
+저작 지시서 양식 (ontology-author에게 전달):
+- 시리즈명 + 저작 범위 (신규 WorldLine N / EventVariation M / Event K / Shift L / MediaSource P)
+- APPROVED PLAN 표시
+- registry 예약 결과
+- MCP 커버리지 결과
+- 출력 파일: docker/holyclaude/ontology/src/슈타인즈게이트_온톨로지.ttl
+
+위생 규칙 (절대 준수):
+- sg_game_sge/sg_game_sg0_en 원문 직접 인용 블록·소스명·chunk ID를 TTL sg:summary/sg:note에 노출 금지 (방금 통일된 정책). 파라프레이즈만.
+- 기존 인스턴스 id 덮어쓰기/삭제 금지 (추가만).
+- SHACL 자체 점검 없이 보고 금지: python /workspace/scripts/validate_ontology.py
+- wiki/*.md 편집 금지 (p3는 온톨로지만).
+- 커밋은 팀장만. ontology-author/validator는 파일 편집/읽기만.
+
+운영 제약:
+- 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- 동일 TTL 파일을 병렬로 편집하지 마세요 (registry로 직렬화).
+- 막히면 명확히 보고하고, 검증되지 않은 TTL은 commit하지 마세요.
+- 완료 시 추가된 인스턴스 id 목록(WorldLine/EventVariation/Event/Shift/MediaSource 카운트), validator 결과, MCP 커버리지, commit hash 또는 미커밋 사유를 요약하세요.`;
+}
+
 function buildPrompt(command, runId) {
   if (command === 'p1') {
     return buildP1Prompt(runId);
+  }
+  if (command === 'p3') {
+    return buildP3Prompt(runId);
   }
   return buildP2Prompt(runId);
 }

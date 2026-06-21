@@ -24,7 +24,7 @@ RUNS_DIR = Path(os.getenv("ADMIN_RUNS_DIR", ".admin/runs"))
 WORKSPACE = Path(os.getenv("WORKSPACE", "/workspace"))
 WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
-HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "holyclaude")
+HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "sg-wiki-holyclaude")
 PIPELINE_SCRIPT = os.getenv("PIPELINE_SCRIPT", os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs"))
 MAX_CONCURRENT_RUNS = int(os.getenv("ADMIN_MAX_CONCURRENT_RUNS", "10"))
 RUN_OUTPUT_LIMIT = int(os.getenv("ADMIN_RUN_OUTPUT_LIMIT", "30000"))
@@ -110,6 +110,15 @@ async def trigger_p2():
     return {"status": "queued", "pipeline": "p2", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
+@app.post("/trigger/p3")
+async def trigger_p3():
+    run_id, started_at, status = _start_active_job("p3", "holyclaude 온톨로지 저작 파이프라인 실행 준비 중")
+    if status == "running":
+        asyncio.create_task(_run_p3(run_id, started_at))
+        return {"status": "started", "pipeline": "p3", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p3", "run_id": run_id, "queue_position": _queue_position(run_id)}
+
+
 @app.get("/running")
 async def get_running():
     with active_jobs_lock:
@@ -159,7 +168,7 @@ _ANSI = re.compile(r'\x1b\[[0-9;]*[A-Za-z]|\x1b\][^\x07]*\x07|\x1b[()][AB012]')
 
 
 @app.get("/logs/stream")
-async def stream_logs(tail: int = 200, container: str = "holyclaude"):
+async def stream_logs(tail: int = 200, container: str = "sg-wiki-holyclaude"):
     loop = asyncio.get_event_loop()
     queue: asyncio.Queue = asyncio.Queue(maxsize=500)
 
@@ -842,6 +851,60 @@ async def set_schedule(body: ScheduleBody):
         return {"status": "disabled", "jobs": get_jobs()}
 
 
+class ConfigBody(BaseModel):
+    max_concurrent_runs: int | None = None
+    mem_limit_gb: int | None = None
+    pids_limit: int | None = None
+
+
+@app.get("/config")
+async def get_config():
+    info: dict = {"max_concurrent_runs": MAX_CONCURRENT_RUNS}
+    try:
+        import docker as docker_sdk
+        client = docker_sdk.from_env()
+        c = client.containers.get(HOLYCLAUDE_CONTAINER)
+        hc = c.attrs.get("HostConfig", {})
+        mem = hc.get("Memory", 0)
+        pids = hc.get("PidsLimit", 0)
+        info["mem_limit_gb"] = round(mem / (1024 ** 3)) if mem else None
+        info["pids_limit"] = pids if pids else None
+    except Exception:
+        pass
+    return info
+
+
+@app.post("/config")
+async def set_config(body: ConfigBody):
+    global MAX_CONCURRENT_RUNS
+    changes: dict = {}
+
+    if body.max_concurrent_runs is not None:
+        if not (1 <= body.max_concurrent_runs <= 20):
+            raise HTTPException(status_code=422, detail="max_concurrent_runs는 1~20 사이여야 합니다")
+        with active_jobs_lock:
+            MAX_CONCURRENT_RUNS = body.max_concurrent_runs
+        changes["max_concurrent_runs"] = MAX_CONCURRENT_RUNS
+
+    if body.mem_limit_gb is not None or body.pids_limit is not None:
+        try:
+            import docker as docker_sdk
+            client = docker_sdk.from_env()
+            c = client.containers.get(HOLYCLAUDE_CONTAINER)
+            kwargs: dict = {}
+            if body.mem_limit_gb is not None:
+                kwargs["mem_limit"] = f"{body.mem_limit_gb}g"
+                changes["mem_limit_gb"] = body.mem_limit_gb
+            if body.pids_limit is not None:
+                kwargs["pids_limit"] = body.pids_limit
+                changes["pids_limit"] = body.pids_limit
+            c.update(**kwargs)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=f"컨테이너 업데이트 실패: {exc}")
+
+    return {"status": "ok", **changes}
+
+
 @app.get("/status")
 async def get_status():
     return await asyncio.to_thread(_status_response)
@@ -866,6 +929,14 @@ def _load_status_response() -> dict:
 async def _run_p1(run_id: str, started_at: str) -> None:
     try:
         log = await asyncio.to_thread(_run_holyclaude_pipeline, "p1", run_id, started_at)
+        _save_run(log)
+    finally:
+        _pop_active_job(run_id)
+
+
+async def _run_p3(run_id: str, started_at: str) -> None:
+    try:
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p3", run_id, started_at)
         _save_run(log)
     finally:
         _pop_active_job(run_id)
@@ -962,6 +1033,8 @@ def _dispatch_next_job() -> None:
             asyncio.create_task(_run_p1(rid, started_at))
         elif pipeline == "p2":
             asyncio.create_task(_run_p2(rid, started_at))
+        elif pipeline == "p3":
+            asyncio.create_task(_run_p3(rid, started_at))
 
 
 def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dict:

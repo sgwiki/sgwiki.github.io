@@ -34,11 +34,15 @@ function normalizeWikiFile(value) {
   if (
     normalized.startsWith('../') ||
     normalized.includes('/../') ||
-    path.isAbsolute(normalized) ||
-    !normalized.startsWith('wiki/') ||
-    !normalized.endsWith('.md')
+    path.isAbsolute(normalized)
   ) {
-    throw new Error(`Invalid wiki file path: ${value}`);
+    throw new Error(`Invalid file path: ${value}`);
+  }
+  // p1/p2: wiki/*.md. p3: 온톨로지 TTL (docker/holyclaude/ontology/...).
+  const isWiki = normalized.startsWith('wiki/') && normalized.endsWith('.md');
+  const isOntology = normalized.startsWith('docker/holyclaude/ontology/') && normalized.endsWith('.ttl');
+  if (!isWiki && !isOntology) {
+    throw new Error(`Invalid file path (expected wiki/*.md or docker/holyclaude/ontology/*.ttl): ${value}`);
   }
   return normalized;
 }
