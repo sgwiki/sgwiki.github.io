@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import gsap from 'gsap'
 import type { SeriesDataset } from '@/types/ontology'
-import { MAP_DIMENSIONS, computeScales, parseLocalDateTime } from '@/lib/scales'
+import { MAP_DIMENSIONS, computeScales, computeInitialZoom, CLUSTER_END_DATE, parseLocalDateTime } from '@/lib/scales'
 import { useD3Zoom } from '@/hooks/useD3Zoom'
 import { BandsLayer } from './BandsLayer'
 import { WorldLineLayer } from './WorldLineLayer'
@@ -35,7 +35,11 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   // scaleExtent를 안정된 참조로 유지 — 매 렌더마다 새 배열이 생기면 D3 zoom이 재초기화됨
   const scaleExtent = useMemo<[number, number]>(() => [0.05, 300], [])
 
-  const { transform, reset } = useD3Zoom(svgRef, { scaleExtent })
+  // 마운트 시 2010-07~08 구간에 포커스 — 이후 사용자가 자유 줌/패닝 가능
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialTransform = useMemo(() => computeInitialZoom(scales, width, marginLeft), [])
+
+  const { transform, reset } = useD3Zoom(svgRef, { scaleExtent, initialTransform })
 
   const [highlightedWl, setHighlightedWl] = useState<string | null>(null)
   const [highlightedEvent, setHighlightedEvent] = useState<string | null>(null)
@@ -152,24 +156,47 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
 }
 
 function TimeAxis({ scales, innerWidth }: { scales: ReturnType<typeof computeScales>; innerWidth: number }) {
-  const tickInterval = d3.timeDay.every(3)
-  const ticks = tickInterval ? scales.x.ticks(tickInterval) : scales.x.ticks(10)
+  // 주요 구간(2010~2011)과 미래 압축 구간을 분리하여 틱 생성
+  const mainEnd = scales.isPiecewise ? CLUSTER_END_DATE : scales.xDomain[1]
+  const mainTicks = d3.timeDay.every(3)?.range(scales.xDomain[0], mainEnd) ?? []
+
+  // 미래 구간: 해당 연도만 표시
+  const futureTicks: Date[] = scales.isPiecewise
+    ? [new Date(`${scales.xDomain[1].getFullYear()}-01-01`)]
+    : []
+
+  const breakX = scales.isPiecewise ? scales.x(CLUSTER_END_DATE) : null
+
   return (
     <g className="timeline-axis">
       <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="#475569" strokeWidth={1} />
-      {ticks.map((t, i) => {
-        const x = scales.x(t)
-        return (
-          <g key={i} transform={`translate(${x}, 0)`}>
-            <line y2={-6} stroke="#64748b" />
-            <text y={-10} textAnchor="middle" fontSize={10} fill="#94a3b8">
-              {d3.timeFormat('%m/%d')(t)}
-            </text>
-          </g>
-        )
-      })}
+      {mainTicks.map((t, i) => (
+        <g key={i} transform={`translate(${scales.x(t)}, 0)`}>
+          <line y2={-6} stroke="#64748b" />
+          <text y={-10} textAnchor="middle" fontSize={10} fill="#94a3b8">
+            {d3.timeFormat('%m/%d')(t)}
+          </text>
+        </g>
+      ))}
+      {futureTicks.map((t, i) => (
+        <g key={`f${i}`} transform={`translate(${scales.x(t)}, 0)`}>
+          <line y2={-6} stroke="#334155" />
+          <text y={-10} textAnchor="middle" fontSize={10} fill="#64748b">
+            {d3.timeFormat('%Y')(t)}
+          </text>
+        </g>
+      ))}
+      {/* 시간 압축 구간 경계 표시 */}
+      {breakX !== null && (
+        <g transform={`translate(${breakX}, 0)`}>
+          <line y1={4} y2={-16} stroke="#334155" strokeWidth={1} strokeDasharray="3,2" />
+          <text y={-20} textAnchor="middle" fontSize={8} fill="#475569" letterSpacing="2">
+            ···
+          </text>
+        </g>
+      )}
       <text x={innerWidth / 2} y={-30} textAnchor="middle" fontSize={12} fill="#cbd5e1">
-        타임라인 (2010)
+        타임라인
       </text>
     </g>
   )

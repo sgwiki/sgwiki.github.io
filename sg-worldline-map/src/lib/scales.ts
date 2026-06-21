@@ -45,6 +45,11 @@ export const INITIAL_VIEW = {
   end: new Date('2010-09-05'),
 }
 
+/** 주요 이벤트 밀집 구간 종료 — 이후 구간은 비선형 압축으로 처리 */
+export const CLUSTER_END_DATE = new Date('2011-06-01')
+/** 미래(압축) 구간이 차지할 화면 비율 */
+const FUTURE_FRACTION = 0.12
+
 export function computeScales(dataset: SeriesDataset) {
   const { marginLeft, marginRight, marginTop, marginBottom, width, height } = MAP_DIMENSIONS
   const innerWidth = width - marginLeft - marginRight
@@ -68,14 +73,20 @@ export function computeScales(dataset: SeriesDataset) {
     new Date(maxTime.getTime() + padMs),
   ]
 
-  const x = d3.scaleTime().domain(xDomain).range([0, innerWidth])
+  // 주요 구간 이후 크게 동떨어진 사건이 있으면 piecewise 스케일로 미래 구간 압축
+  const isPiecewise = maxTime > CLUSTER_END_DATE
+  const x = isPiecewise
+    ? d3.scaleTime()
+        .domain([xDomain[0], CLUSTER_END_DATE, xDomain[1]])
+        .range([0, innerWidth * (1 - FUTURE_FRACTION), innerWidth])
+    : d3.scaleTime().domain(xDomain).range([0, innerWidth])
 
   // Y는 generate-data.py에서 계산됨 — 그대로 사용. 약간의 상하 여백.
   const ys = dataset.worldlines.map((w) => w.y)
   const yMin = Math.min(...ys, ...dataset.bands.map((b) => b.yTop)) - marginTop
   const yMax = Math.max(...ys, ...dataset.bands.map((b) => b.yBottom)) + marginBottom
 
-  return { x, xDomain, width, height, yMin, yMax }
+  return { x, xDomain, width, height, yMin, yMax, isPiecewise }
 }
 
 /**
