@@ -119,6 +119,15 @@ async def trigger_p3():
     return {"status": "queued", "pipeline": "p3", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
+@app.post("/trigger/p4")
+async def trigger_p4():
+    run_id, started_at, status = _start_active_job("p4", "holyclaude 위키 품질 검사 파이프라인 실행 준비 중")
+    if status == "running":
+        asyncio.create_task(_run_p4(run_id, started_at))
+        return {"status": "started", "pipeline": "p4", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p4", "run_id": run_id, "queue_position": _queue_position(run_id)}
+
+
 @app.get("/running")
 async def get_running():
     with active_jobs_lock:
@@ -942,6 +951,14 @@ async def _run_p3(run_id: str, started_at: str) -> None:
         _pop_active_job(run_id)
 
 
+async def _run_p4(run_id: str, started_at: str) -> None:
+    try:
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p4", run_id, started_at)
+        _save_run(log)
+    finally:
+        _pop_active_job(run_id)
+
+
 def _start_active_job(pipeline: str, last_line: str) -> tuple[str, str, str]:
     """Register a job. Returns (run_id, started_at, status).
 
@@ -1035,6 +1052,8 @@ def _dispatch_next_job() -> None:
             asyncio.create_task(_run_p2(rid, started_at))
         elif pipeline == "p3":
             asyncio.create_task(_run_p3(rid, started_at))
+        elif pipeline == "p4":
+            asyncio.create_task(_run_p4(rid, started_at))
 
 
 def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dict:

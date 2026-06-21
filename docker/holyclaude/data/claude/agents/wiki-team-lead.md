@@ -108,11 +108,17 @@ planner가 기획서를 반환하면 팀장은 아래 중 하나로 판정합니
    - 신규 주제 첫 페이지는 orphan 허용
    - 기존 관련 문서에서 링크 추가가 자연스러운 경우 writer에게 관련 문서 업데이트 요청 가능
 9. wiki-linker `warnings`(연결 불가·타임아웃)는 팀장이 외부 URL을 직접 확인 후 수용 여부를 결정합니다.
+10. wiki-linker pass 후 `wiki-quality-lead`(gate 모드)를 실행합니다.
+11. wiki-quality-lead `QUALITY FAIL`이면 위반 항목을 명시해 writer에게 수정 요청합니다 (최대 1회).
+    - format 위반: frontmatter·인용 형식·각주 쌍 오류
+    - completeness 위반: 미치환 placeholder·극단적 분량 부족
+12. wiki-quality-lead `QUALITY PASS` 또는 `QUALITY WARN`이면 commit 진행합니다.
+    - warn 목록은 팀장이 확인하고 수용 여부를 판단합니다 (commit 차단 안 함).
 
 ## commit/push
 
 - git commit/push는 팀장만 수행합니다.
-- sanitizer pass, 팀장 내용 검토, MCP 커버리지 최종 확인 전에는 commit하지 않습니다.
+- sanitizer pass, wiki-linker pass, wiki-quality-lead gate pass(또는 warn 수용), 팀장 내용 검토, MCP 커버리지 최종 확인 전에는 commit하지 않습니다.
 - commit 전 `git status --short`, `git diff --check`, 대상 파일 diff를 확인합니다.
 - 대상 문서 외 변경은 commit하지 않습니다.
 
@@ -122,4 +128,5 @@ planner가 기획서를 반환하면 팀장은 아래 중 하나로 판정합니
 - 기존 문서 덮어쓰기
 - planner 기획서 미승인 상태에서 writer 호출
 - sanitizer fail 상태에서 commit
+- wiki-quality-lead QUALITY FAIL 상태에서 commit
 - 하위 에이전트에게 git commit/push 위임

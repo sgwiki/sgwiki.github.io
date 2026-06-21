@@ -86,6 +86,13 @@
     }
     .btn-warning:hover { background: #b45309; }
 
+    .btn-quality {
+      background: #6d28d9;
+      border-color: #7c3aed;
+      color: #fff;
+    }
+    .btn-quality:hover { background: #7c3aed; }
+
     .btn-small {
       padding: 4px 9px;
       font-size: 11px;
@@ -397,6 +404,9 @@
       <span class="tip" data-tip="온톨로지 저작 파이프라인&#10;① 시리즈 선정 (기본 S;G0) + sg-ontology MCP로 누락 인스턴스 식별&#10;② registry 예약 (p3-work, 동일 시리즈/범위 중복 방지)&#10;③ ontology-author: TTL facts 저작 (SHACL 스키마·MCP 6종·정책 준수)&#10;④ ontology-validator: SHACL + 참조 무결성 + 정책 검증 (최대 2회 재시도)&#10;⑤ 팀장 검토 → git commit → 온톨로지 TTL push">
         <button class="btn btn-warning" onclick="triggerPipeline(3)">온톨로지 저작 팀 실행</button>
       </span>
+      <span class="tip" data-tip="위키 품질 검사 파이프라인 (전체 감사)&#10;① wiki/*.md 전체 대상 선정 (현재 188개 파일)&#10;② wiki-format-inspector: frontmatter·인용 형식·섹션 구조 검사&#10;③ wiki-completeness-checker: 미치환 placeholder·빈 섹션·완성도 검사&#10;④ wiki-consistency-checker: 세계선 수치·날짜·인물명 교차 검사&#10;⑤ 감사 리포트 생성 (.admin/quality-audit-{날짜}.json)">
+        <button class="btn btn-quality" onclick="triggerPipeline(4)">품질 검사 팀 실행</button>
+      </span>
     </div>
     <div id="trigger-msg" class="msg"></div>
   </div>
@@ -524,7 +534,7 @@
 
 <script>
   // ── Pipeline name map ─────────────────────────────────────────────────────
-  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀' };
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
   // ── Trigger ──────────────────────────────────────────────────────────────

@@ -59,9 +59,9 @@ function parseArgs(argv) {
   }
 
   if (!args.command) {
-    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3> --run-id <id> [--dry-run]');
+    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4> --run-id <id> [--dry-run]');
   }
-  if (!['p1', 'p2', 'p3'].includes(args.command)) {
+  if (!['p1', 'p2', 'p3', 'p4'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
@@ -254,12 +254,66 @@ function buildP3Prompt(runId) {
 - 완료 시 추가된 인스턴스 id 목록(WorldLine/EventVariation/Event/Shift/MediaSource 카운트), validator 결과, MCP 커버리지, commit hash 또는 미커밋 사유를 요약하세요.`;
 }
 
+function buildP4Prompt(runId) {
+  return `파이프라인 4 - 위키 품질 검사(전체 감사)를 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-quality-lead.md, wiki-format-inspector.md, wiki-completeness-checker.md, wiki-consistency-checker.md 규칙을 준수하세요.
+
+당신은 파이프라인 4의 wiki-quality-lead(위키 품질 검사 팀장)입니다.
+
+파이프라인 4는 읽기 전용 감사입니다. 위키 파일을 수정하거나 commit/push하지 않습니다.
+
+목표:
+1. \`find /workspace/wiki -name "*.md"\` 로 대상 파일 목록을 수집하세요.
+2. **wiki-format-inspector** 에이전트를 스폰하여 각 파일의 형식/구조 검사를 수행하세요.
+   - frontmatter spoiler 필드 존재 및 enum 유효성
+   - H1 헤더 정확히 1개 존재
+   - 인용 형식([공식]/[팬 분석]) 준수
+   - 각주 참조·정의 쌍 일치
+3. **wiki-completeness-checker** 에이전트를 스폰하여 각 파일의 완성도 검사를 수행하세요.
+   - 미치환 {placeholder} 탐지
+   - 빈 섹션(헤더 직후 다음 헤더/EOF) 탐지
+   - 개요 분량(50자 이상) 확인
+   - 캐릭터 문서 프로필 표 존재 여부
+4. **wiki-consistency-checker** 에이전트를 스폰하여 전체 문서 간 일관성 검사를 수행하세요.
+   - 세계선 다이버전스 수치 불일치
+   - 날짜/시각 불일치
+   - 인물명 표기 불일치
+5. 결과를 취합하여 감사 리포트를 /workspace/.admin/quality-audit-$(date +%Y-%m-%d).json에 저장하세요.
+
+감사 리포트 형식:
+{
+  "date": "YYYY-MM-DD",
+  "run_id": "${runId}",
+  "mode": "audit",
+  "summary": { "total": N, "fail": F, "warn": W, "pass": P },
+  "failures": [
+    { "file": "wiki/...", "checker": "format|completeness", "violations": [...] }
+  ],
+  "warnings": [...],
+  "consistency_issues": [...]
+}
+
+운영 제약:
+- 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- wiki/*.md 파일 수정 금지 (읽기 전용 감사).
+- git 명령 실행 금지.
+- MCP 조회 불필요 (형식/구조/완성도 검사는 파일 읽기만으로 수행).
+- 완료 시 총 파일 수, fail/warn/pass 건수, 주요 위반 항목 요약을 보고하세요.`;
+}
+
 function buildPrompt(command, runId) {
   if (command === 'p1') {
     return buildP1Prompt(runId);
   }
   if (command === 'p3') {
     return buildP3Prompt(runId);
+  }
+  if (command === 'p4') {
+    return buildP4Prompt(runId);
   }
   return buildP2Prompt(runId);
 }
