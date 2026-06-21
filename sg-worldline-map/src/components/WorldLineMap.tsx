@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import gsap from 'gsap'
 import type { SeriesDataset } from '@/types/ontology'
-import { MAP_DIMENSIONS, computeScales, computeInitialZoom, parseLocalDateTime } from '@/lib/scales'
+import { MAP_DIMENSIONS, computeScales, parseLocalDateTime } from '@/lib/scales'
 import { useD3Zoom } from '@/hooks/useD3Zoom'
 import { BandsLayer } from './BandsLayer'
 import { WorldLineLayer } from './WorldLineLayer'
@@ -32,19 +32,11 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   const { width, height, marginLeft, marginTop } = MAP_DIMENSIONS
   const innerWidth = width - marginLeft - 120
 
-  const initialZoom = useMemo(
-    () => computeInitialZoom(scales, width, marginLeft),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],  // 최초 데이터 기준으로 한 번만 계산
-  )
-
   // scaleExtent를 안정된 참조로 유지 — 매 렌더마다 새 배열이 생기면 D3 zoom이 재초기화됨
   const scaleExtent = useMemo<[number, number]>(() => [0.05, 300], [])
 
-  const { transform, zoomTo } = useD3Zoom(svgRef, {
-    scaleExtent,
-    initialTransform: initialZoom,
-  })
+  const { transform, reset } = useD3Zoom(svgRef, { scaleExtent })
+
   const [highlightedWl, setHighlightedWl] = useState<string | null>(null)
   const [highlightedEvent, setHighlightedEvent] = useState<string | null>(null)
   const [highlightedShift, setHighlightedShift] = useState<string | null>(null)
@@ -140,12 +132,12 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
         </g>
       </svg>
 
-      {/* 줌 리셋 버튼 — 2010년 핵심 구간으로 복귀 */}
+      {/* 줌 리셋 버튼 — 전체 보기로 복귀 */}
       <button
-        onClick={() => zoomTo(initialZoom.x, initialZoom.y, initialZoom.k, 500)}
+        onClick={() => reset()}
         className="absolute top-3 right-3 z-10 bg-[#0A1525]/90 hover:bg-[#152240] text-[#4A6A8A] hover:text-[#C0D8F0] px-3 py-1.5 rounded text-sm border border-[#152240] transition-colors"
       >
-        ⟲ 초기 화면
+        ⟲ 전체 보기
       </button>
 
       {/* 범례 */}
