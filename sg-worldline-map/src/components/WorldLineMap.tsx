@@ -31,13 +31,18 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   const scales = useMemo(() => computeScales(dataset), [dataset])
   const { width, height, marginLeft, marginTop } = MAP_DIMENSIONS
   const innerWidth = width - marginLeft - 120
+
   const initialZoom = useMemo(
     () => computeInitialZoom(scales, width, marginLeft),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],  // 최초 데이터 기준으로 한 번만 계산
   )
+
+  // scaleExtent를 안정된 참조로 유지 — 매 렌더마다 새 배열이 생기면 D3 zoom이 재초기화됨
+  const scaleExtent = useMemo<[number, number]>(() => [0.05, 300], [])
+
   const { transform, zoomTo } = useD3Zoom(svgRef, {
-    scaleExtent: [0.05, 300],
+    scaleExtent,
     initialTransform: initialZoom,
   })
   const [highlightedWl, setHighlightedWl] = useState<string | null>(null)

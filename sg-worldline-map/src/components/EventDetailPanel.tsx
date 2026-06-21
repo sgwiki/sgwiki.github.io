@@ -1,6 +1,6 @@
 /**
- * 이벤트 클릭 시 상세 패널 (우측).
- * AC5/AC7: mechanismType 아이콘, from/to 발산률, 위키 링크.
+ * 이벤트 클릭 시 상세 패널.
+ * 모바일: 하단 시트 (max-h-65vh), 데스크톱: 우측 패널 (w-80 고정).
  */
 
 import type { SeriesDataset, SGEvent } from '@/types/ontology'
@@ -21,15 +21,29 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
   const toWl = shift ? dataset.worldlines.find((w) => w.uri === shift.toWorldLineId) : null
 
   return (
-    <div className="fixed right-0 top-0 h-full w-80 bg-[#0A1525]/98 backdrop-blur border-l border-[#152240] p-5 overflow-y-auto z-20 shadow-2xl">
+    <div className={[
+      // 공통
+      'fixed z-20 shadow-2xl overflow-y-auto',
+      'bg-[#0A1525]/98 backdrop-blur border-[#152240]',
+      // 모바일: 하단 시트
+      'bottom-0 left-0 right-0 max-h-[65vh] rounded-t-xl border-t p-4',
+      // 데스크톱: 우측 패널
+      'sm:top-0 sm:right-0 sm:bottom-auto sm:left-auto sm:h-full sm:w-80',
+      'sm:rounded-none sm:max-h-none sm:border-t-0 sm:border-l sm:p-5',
+    ].join(' ')}>
+      {/* 모바일 드래그 핸들 */}
+      <div className="flex justify-center mb-3 sm:hidden">
+        <div className="w-10 h-1 rounded-full bg-[#152240]" />
+      </div>
+
       <div className="flex justify-between items-start mb-3">
-        <h2 className="text-lg font-bold text-[#C0D8F0] flex items-center gap-2">
+        <h2 className="text-base sm:text-lg font-bold text-[#C0D8F0] flex items-center gap-2">
           <span className="text-xl">{mechanismIcon(event.mechanismType)}</span>
           {event.labelKo}
         </h2>
         <button
           onClick={onClose}
-          className="text-[#4A6A8A] hover:text-[#C0D8F0] text-2xl leading-none transition-colors"
+          className="text-[#4A6A8A] hover:text-[#C0D8F0] text-2xl leading-none transition-colors flex-shrink-0 ml-2"
           aria-label="닫기"
         >
           ×
@@ -58,7 +72,7 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
           <div className="text-[#4A6A8A] text-xs mb-2">세계선 이동 ({shiftTypeKo(shift.shiftType)})</div>
           <div className="nixie text-sm">
             {(fromWl.divergence > 0 ? '+' : '') + fromWl.divergence.toFixed(6)}%
-            <span className="mx-2 text-[#4A6A8A]" style={{ fontFamily: 'inherit', textShadow: 'none', color: '#4A6A8A' }}>→</span>
+            <span className="mx-2" style={{ fontFamily: 'inherit', textShadow: 'none', color: '#4A6A8A' }}>→</span>
             {(toWl.divergence > 0 ? '+' : '') + toWl.divergence.toFixed(6)}%
           </div>
         </div>
@@ -78,7 +92,6 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
         </div>
       )}
 
-      {/* 느슨한 위키 링크 */}
       {wl && (
         <a
           href={worldlineWikiUrl(wl)}

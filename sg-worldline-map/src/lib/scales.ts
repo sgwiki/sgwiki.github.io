@@ -79,8 +79,10 @@ export function computeScales(dataset: SeriesDataset) {
 }
 
 /**
- * INITIAL_VIEW 날짜 범위를 SVG 뷰포트에 꽉 채우는 D3 zoom transform 계산.
- * screen_x = content_x * k + tx + marginLeft 공식 기반.
+ * INITIAL_VIEW 날짜 범위를 차트 내부 영역(marginLeft ~ svgWidth-marginRight)에 맞추는 zoom 계산.
+ * content point P → SVG x = k·P + x + marginLeft 공식.
+ * P_start → marginLeft 이 되려면: x = −k·xStart (marginLeft 제외).
+ * k = innerWidth / (xEnd − xStart).
  */
 export function computeInitialZoom(
   scales: ReturnType<typeof computeScales>,
@@ -89,8 +91,9 @@ export function computeInitialZoom(
 ): { k: number; x: number; y: number } {
   const xStart = scales.x(INITIAL_VIEW.start)
   const xEnd = scales.x(INITIAL_VIEW.end)
-  const k = svgWidth / (xEnd - xStart)
-  const x = -xStart * k - marginLeft
+  const innerWidth = svgWidth - marginLeft - MAP_DIMENSIONS.marginRight
+  const k = innerWidth / (xEnd - xStart)
+  const x = -xStart * k
   return { k, x, y: 0 }
 }
 
