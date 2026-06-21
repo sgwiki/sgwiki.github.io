@@ -120,6 +120,6 @@ D메일을 보내지 않는 세계선에서, 텐노지는 모에카를 총으로
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.6.3 Reversing Moeka's D-mail
-[^2]: 《Steins;Gate》 챕터 11
-[^3]: 《Steins;Gate Elite》 챕터 11
+- 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md)》, 2.6.3 Reversing Moeka's D-mail
+- 《Steins;Gate》 챕터 11
+- 《Steins;Gate Elite》 챕터 11

@@ -219,4 +219,4 @@ ED 곡의 화별 교체 전략은 후반부 감정선의 고조를 음악으로 
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §2.6.1 시리즈 연대기, §3.1.2 오퍼레이션 아크라이트, §3.1.3 오퍼레이션 스쿨드 참조.
+- [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §2.6.1 시리즈 연대기, §3.1.2 오퍼레이션 아크라이트, §3.1.3 오퍼레이션 스쿨드 참조.

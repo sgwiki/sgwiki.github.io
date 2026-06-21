@@ -110,5 +110,5 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
-[^2]: 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md)》, 3.2.1 타임 리프 제한, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+- 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md)》, 3.1.3 Operation Skuld, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5
+- 《[The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md)》, 3.2.1 타임 리프 제한, https://www.notion.so/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5

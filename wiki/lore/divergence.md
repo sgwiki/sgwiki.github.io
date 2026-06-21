@@ -83,4 +83,4 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md) - 팬 분석 논문, 세계선 변동률과 다이버전스 메커니즘 분석
+- [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/index.md) - 팬 분석 논문, 세계선 변동률과 다이버전스 메커니즘 분석

@@ -115,5 +115,5 @@ Steins;Gate 0 ELITE는 발매가 예고된 상태이나 아직 미발매다. 202
 
 ## 인용 출처
 
-[^1]: [슈타인즈 게이트 공식 QA자료집](../근거자료/공식/qa-자료집.md) — 엘리트 버전의 리메이크 성격, 원작과의 차이점 요약
-[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §Operation Skuld — 슈타인즈 게이트 세계선 도달 구조 참조
+- [슈타인즈 게이트 공식 QA자료집](../근거자료/공식/qa-자료집.md) — 엘리트 버전의 리메이크 성격, 원작과의 차이점 요약
+- [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §Operation Skuld — 슈타인즈 게이트 세계선 도달 구조 참조
