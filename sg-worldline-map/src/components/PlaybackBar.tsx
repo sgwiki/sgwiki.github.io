@@ -87,7 +87,7 @@ export function PlaybackBar({ dataset, onStepChange }: Props) {
   const currentStep = channel.steps[stepIdx]
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 w-[min(90%,720px)]">
+    <div className="fixed bottom-4 right-4 z-20 w-64">
       {routes && (
         <div className="mb-2 flex gap-2 justify-center">
           {routes.map((r) => (
@@ -147,7 +147,7 @@ export function PlaybackBar({ dataset, onStepChange }: Props) {
           </>
         ) : (
           <button onClick={handlePlay} className="w-full py-2 text-sm text-[#A0B8CC] hover:text-[#C0D8F0] transition-colors">
-            ▶ "{channel.labelKo ?? '오카베 따라가기'}" 시작하기
+            ▶ 시나리오 재생
           </button>
         )}
       </div>
