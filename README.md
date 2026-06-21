@@ -2,6 +2,8 @@
 
 슈타인즈 게이트 공식·팬 분석 자료를 바탕으로 한 **한국어 설정 해설 위키** 저장소입니다. 위키 본문은 `wiki/` 아래 마크다운으로 관리되고, MkDocs Material로 빌드해 [GitHub Pages](https://sgwiki.github.io/)에 배포합니다.
 
+세계선 분기와 사건 흐름을 탐색하는 인터랙티브 맵은 `sg-worldline-map/`의 React/Vite SPA로 관리하며, 배포 시 정적 산출물을 `site/maps/`에 병합합니다.
+
 위키 페이지는 Claude Code 에이전트 팀이 자동으로 작성·검수·커밋하며, 운영자는 관리 UI에서 실행·검토·승인합니다.
 
 ## 위키 구조
@@ -31,6 +33,7 @@ wiki/
 │   ├── run_holyclaude_pipeline.mjs   P1~P5 파이프라인 실행 래퍼
 │   ├── wiki_work_registry.mjs        병렬 실행 중복 주제 방지용 작업 현황 registry
 │   └── poll_suggestions.py           R2에서 제안 수신 → suggestions/inbox/
+├── sg-worldline-map/    세계선 인터랙티브 맵 React/Vite SPA (`/maps/`)
 ├── worker/               "제안하기" 폼을 받는 Cloudflare Worker (R2 + KV)
 ├── docker/holyclaude/    Claude Code 에이전트 팀 + 관리 UI 컨테이너
 ├── data/
@@ -52,6 +55,26 @@ make wiki-deploy       # 빌드 후 Cloudflare Pages 배포
 ```
 
 > 배포는 GitHub Pages(현재 기본 경로)로도 연동됩니다. MkDocs 설정은 `mkdocs.yml`을 참고하세요.
+
+## 세계선 인터랙티브 맵
+
+`sg-worldline-map/`은 슈타인즈 게이트 세계선, 사건, 세계선 이동, 수속 패턴을 시각화하는 정적 SPA입니다. 빌드 결과는 `/maps/` 하위 경로에서 동작하도록 `vite.config.ts`의 `base`가 `/maps/`로 고정되어 있습니다.
+
+```bash
+cd sg-worldline-map
+npm ci
+npm run dev          # Vite 개발 서버
+npm run typecheck    # TypeScript 검사
+npm run build        # tsc + Vite build + SPA route fallback 생성
+```
+
+맵 데이터는 `scripts/generate-data.py`가 온톨로지 TTL을 읽어 생성한 `sg-worldline-map/src/data/*.json`을 빌드 타임에 정적으로 import합니다. 이 JSON 파일들은 배포 입력이므로 git에 포함하고, `dist/`, `node_modules/`, TypeScript 빌드 캐시는 `.gitignore`로 제외합니다.
+
+```bash
+python scripts/generate-data.py --out sg-worldline-map/src/data
+```
+
+GitHub Pages 배포 워크플로는 SPA를 먼저 빌드하고, 성공 시 산출물을 MkDocs 결과물의 `site/maps/`에 복사합니다. SPA 빌드가 실패해도 위키 본문 배포는 계속 진행되며, 맵만 누락됩니다.
 
 ## Docker — sg-wiki-holyclaude 에이전트 팀
 
@@ -137,6 +160,7 @@ make suggestions-poll   # R2 → suggestions/inbox/ 수동 폴링
 ## 문서
 
 - [위키 안내 및 근거 체계](wiki/README.md)
+- [세계선 인터랙티브 맵 개발 안내](sg-worldline-map/README.md)
 - [holyclaude 위키 에이전트 팀 설계](docs/holyclaude-wiki-agent-팀-설계.md)
 - [제안 처리 팀 설계](docs/제안%20처리%20팀%20설계.md)
 - [RAG 소스 저작권 검토](docs/rag-소스-저작권-검토.md)
