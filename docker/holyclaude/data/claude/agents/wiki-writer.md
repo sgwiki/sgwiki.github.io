@@ -55,6 +55,10 @@ spoiler: {none|early_story|main_story|zero_story|endgame}
 공식자료집을 각주(`[^N]: ...`)로 쓸 때도 반드시 내부 링크 사용:
 `[^1]: [슈타게 공식 QA자료집](../공식자료/qa-자료집.md) — QN 요약`
 
+## MCP 조회 제약
+
+- dataforge `search_with_filters` 호출 시 `top_k`는 반드시 **30 이하**로 지정한다.
+
 ## 절대 금지
 
 - chunk ID(`qs-`, `sge_`, `sg0_` 등) 본문 기재

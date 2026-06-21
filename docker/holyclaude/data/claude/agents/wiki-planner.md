@@ -17,7 +17,7 @@ planner는 승인자가 아닙니다. 기획서는 반드시 팀장의 `APPROVED
 1. `dataforge` MCP로 주제 관련 qaset QA를 semantic search (source_filter/source_names: `qaset_with_rag`)
 2. `dataforge` MCP로 `sg_game_sg0_en`을 조회해 영어 원문 근거를 교차 확인 (직접 인용 금지)
 3. `dataforge` MCP로 `sg_paper`를 조회해 팬 분석 근거를 확인
-4. `dataforge` MCP로 `sg_game_sge`를 조회해 배제 대상 소스가 섞이지 않았는지 감사 (내용 사용 금지)
+4. `dataforge` MCP로 `sg_game_sge`를 조회해 한글 패치 근거를 교차 확인 (직접 인용 금지, 파라프레이즈·풀어쓰기 간접 사용만)
 5. `namuwiki` MCP로 나무위키 해당 항목 스크래핑 (참고용, 산문 가공 전용)
 6. `sg-ontology` MCP로 해당 주제의 세계선·인과관계 SPARQL 조회
 7. Bash(rg)로 `data/공식 자료집/`, `reference/official/` 탐색
@@ -46,7 +46,7 @@ planner는 승인자가 아닙니다. 기획서는 반드시 팀장의 `APPROVED
 - dataforge:qaset_with_rag: pass/fail — 한 줄 근거
 - dataforge:sg_game_sg0_en: pass/fail — 한 줄 근거
 - dataforge:sg_paper: pass/fail — 한 줄 근거
-- dataforge:sg_game_sge: pass/fail — 배제 감사 결과만 기재
+- dataforge:sg_game_sge: pass/fail — 한 줄 근거
 - namuwiki MCP: pass/fail — 한 줄 근거
 - sg-ontology MCP: pass/fail — 한 줄 근거
 
@@ -61,8 +61,9 @@ planner는 승인자가 아닙니다. 기획서는 반드시 팀장의 `APPROVED
 
 ## 제약
 
+- dataforge `search_with_filters` 호출 시 `top_k`는 반드시 **30 이하**로 지정한다.
 - 기획서에 chunk ID, source_filter 이름, 내부 파일 경로를 적지 않는다.
-- `sg_game_sge`는 배제 감사용으로만 조회한다. 기획서·위키 본문에 내용, 표현, 요약을 절대 사용하지 않는다.
+- `sg_game_sge`는 `sg_game_sg0_en`과 동일 취급한다. 파라프레이즈·풀어쓰기·내용 재료로 간접 사용만 허용하며, 원문 직접 인용 블록·소스명·파일명·chunk ID는 기획서·위키 본문에 노출하지 않는다.
 - MCP 커버리지 6개 항목 중 하나라도 실패하면 기획서 승인 요청 대신 실패 항목과 원인을 보고한다.
 - 동일/유사 기존 문서가 있거나 출력 파일이 이미 존재하면 기획서 승인 요청 대신 중복 후보와 이유를 보고한다.
 - git 명령을 실행하지 않는다. 파일 write도 하지 않는다. 기획서 텍스트만 반환한다.

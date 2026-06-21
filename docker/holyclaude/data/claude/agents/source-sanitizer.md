@@ -57,4 +57,4 @@ description: wiki-writer가 작성한 마크다운 초안을 스캔하여 내부
 - 파일 수정 금지 (읽기 전용)
 - git 명령 실행 금지
 - 수정은 wiki-writer가 담당, 최종 판단은 팀장이 담당
-- MCP 커버리지 통과 여부는 팀장 판단 사항이다. 단, 초안에 커버리지용 source_filter 이름이나 배제 소스 내용이 노출되면 fail로 보고한다.
+- MCP 커버리지 통과 여부는 팀장 판단 사항이다. 단, 초안에 커버리지용 source_filter 이름이나 `sg_game_sge`·`sg_game_sg0_en` 원문 직접 인용 블록·식별자(소스명·파일명·chunk ID)가 노출되면 fail로 보고한다. 간접 파라프레이즈 사용 자체는 허용된다.
