@@ -87,7 +87,7 @@ export function PlaybackBar({ dataset, onStepChange }: Props) {
   const currentStep = channel.steps[stepIdx]
 
   return (
-    <div className="fixed bottom-4 right-4 z-20 w-64">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 w-64">
       {routes && (
         <div className="mb-2 flex gap-2 justify-center">
           {routes.map((r) => (

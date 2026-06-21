@@ -10,7 +10,20 @@ import { EventDetailPanel } from '@/components/EventDetailPanel'
 import { PlaybackBar } from '@/components/PlaybackBar'
 import { datasets, resolveSeries, getDataset } from '@/data/loader'
 import { validateDataset } from '@/lib/scales'
-import type { PlaybackStep, SeriesId } from '@/types/ontology'
+import type { PlaybackStep, SeriesDataset, SeriesId } from '@/types/ontology'
+
+/**
+ * 재생 단계에서 강조할 이벤트 id 결정.
+ * 단계에 eventId가 명시되면 그대로, 아니면 shift의 triggeredByEventId(화살표 꼬리 D메일)를 사용.
+ */
+function resolvePlaybackEventId(step: PlaybackStep, dataset: SeriesDataset): string | null {
+  if (step.eventId) return step.eventId
+  if (step.shiftId) {
+    const sh = dataset.shifts.find((s) => s.id === step.shiftId || s.uri === step.shiftId)
+    return sh?.triggeredByEventId ?? null
+  }
+  return null
+}
 
 export function App() {
   // URL에서 시리즈 결정: /maps/anime/ → anime, /maps/sg0/ → sg0
@@ -42,6 +55,13 @@ export function App() {
     ? dataset.events.find((e) => e.uri === selectedEventId || e.id === selectedEventId) ?? null
     : null
 
+  // 재생 중에는 현재 단계에서 활성화된 D메일 이벤트를 기존 상세 패널에 그대로 표시.
+  const playbackEventId = playbackStep ? resolvePlaybackEventId(playbackStep, dataset) : null
+  const playbackEvent = playbackEventId
+    ? dataset.events.find((e) => e.uri === playbackEventId || e.id === playbackEventId) ?? null
+    : null
+  const panelEvent = playbackStep ? playbackEvent : selectedEvent
+
   const availableSeries = Object.keys(datasets)
   const isPlayable = !!dataset.playbackScript
 
@@ -64,7 +84,8 @@ export function App() {
             playbackStep
               ? {
                   worldLineId: playbackStep.worldLineId ?? null,
-                  eventId: playbackStep.eventId ?? null,
+                  // 이동(화살표) 단계면 그 이동을 일으킨 D메일(꼬리 쪽 메일)도 함께 강조
+                  eventId: resolvePlaybackEventId(playbackStep, dataset),
                   shiftId: playbackStep.shiftId ?? null,
                 }
               : null
@@ -77,7 +98,7 @@ export function App() {
       </div>
 
       <EventDetailPanel
-        event={selectedEvent}
+        event={panelEvent}
         dataset={dataset}
         onClose={() => setSelectedEventId(null)}
       />

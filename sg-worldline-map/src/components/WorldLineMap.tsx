@@ -76,6 +76,20 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
     return (id: string) => m.get(id)
   }, [dataset])
 
+  // D메일 ↔ 이동(shift) 양방향 매핑 — 한쪽 클릭 시 짝을 함께 강조.
+  // shift.triggeredByEventId = 화살표 꼬리 쪽 D메일.
+  const { shiftIdByEventId, eventIdByShiftId } = useMemo(() => {
+    const s2e = new Map<string, string>() // shift id/uri → trigger event id
+    const e2s = new Map<string, string>() // trigger event id → shift id
+    for (const s of dataset.shifts) {
+      if (!s.triggeredByEventId) continue
+      s2e.set(s.id, s.triggeredByEventId)
+      s2e.set(s.uri, s.triggeredByEventId)
+      e2s.set(s.triggeredByEventId, s.id)
+    }
+    return { shiftIdByEventId: e2s, eventIdByShiftId: s2e }
+  }, [dataset])
+
   const bandYRange = (af: string) => {
     const band = dataset.bands.find((b) => b.id === af)
     if (!band) return null
@@ -121,7 +135,10 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
             x={(s) => scales.x(parseLocalDateTime(s))}
             highlightedShiftId={highlightedShift}
             onSelectShift={(id) => {
-              if (!externalHighlight) setHighlightedShift(id)
+              if (externalHighlight) return
+              setHighlightedShift(id)
+              // 화살표 클릭 → 이 이동을 일으킨 D메일도 함께 강조
+              setHighlightedEvent(eventIdByShiftId.get(id) ?? null)
             }}
           />
           <EventLayer
@@ -133,6 +150,8 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
             onSelectEvent={(id) => {
               if (externalHighlight) return
               setHighlightedEvent(id)
+              // D메일 클릭 → 이 D메일로 인한 이동 화살표도 함께 강조
+              setHighlightedShift(shiftIdByEventId.get(id) ?? null)
               onSelectEvent?.(id)
             }}
           />

@@ -12,7 +12,7 @@ export const animePlaybackScript: PlaybackScript = {
   channels: [
     {
       id: 'main',
-      labelKo: '본편 주선',
+      labelKo: 'SG 애니메이션',
       steps: [
         {
           worldLineId: 'WL_1_130426',
@@ -37,9 +37,35 @@ export const animePlaybackScript: PlaybackScript = {
           autoAdvanceMs: 3000,
         },
         {
-          worldLineId: 'WL_0_337187',
+          worldLineId: 'WL_0_523299',
+          shiftId: 'Shift_AlphaInternal_02',
+          eventId: 'Event_DMail_Moeka',
           captionKo:
-            'D메일 연쇄로 α 최심부 0.337187% 도달. 그러나 이곳에서 마유리의 죽음이 수속된다.',
+            'D메일: 모에카 기종 변경 지시 — 휴대폰 기종을 바꾸게 해 α 0.523299%로 이동.',
+          autoAdvanceMs: 3000,
+        },
+        {
+          worldLineId: 'WL_0_456903',
+          shiftId: 'Shift_AlphaInternal_03',
+          eventId: 'Event_DMail_Luka',
+          captionKo:
+            'D메일: 루카 어머니에게 호출기 메시지 — 루카가 여성으로 태어나며 α 0.456903%로 이동.',
+          autoAdvanceMs: 3000,
+        },
+        {
+          worldLineId: 'WL_0_409420',
+          shiftId: 'Shift_AlphaInternal_04',
+          eventId: 'Event_DMail_Faris',
+          captionKo:
+            'D메일: 페이리스 아버지 생존 지시 — 아버지가 살아남아 α 0.409420%로 이동.',
+          autoAdvanceMs: 3000,
+        },
+        {
+          worldLineId: 'WL_0_337187',
+          shiftId: 'Shift_AlphaInternal_05',
+          eventId: 'Event_DMail_SuzuhaChase',
+          captionKo:
+            '스즈하 미행 중지 D메일로 α 최심부 0.337187% 도달. 그러나 이곳에서 마유리의 죽음이 수속된다.',
           autoAdvanceMs: 4000,
         },
         {
@@ -53,14 +79,39 @@ export const animePlaybackScript: PlaybackScript = {
           worldLineId: 'WL_0_409431',
           shiftId: 'Shift_Alpha_337187_to_409431',
           eventId: 'Event_DMail_Cancel_SuzuhaChase',
-          captionKo: 'D메일 취소 연쇄 시작 — α 밴드를 역순으로 되짚는다.',
+          captionKo:
+            'D메일 취소 연쇄 시작 — 스즈하 미행 중지 D메일을 취소해 α 밴드를 역순으로 되짚는다.',
+          autoAdvanceMs: 3000,
+        },
+        {
+          worldLineId: 'WL_0_456914',
+          shiftId: 'Shift_Alpha_409431_to_456914',
+          eventId: 'Event_DMail_Cancel_Faris',
+          captionKo:
+            'D메일 취소: 페이리스 아버지 사건 복구 — 아버지를 되살렸던 D메일을 취소. α 0.456914%로.',
+          autoAdvanceMs: 3000,
+        },
+        {
+          worldLineId: 'WL_0_523307',
+          shiftId: 'Shift_Alpha_456914_to_523307',
+          eventId: 'Event_DMail_Cancel_Luka',
+          captionKo:
+            'D메일 취소: 루카 성별 복구 — 루카를 여성으로 바꿨던 호출기 메시지를 취소. α 0.523307%로.',
+          autoAdvanceMs: 3000,
+        },
+        {
+          worldLineId: 'WL_0_571046',
+          shiftId: 'Shift_Alpha_523307_to_571046',
+          eventId: 'Event_DMail_Cancel_Moeka',
+          captionKo:
+            'D메일 취소: 모에카 IBN 5100 회수 복구 — 기종 변경 지시를 취소해 IBN 5100을 되돌린다. α 0.571046%로.',
           autoAdvanceMs: 3000,
         },
         {
           worldLineId: 'WL_0_571024',
           shiftId: 'Shift_Alpha_571046_to_571024',
           eventId: 'Event_DMail_Cancel_Loto6',
-          captionKo: '마지막 D메일 취소. α 진입점 0.571024%로 복귀.',
+          captionKo: '마지막 D메일 취소: 로또6 당첨 취소. α 진입점 0.571024%로 복귀.',
           autoAdvanceMs: 3000,
         },
         {
@@ -75,7 +126,7 @@ export const animePlaybackScript: PlaybackScript = {
           worldLineId: 'WL_1_130209',
           eventId: 'Event_Skuld_Fail_Travel',
           captionKo:
-            '스쿨드 작전 1차 실패 — 크리스를 구하지 못하고 β 내부로 미세 이동. (온톨로지는 표시값 변동 없는 미세 이동은 별도 shift로 모델링하지 않는다.)',
+            '스쿨드 작전 1차 실패 — 크리스를 구하지 못하고 β 내부로 미세 이동.',
           autoAdvanceMs: 3500,
         },
         {
