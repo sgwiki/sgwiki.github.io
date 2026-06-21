@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import gsap from 'gsap'
 import type { SeriesDataset } from '@/types/ontology'
-import { MAP_DIMENSIONS, computeScales, parseLocalDateTime } from '@/lib/scales'
+import { MAP_DIMENSIONS, computeScales, computeInitialZoom, parseLocalDateTime } from '@/lib/scales'
 import { useD3Zoom } from '@/hooks/useD3Zoom'
 import { BandsLayer } from './BandsLayer'
 import { WorldLineLayer } from './WorldLineLayer'
@@ -28,14 +28,21 @@ interface Props {
 
 export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
-  const { transform, reset } = useD3Zoom(svgRef, { scaleExtent: [0.3, 8] })
   const scales = useMemo(() => computeScales(dataset), [dataset])
+  const { width, height, marginLeft, marginTop } = MAP_DIMENSIONS
+  const innerWidth = width - marginLeft - 120
+  const initialZoom = useMemo(
+    () => computeInitialZoom(scales, width, marginLeft),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],  // 최초 데이터 기준으로 한 번만 계산
+  )
+  const { transform, zoomTo } = useD3Zoom(svgRef, {
+    scaleExtent: [0.05, 300],
+    initialTransform: initialZoom,
+  })
   const [highlightedWl, setHighlightedWl] = useState<string | null>(null)
   const [highlightedEvent, setHighlightedEvent] = useState<string | null>(null)
   const [highlightedShift, setHighlightedShift] = useState<string | null>(null)
-
-  const { width, height, marginLeft, marginTop } = MAP_DIMENSIONS
-  const innerWidth = width - marginLeft - 120
 
   // 외부 강조(재생 모드) 반영
   useEffect(() => {
@@ -128,9 +135,9 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
         </g>
       </svg>
 
-      {/* 줌 리셋 버튼 */}
+      {/* 줌 리셋 버튼 — 2010년 핵심 구간으로 복귀 */}
       <button
-        onClick={reset}
+        onClick={() => zoomTo(initialZoom.x, initialZoom.y, initialZoom.k, 500)}
         className="absolute top-3 right-3 z-10 bg-slate-800/90 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-sm border border-slate-700"
       >
         ⟲ 초기 화면

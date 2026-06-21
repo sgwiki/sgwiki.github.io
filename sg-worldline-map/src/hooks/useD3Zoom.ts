@@ -14,7 +14,7 @@ export interface ZoomTransform {
 
 export function useD3Zoom<SVGSVG extends SVGSVGElement>(
   svgRef: React.RefObject<SVGSVG | null>,
-  opts: { scaleExtent?: [number, number] } = {},
+  opts: { scaleExtent?: [number, number]; initialTransform?: ZoomTransform } = {},
 ) {
   const [transform, setTransform] = useState<ZoomTransform>({ x: 0, y: 0, k: 1 })
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVG, unknown> | null>(null)
@@ -38,9 +38,17 @@ export function useD3Zoom<SVGSVG extends SVGSVGElement>(
     selection.call(zoom)
     zoomRef.current = zoom
 
+    // 초기 transform 즉시 적용 (마운트 시 한 번만)
+    if (opts.initialTransform) {
+      const { x, y, k } = opts.initialTransform
+      selection.call(zoom.transform, d3.zoomIdentity.translate(x, y).scale(k))
+    }
+
     return () => {
       selection.on('.zoom', null)
     }
+  // initialTransform은 의도적으로 deps 제외 — 마운트 시 한 번만 적용
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [svgRef, opts.scaleExtent])
 
   /** 특정 영역으로 줌 (재생 모드에서 사용) */

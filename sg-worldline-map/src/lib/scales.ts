@@ -39,6 +39,12 @@ export const MAP_DIMENSIONS = {
   marginBottom: 60,
 }
 
+// 초기 뷰: 주요 사건이 밀집한 2010년 여름 구간
+export const INITIAL_VIEW = {
+  start: new Date('2010-07-26'),
+  end: new Date('2010-09-05'),
+}
+
 export function computeScales(dataset: SeriesDataset) {
   const { marginLeft, marginRight, marginTop, marginBottom, width, height } = MAP_DIMENSIONS
   const innerWidth = width - marginLeft - marginRight
@@ -70,6 +76,22 @@ export function computeScales(dataset: SeriesDataset) {
   const yMax = Math.max(...ys, ...dataset.bands.map((b) => b.yBottom)) + marginBottom
 
   return { x, xDomain, width, height, yMin, yMax }
+}
+
+/**
+ * INITIAL_VIEW 날짜 범위를 SVG 뷰포트에 꽉 채우는 D3 zoom transform 계산.
+ * screen_x = content_x * k + tx + marginLeft 공식 기반.
+ */
+export function computeInitialZoom(
+  scales: ReturnType<typeof computeScales>,
+  svgWidth: number,
+  marginLeft: number,
+): { k: number; x: number; y: number } {
+  const xStart = scales.x(INITIAL_VIEW.start)
+  const xEnd = scales.x(INITIAL_VIEW.end)
+  const k = svgWidth / (xEnd - xStart)
+  const x = -xStart * k - marginLeft
+  return { k, x, y: 0 }
 }
 
 // ─── 색상 매핑 ───────────────────────────────────────────────────────
