@@ -59,9 +59,9 @@ function parseArgs(argv) {
   }
 
   if (!args.command) {
-    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2> --run-id <id> [--dry-run]');
+    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3> --run-id <id> [--dry-run]');
   }
-  if (!['p1', 'p2'].includes(args.command)) {
+  if (!['p1', 'p2', 'p3'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
