@@ -47,3 +47,6 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/sgwiki/sgwiki.github.io
+
+extra_javascript:
+  - javascripts/worldline-map-btn.js
