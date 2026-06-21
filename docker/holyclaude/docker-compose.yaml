@@ -4,10 +4,12 @@
 # UI:     http://localhost:3001
 # ==============================================================================
 
+name: sg-wiki
+
 services:
-  sg-ontology-http:
-    image: steinsgate-mcp:latest
-    container_name: sg-ontology-http
+  ontology:
+    build: ./ontology/
+    container_name: sg-wiki-ontology-http
     restart: unless-stopped
     ports:
       - "8093:8093"
@@ -37,10 +39,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: holyclaude
-    hostname: holyclaude
+    container_name: sg-wiki-holyclaude
+    hostname: sg-wiki-holyclaude
     restart: unless-stopped
     shm_size: 2g                           # Chromium needs this — don't remove
+    mem_limit: 48g                         # 에이전트 spawn storm 메모리 상한
+    pids_limit: 512                        # 프로세스 무한 증식 방지
     network_mode: bridge
     extra_hosts:
       - "host.docker.internal:host-gateway"   # Linux에서 MCP HTTP 연결 필수
@@ -74,7 +78,7 @@ services:
       - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       - HOLYCLAUDE_PIPELINE_MODEL=glm-5.2
 
-  sg-wiki-admin:
+  admin:
     build: ./admin/
     container_name: sg-wiki-admin
     restart: unless-stopped
@@ -87,6 +91,7 @@ services:
       - TZ=Asia/Seoul
       - WORKSPACE=/workspace
       - ADMIN_RUNS_DIR=/workspace/.admin/runs
+      - ADMIN_MAX_CONCURRENT_RUNS=6
       - R2_MOCK=${R2_MOCK:-1}
       - R2_ENDPOINT=${R2_ENDPOINT:-}
       - R2_ACCESS_KEY=${R2_ACCESS_KEY:-}

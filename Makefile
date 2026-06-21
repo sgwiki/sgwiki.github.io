@@ -1,27 +1,32 @@
 COMPOSE_FILE := docker/holyclaude/docker-compose.yaml
 COMPOSE      := docker compose --env-file .env -f $(COMPOSE_FILE)
 
-.PHONY: holyclaude-up holyclaude-down holyclaude-restart holyclaude-logs holyclaude-shell \
+.PHONY: up down restart logs shell \
         wiki-serve wiki-build wiki-deploy \
         suggestions-poll worker-dev worker-deploy \
         help
 
-# ── holyclaude 컨테이너 ──────────────────────────────────────────────────────
+# ── sg-wiki-holyclaude 컨테이너 ─────────────────────────────────────────────
 
-holyclaude-up:
+up:
 	$(COMPOSE) up -d --build
+	@echo ""
+	@echo "  HolyClaude UI  →  http://localhost:3001"
+	@echo "  Admin          →  http://localhost:3002"
+	@echo "  Ontology MCP   →  http://localhost:8093/mcp"
+	@echo ""
 
-holyclaude-down:
+down:
 	$(COMPOSE) down
 
-holyclaude-restart:
-	$(COMPOSE) restart holyclaude
+restart:
+	$(COMPOSE) restart sg-wiki-holyclaude
 
-holyclaude-logs:
-	$(COMPOSE) logs -f holyclaude
+logs:
+	$(COMPOSE) logs -f sg-wiki-holyclaude
 
-holyclaude-shell:
-	$(COMPOSE) exec holyclaude bash
+shell:
+	$(COMPOSE) exec sg-wiki-holyclaude bash
 
 # ── 위키 빌드 / 로컬 미리보기 ───────────────────────────────────────────────
 
@@ -52,11 +57,11 @@ worker-deploy:
 
 help:
 	@echo ""
-	@echo "  holyclaude-up        컨테이너 빌드 & 시작 (포트 3001)"
-	@echo "  holyclaude-down      컨테이너 중지"
-	@echo "  holyclaude-restart   컨테이너 재시작 (재빌드 없음)"
-	@echo "  holyclaude-logs      컨테이너 로그 스트리밍"
-	@echo "  holyclaude-shell     컨테이너 bash 접속"
+	@echo "  up        컨테이너 빌드 & 시작 (포트 3001)"
+	@echo "  down      컨테이너 중지"
+	@echo "  restart   컨테이너 재시작 (재빌드 없음)"
+	@echo "  logs      컨테이너 로그 스트리밍"
+	@echo "  shell     컨테이너 bash 접속"
 	@echo ""
 	@echo "  wiki-serve           로컬 미리보기 (localhost:8000)"
 	@echo "  wiki-build           정적 사이트 빌드 (site/)"
