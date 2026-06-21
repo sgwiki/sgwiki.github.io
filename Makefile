@@ -1,5 +1,6 @@
 COMPOSE_FILE := docker/holyclaude/docker-compose.yaml
 COMPOSE      := docker compose --env-file .env -f $(COMPOSE_FILE)
+MKDOCS       := uv run mkdocs
 
 .PHONY: up down restart logs shell \
         wiki-serve wiki-build wiki-deploy \
@@ -31,13 +32,13 @@ shell:
 # ── 위키 빌드 / 로컬 미리보기 ───────────────────────────────────────────────
 
 wiki-serve:
-	mkdocs serve
+	$(MKDOCS) serve
 
 wiki-build:
-	mkdocs build --strict
+	$(MKDOCS) build --strict
 
 wiki-deploy:
-	mkdocs build --strict
+	$(MKDOCS) build --strict
 	wrangler pages deploy site --project-name=sg-wiki --branch=main
 
 # ── 제안 관리 ────────────────────────────────────────────────────────────────
