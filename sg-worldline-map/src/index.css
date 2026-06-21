@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  overscroll-behavior: none;
+}
+
+/* SVG 트랜지션 공통 */
+.worldline, .event-node, .transition-path, .convergence-zone {
+  transition: opacity 0.3s ease, stroke-width 0.3s ease;
+}
+
+/* 줌 핸들러가 터치 스크롤을 막기 위해 */
+.map-container {
+  touch-action: none;
+}

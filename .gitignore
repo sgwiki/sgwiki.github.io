@@ -42,7 +42,7 @@ reference/
 
 # MkDocs build output
 site/
-
+docs/
 # Runtime: R2 폴링 수신함, 처리 완료 마커, 결정 로그
 suggestions/
 
@@ -78,3 +78,18 @@ docker/holyclaude/data/claude/projects/
 docker/holyclaude/data/claude/sessions/
 docker/holyclaude/data/claude/shell-snapshots/
 docker/holyclaude/data/claude/backups/
+
+# sg-worldline-map (인터랙티브 맵 SPA)
+# src/data/*.json은 generate-data.py 산출물이나 빌드 입력이라 tracked 허용.
+# dist/, node_modules/, TS 빌드 캐시는 무시.
+sg-worldline-map/node_modules/
+sg-worldline-map/dist/
+sg-worldline-map/dist-tsbuildinfo/
+sg-worldline-map/*.tsbuildinfo
+
+# Planning/interview 산출물 (planning-with-files + omx)
+.omx/
+# 루트 planning 파일 (pi/omx 작업 추적용)
+findings.md
+task_plan.md
+progress.md

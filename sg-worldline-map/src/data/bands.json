@@ -1,0 +1,30 @@
+[
+  {
+    "id": "AF_Omega",
+    "labelKo": "Ω 오메가",
+    "color": "#6b7280",
+    "yTop": 60,
+    "yBottom": 100
+  },
+  {
+    "id": "AF_Alpha",
+    "labelKo": "α 알파",
+    "color": "#ef4444",
+    "yTop": 150,
+    "yBottom": 470
+  },
+  {
+    "id": "AF_SteinsGate",
+    "labelKo": "Steins;Gate",
+    "color": "#f59e0b",
+    "yTop": 510,
+    "yBottom": 550
+  },
+  {
+    "id": "AF_Beta",
+    "labelKo": "β 베타",
+    "color": "#6366f1",
+    "yTop": 600,
+    "yBottom": 900
+  }
+]
