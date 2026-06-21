@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import gsap from 'gsap'
 import type { SeriesDataset } from '@/types/ontology'
-import { MAP_DIMENSIONS, computeScales, computeInitialZoom, CLUSTER_END_DATE, parseLocalDateTime } from '@/lib/scales'
+import { MAP_DIMENSIONS, computeScales, parseLocalDateTime } from '@/lib/scales'
 import { useD3Zoom } from '@/hooks/useD3Zoom'
 import { BandsLayer } from './BandsLayer'
 import { WorldLineLayer } from './WorldLineLayer'
@@ -35,9 +35,8 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   // scaleExtent를 안정된 참조로 유지 — 매 렌더마다 새 배열이 생기면 D3 zoom이 재초기화됨
   const scaleExtent = useMemo<[number, number]>(() => [0.05, 300], [])
 
-  // 마운트 시 2010-07~08 구간에 포커스 — 이후 사용자가 자유 줌/패닝 가능
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initialTransform = useMemo(() => computeInitialZoom(scales, width, marginLeft), [])
+  // 3구역 piecewise 축이 한 화면에 모두 들어오므로 초기 줌 없이 전체 보기(항등 변환).
+  const initialTransform = useMemo(() => ({ k: 1, x: 0, y: 0 }), [])
 
   const { transform, reset } = useD3Zoom(svgRef, { scaleExtent, initialTransform })
 
@@ -55,13 +54,17 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   }, [externalHighlight])
 
   // GSAP 초기 로딩 시퀀스 (AC: 축→밴드→선→전환→노드 순차 등장)
+  // gsap.context + revert로 감싸 StrictMode 이중 마운트 시 .from 시작값(scale:0/opacity:0)이
+  // 그대로 남아 레이어가 사라지는 문제를 방지 — cleanup에서 자연 상태로 복원된다.
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
-    tl.from('.bands-layer', { opacity: 0, duration: 0.5 })
-      .from('.worldlines-layer .worldline-group', { scaleX: 0, transformOrigin: 'left', duration: 0.6, stagger: 0.04 }, '-=0.2')
-      .from('.transitions-layer .transition-group', { opacity: 0, duration: 0.4, stagger: 0.04 }, '-=0.4')
-      .from('.events-layer .event-node-group', { scale: 0, transformOrigin: 'center', duration: 0.3, stagger: 0.015 }, '-=0.3')
-    return () => { tl.kill() }
+    const ctx = gsap.context(() => {
+      gsap.timeline({ defaults: { ease: 'power2.out' } })
+        .from('.bands-layer', { opacity: 0, duration: 0.5 })
+        .from('.worldlines-layer .worldline-group', { scaleX: 0, transformOrigin: 'left', duration: 0.6, stagger: 0.04 }, '-=0.2')
+        .from('.transitions-layer .transition-group', { opacity: 0, duration: 0.4, stagger: 0.04 }, '-=0.4')
+        .from('.events-layer .event-node-group', { scale: 0, transformOrigin: 'center', duration: 0.3, stagger: 0.015 }, '-=0.3')
+    }, svgRef)
+    return () => { ctx.revert() }
   }, [dataset])
 
   const wlYById = useMemo(() => {
@@ -133,6 +136,9 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
               onSelectEvent?.(id)
             }}
           />
+
+          {/* 시간 단절(세로 물결) — 모든 레이어 위에 오버레이 */}
+          <TimeBreaks scales={scales} />
         </g>
       </svg>
 
@@ -155,49 +161,77 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   )
 }
 
+/** 세로 물결(squiggle) path — y0~y1 구간을 진폭 amp, 주기 period로 흔든다. */
+function wavyVerticalPath(x: number, y0: number, y1: number, amp = 4, period = 14): string {
+  const half = period / 2
+  let d = `M ${x} ${y0}`
+  let dir = 1
+  for (let y = y0; y < y1; y += half) {
+    const yNext = Math.min(y + half, y1)
+    const ctrlY = (y + yNext) / 2
+    d += ` Q ${x + dir * amp} ${ctrlY} ${x} ${yNext}`
+    dir *= -1
+  }
+  return d
+}
+
+/** 구역별 틱 날짜 생성 — A/B는 일 단위, C(단일 시점)는 시작점만. */
+function zoneTicks(zone: ReturnType<typeof computeScales>['zones'][number]): Date[] {
+  if (zone.id === 'C') return [new Date('2025-08-21')]
+  const stepDays = zone.id === 'A' ? 3 : 7
+  return d3.timeDay.every(stepDays)?.range(zone.start, zone.end) ?? [zone.start]
+}
+
 function TimeAxis({ scales, innerWidth }: { scales: ReturnType<typeof computeScales>; innerWidth: number }) {
-  // 주요 구간(2010~2011)과 미래 압축 구간을 분리하여 틱 생성
-  const mainEnd = scales.isPiecewise ? CLUSTER_END_DATE : scales.xDomain[1]
-  const mainTicks = d3.timeDay.every(3)?.range(scales.xDomain[0], mainEnd) ?? []
-
-  // 미래 구간: 해당 연도만 표시
-  const futureTicks: Date[] = scales.isPiecewise
-    ? [new Date(`${scales.xDomain[1].getFullYear()}-01-01`)]
-    : []
-
-  const breakX = scales.isPiecewise ? scales.x(CLUSTER_END_DATE) : null
+  const { zones } = scales
 
   return (
     <g className="timeline-axis">
       <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="#475569" strokeWidth={1} />
-      {mainTicks.map((t, i) => (
-        <g key={i} transform={`translate(${scales.x(t)}, 0)`}>
-          <line y2={-6} stroke="#64748b" />
-          <text y={-10} textAnchor="middle" fontSize={10} fill="#94a3b8">
-            {d3.timeFormat('%m/%d')(t)}
-          </text>
+
+      {/* 구역별 틱 + 라벨 */}
+      {zones.map((zone) => {
+        const ticks = zoneTicks(zone)
+        const fmt = zone.id === 'C' ? d3.timeFormat('%Y-%m-%d') : d3.timeFormat('%m/%d')
+        const mid = (zone.xStart + zone.xEnd) / 2
+        return (
+          <g key={zone.id}>
+            {ticks.map((t, i) => (
+              <g key={i} transform={`translate(${scales.x(t)}, 0)`}>
+                <line y2={-6} stroke="#64748b" />
+                <text y={-10} textAnchor="middle" fontSize={10} fill="#94a3b8">
+                  {fmt(t)}
+                </text>
+              </g>
+            ))}
+            {/* 구역 라벨 */}
+            <text x={mid} y={-26} textAnchor="middle" fontSize={11} fill="#cbd5e1" letterSpacing="1">
+              {zone.label}
+            </text>
+          </g>
+        )
+      })}
+    </g>
+  )
+}
+
+/** 세로 물결 break 오버레이 — 세계선/노드 위에 그려 시간 단절을 시각화. */
+function TimeBreaks({ scales }: { scales: ReturnType<typeof computeScales> }) {
+  const { yMin, yMax, breaks } = scales
+  return (
+    <g className="timeline-breaks">
+      {breaks.map((b, i) => (
+        <g key={`break${i}`}>
+          {/* 배경색 얇은 마스크로 양옆을 살짝 가려 끊김 강조 */}
+          <rect x={b.x - 7} y={yMin} width={14} height={yMax - yMin} fill="#040810" opacity={0.85} />
+          <path
+            d={wavyVerticalPath(b.x, yMin, yMax)}
+            fill="none"
+            stroke="#475569"
+            strokeWidth={1.5}
+          />
         </g>
       ))}
-      {futureTicks.map((t, i) => (
-        <g key={`f${i}`} transform={`translate(${scales.x(t)}, 0)`}>
-          <line y2={-6} stroke="#334155" />
-          <text y={-10} textAnchor="middle" fontSize={10} fill="#64748b">
-            {d3.timeFormat('%Y')(t)}
-          </text>
-        </g>
-      ))}
-      {/* 시간 압축 구간 경계 표시 */}
-      {breakX !== null && (
-        <g transform={`translate(${breakX}, 0)`}>
-          <line y1={4} y2={-16} stroke="#334155" strokeWidth={1} strokeDasharray="3,2" />
-          <text y={-20} textAnchor="middle" fontSize={8} fill="#475569" letterSpacing="2">
-            ···
-          </text>
-        </g>
-      )}
-      <text x={innerWidth / 2} y={-30} textAnchor="middle" fontSize={12} fill="#cbd5e1">
-        타임라인
-      </text>
     </g>
   )
 }

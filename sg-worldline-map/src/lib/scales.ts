@@ -39,73 +39,70 @@ export const MAP_DIMENSIONS = {
   marginBottom: 60,
 }
 
-// 초기 뷰: 주요 사건이 밀집한 2010년 여름 구간
-export const INITIAL_VIEW = {
-  start: new Date('2010-07-26'),
-  end: new Date('2010-09-05'),
+/**
+ * 시간 구역 정의 — 데이터가 시간상 세 덩어리로 떨어져 있어(2010 여름 / 2011-01 SG0 /
+ * 2025 단일 사건) 각 구역을 별도 선형 구간으로 두고 사이를 세로 물결(break)로 끊는다.
+ * 큐레이션된 데이터셋이므로 경계는 명명 상수로 고정. 데이터가 구역 밖으로 확장되면
+ * (validateDataset 경고 참고) 아래 경계를 갱신할 것.
+ */
+export interface TimeZone {
+  id: string
+  label: string
+  start: Date
+  end: Date
+  /** innerWidth에서 이 구역이 차지할 비율 */
+  frac: number
 }
 
-/** 주요 이벤트 밀집 구간 종료 — 이후 구간은 비선형 압축으로 처리 */
-export const CLUSTER_END_DATE = new Date('2011-06-01')
-/** 미래(압축) 구간이 차지할 화면 비율 */
-const FUTURE_FRACTION = 0.12
+export const TIME_ZONES: TimeZone[] = [
+  { id: 'A', label: '2010년 여름', start: new Date('2010-07-26'), end: new Date('2010-08-22'), frac: 0.62 },
+  { id: 'B', label: '2011-01', start: new Date('2010-12-28'), end: new Date('2011-01-28'), frac: 0.20 },
+  { id: 'C', label: '2025', start: new Date('2025-08-10'), end: new Date('2025-08-31'), frac: 0.13 },
+]
+
+/** 구역 사이 물결 break 1개가 차지할 폭 비율 (구역 frac 합 + GAP_FRAC×breakCount = 1.0) */
+const GAP_FRAC = 0.025
+
+export interface ZoneLayout extends TimeZone {
+  /** 구역 시작/끝의 content-space x 픽셀 (transform 이전) */
+  xStart: number
+  xEnd: number
+}
 
 export function computeScales(dataset: SeriesDataset) {
   const { marginLeft, marginRight, marginTop, marginBottom, width, height } = MAP_DIMENSIONS
   const innerWidth = width - marginLeft - marginRight
 
-  // X 도메인: 모든 시간 정보(이벤트 localDateTime + shift shiftMoment)의 범위
-  const times: Date[] = []
-  for (const e of dataset.events) times.push(parseLocalDateTime(e.localDateTime))
-  for (const s of dataset.shifts) times.push(parseLocalDateTime(s.shiftMoment))
-  // convergence의 onTimeline 항목 timeWindow는 "YYYY-MM-DD ..." 형태라 별도 파싱
-  for (const c of dataset.convergence) {
-    if (c.onTimeline && /^\d{4}-\d{2}-\d{2}/.test(c.timeWindow)) {
-      times.push(parseLocalDateTime(c.timeWindow.split(' ')[0]))
-    }
-  }
-  const minTime = d3.min(times) ?? new Date('2010-07-28')
-  const maxTime = d3.max(times) ?? new Date('2010-08-21')
-  // 양끝 패딩
-  const padMs = (maxTime.getTime() - minTime.getTime()) * 0.03
-  const xDomain: [Date, Date] = [
-    new Date(minTime.getTime() - padMs),
-    new Date(maxTime.getTime() + padMs),
-  ]
+  // 각 구역의 content-space 픽셀 범위 계산 — 구역 사이에 GAP_FRAC 만큼 물결 공간을 둔다.
+  const zones: ZoneLayout[] = []
+  let cursor = 0
+  TIME_ZONES.forEach((z, i) => {
+    const xStart = cursor
+    const xEnd = cursor + innerWidth * z.frac
+    zones.push({ ...z, xStart, xEnd })
+    cursor = xEnd
+    if (i < TIME_ZONES.length - 1) cursor += innerWidth * GAP_FRAC // 다음 구역 전 물결 간격
+  })
 
-  // 주요 구간 이후 크게 동떨어진 사건이 있으면 piecewise 스케일로 미래 구간 압축
-  const isPiecewise = maxTime > CLUSTER_END_DATE
-  const x = isPiecewise
-    ? d3.scaleTime()
-        .domain([xDomain[0], CLUSTER_END_DATE, xDomain[1]])
-        .range([0, innerWidth * (1 - FUTURE_FRACTION), innerWidth])
-    : d3.scaleTime().domain(xDomain).range([0, innerWidth])
+  // 폴리리니어 시간 스케일: [A.start, A.end, B.start, B.end, C.start, C.end]
+  // gap 구간(A.end~B.start 등)에는 데이터가 없어 보간 왜곡 없음.
+  const domain = zones.flatMap((z) => [z.start, z.end])
+  const range = zones.flatMap((z) => [z.xStart, z.xEnd])
+  const x = d3.scaleTime().domain(domain).range(range)
+
+  // 물결 break 위치 — 인접 구역 사이 gap 중앙
+  const breaks = zones.slice(0, -1).map((z, i) => ({
+    x: (z.xEnd + zones[i + 1].xStart) / 2,
+  }))
+
+  const xDomain: [Date, Date] = [zones[0].start, zones[zones.length - 1].end]
 
   // Y는 generate-data.py에서 계산됨 — 그대로 사용. 약간의 상하 여백.
   const ys = dataset.worldlines.map((w) => w.y)
   const yMin = Math.min(...ys, ...dataset.bands.map((b) => b.yTop)) - marginTop
   const yMax = Math.max(...ys, ...dataset.bands.map((b) => b.yBottom)) + marginBottom
 
-  return { x, xDomain, width, height, yMin, yMax, isPiecewise }
-}
-
-/**
- * INITIAL_VIEW 날짜 범위를 차트 내부 영역(marginLeft ~ svgWidth-marginRight)에 맞추는 zoom 계산.
- * content point P → SVG x = k·P + x + marginLeft 공식.
- * P_start → marginLeft 이 되려면: x = −k·xStart (marginLeft 제외).
- * k = innerWidth / (xEnd − xStart).
- */
-export function computeInitialZoom(
-  scales: ReturnType<typeof computeScales>,
-  svgWidth: number,
-  marginLeft: number,
-): { k: number; x: number; y: number } {
-  const xStart = scales.x(INITIAL_VIEW.start)
-  const xEnd = scales.x(INITIAL_VIEW.end)
-  const innerWidth = svgWidth - marginLeft - MAP_DIMENSIONS.marginRight
-  const k = innerWidth / (xEnd - xStart)
-  const x = -xStart * k
-  return { k, x, y: 0 }
+  return { x, xDomain, width, height, yMin, yMax, zones, breaks }
 }
 
 // ─── 색상 매핑 ───────────────────────────────────────────────────────
@@ -165,6 +162,21 @@ export interface DataIssue {
  */
 export function validateDataset(dataset: SeriesDataset): DataIssue[] {
   const issues: DataIssue[] = []
+
+  // 모든 이벤트 시각이 TIME_ZONES 안에 들어오는지 — 벗어나면 piecewise gap에 찍혀 안 보임.
+  // (데이터가 새 시기로 확장되면 TIME_ZONES 갱신 필요 — 조기 경고)
+  for (const e of dataset.events) {
+    const t = parseLocalDateTime(e.localDateTime)
+    const inZone = TIME_ZONES.some((z) => t >= z.start && t <= z.end)
+    if (!inZone) {
+      issues.push({
+        level: 'warn',
+        entity: `Event:${e.id}`,
+        detail: `localDateTime "${e.localDateTime}"가 TIME_ZONES 밖 — 시간축 gap에 가려질 수 있음`,
+      })
+    }
+  }
+
   const wlIds = new Set(dataset.worldlines.map((w) => w.uri))
   const eventIds = new Set(dataset.events.map((e) => e.uri))
   const shiftIds = new Set(dataset.shifts.map((s) => s.uri))
