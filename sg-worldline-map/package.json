@@ -6,7 +6,7 @@
   "description": "Steins;Gate 세계선 인터랙티브 맵 — sgwiki.github.io/maps/ 통합",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/create-spa-route-fallbacks.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b"
   },
