@@ -34,39 +34,39 @@ export function Legend() {
     <div className="absolute bottom-12 right-3 z-10 text-xs">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="block ml-auto bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-700"
+        className="block ml-auto bg-[#0A1525]/90 hover:bg-[#152240] text-[#4A6A8A] hover:text-[#C0D8F0] px-3 py-1.5 rounded border border-[#152240] transition-colors"
       >
         {open ? '▲ 범례 닫기' : '▼ 범례'}
       </button>
 
       {open && (
-        <div className="mt-1 bg-slate-800/95 backdrop-blur border border-slate-700 rounded p-3 w-52 space-y-3">
+        <div className="mt-1 bg-[#0A1525]/98 backdrop-blur border border-[#152240] rounded p-3 w-52 space-y-3">
           <section>
-            <div className="text-slate-400 font-semibold mb-1">이벤트 유형</div>
+            <div className="text-[#4A6A8A] font-semibold mb-1">이벤트 유형</div>
             {EVENT_ITEMS.map(({ label, color, shape }) => (
               <div key={label} className="flex items-center gap-2 py-0.5">
                 <ShapeIcon shape={shape} color={color} />
-                <span className="text-slate-300">{label}</span>
+                <span className="text-[#C0D8F0]">{label}</span>
               </div>
             ))}
           </section>
 
           <section>
-            <div className="text-slate-400 font-semibold mb-1">어트랙터 필드</div>
+            <div className="text-[#4A6A8A] font-semibold mb-1">어트랙터 필드</div>
             {AF_ITEMS.map(({ label, color }) => (
               <div key={label} className="flex items-center gap-2 py-0.5">
                 <span className="inline-block w-4 h-0.5 rounded" style={{ background: color }} />
-                <span className="text-slate-300">{label}</span>
+                <span className="text-[#C0D8F0]">{label}</span>
               </div>
             ))}
           </section>
 
           <section>
-            <div className="text-slate-400 font-semibold mb-1">세계선 전환</div>
+            <div className="text-[#4A6A8A] font-semibold mb-1">세계선 전환</div>
             {SHIFT_ITEMS.map(({ label, color }) => (
               <div key={label} className="flex items-center gap-2 py-0.5">
                 <span className="inline-block w-4 h-0.5 rounded" style={{ background: color }} />
-                <span className="text-slate-300">{label}</span>
+                <span className="text-[#C0D8F0]">{label}</span>
               </div>
             ))}
           </section>

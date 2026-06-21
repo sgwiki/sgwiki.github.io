@@ -79,7 +79,7 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   }
 
   return (
-    <div className="map-container relative w-full h-full overflow-hidden bg-slate-900">
+    <div className="map-container relative w-full h-full overflow-hidden bg-[#040810]">
       <svg
         ref={svgRef}
         viewBox={`0 0 ${width} ${height}`}
@@ -138,7 +138,7 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
       {/* 줌 리셋 버튼 — 2010년 핵심 구간으로 복귀 */}
       <button
         onClick={() => zoomTo(initialZoom.x, initialZoom.y, initialZoom.k, 500)}
-        className="absolute top-3 right-3 z-10 bg-slate-800/90 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-sm border border-slate-700"
+        className="absolute top-3 right-3 z-10 bg-[#0A1525]/90 hover:bg-[#152240] text-[#4A6A8A] hover:text-[#C0D8F0] px-3 py-1.5 rounded text-sm border border-[#152240] transition-colors"
       >
         ⟲ 초기 화면
       </button>
@@ -147,7 +147,7 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
       <Legend />
 
       {/* 현재 줌 표시 */}
-      <div className="absolute bottom-3 left-3 text-xs text-slate-500 bg-slate-900/60 px-2 py-1 rounded">
+      <div className="absolute bottom-3 left-3 text-xs text-[#4A6A8A] bg-[#040810]/80 px-2 py-1 rounded">
         줌 {transform.k.toFixed(2)}× · 드래그=이동 · 휠=확대
       </div>
     </div>

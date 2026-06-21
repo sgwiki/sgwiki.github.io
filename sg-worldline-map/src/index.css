@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,6 +12,16 @@ html, body, #root {
 body {
   font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
   overscroll-behavior: none;
+  background: #040810;
+  color: #C0D8F0;
+}
+
+/* Nixie tube glow — 발산률 숫자 전용 */
+.nixie {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  color: #FF8C00;
+  text-shadow: 0 0 8px rgba(255, 140, 0, 0.7), 0 0 20px rgba(255, 107, 0, 0.3);
+  letter-spacing: 0.05em;
 }
 
 /* SVG 트랜지션 공통 */

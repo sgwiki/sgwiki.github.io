@@ -21,15 +21,15 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
   const toWl = shift ? dataset.worldlines.find((w) => w.uri === shift.toWorldLineId) : null
 
   return (
-    <div className="fixed right-0 top-0 h-full w-80 bg-slate-800/95 backdrop-blur border-l border-slate-700 p-5 overflow-y-auto z-20 shadow-2xl">
+    <div className="fixed right-0 top-0 h-full w-80 bg-[#0A1525]/98 backdrop-blur border-l border-[#152240] p-5 overflow-y-auto z-20 shadow-2xl">
       <div className="flex justify-between items-start mb-3">
-        <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-[#C0D8F0] flex items-center gap-2">
           <span className="text-xl">{mechanismIcon(event.mechanismType)}</span>
           {event.labelKo}
         </h2>
         <button
           onClick={onClose}
-          className="text-slate-400 hover:text-slate-100 text-2xl leading-none"
+          className="text-[#4A6A8A] hover:text-[#C0D8F0] text-2xl leading-none transition-colors"
           aria-label="닫기"
         >
           ×
@@ -45,7 +45,7 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
         <Row label="메커니즘" value={mechanismKo(event.mechanismType)} />
       </dl>
 
-      <p className="text-sm text-slate-300 leading-relaxed mb-4 whitespace-pre-line">
+      <p className="text-sm text-[#A0B8CC] leading-relaxed mb-4 whitespace-pre-line">
         {event.summary}
       </p>
 
@@ -53,12 +53,12 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
       {shift && fromWl && toWl && (
         <div
           className="rounded p-3 mb-4 text-sm"
-          style={{ background: shiftColor(shift.shiftType) + '20', borderLeft: `3px solid ${shiftColor(shift.shiftType)}` }}
+          style={{ background: shiftColor(shift.shiftType) + '18', borderLeft: `3px solid ${shiftColor(shift.shiftType)}` }}
         >
-          <div className="text-slate-400 text-xs mb-1">세계선 이동 ({shiftTypeKo(shift.shiftType)})</div>
-          <div className="font-mono text-slate-100">
+          <div className="text-[#4A6A8A] text-xs mb-2">세계선 이동 ({shiftTypeKo(shift.shiftType)})</div>
+          <div className="nixie text-sm">
             {(fromWl.divergence > 0 ? '+' : '') + fromWl.divergence.toFixed(6)}%
-            <span className="mx-2">→</span>
+            <span className="mx-2 text-[#4A6A8A]" style={{ fontFamily: 'inherit', textShadow: 'none', color: '#4A6A8A' }}>→</span>
             {(toWl.divergence > 0 ? '+' : '') + toWl.divergence.toFixed(6)}%
           </div>
         </div>
@@ -66,11 +66,14 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
 
       {/* 현재 세계선 */}
       {wl && (
-        <div className="rounded bg-slate-900/50 p-3 mb-4 text-sm">
-          <div className="text-slate-400 text-xs mb-1">현재 세계선</div>
-          <div className="text-slate-100 font-semibold">{wl.labelKo}</div>
-          <div className="text-xs text-slate-400 mt-1">
-            {(wl.divergence > 0 ? '+' : '') + wl.divergence.toFixed(6)}% · {wl.attractorField.replace('AF_', '')}
+        <div className="rounded p-3 mb-4 text-sm" style={{ background: '#040810' }}>
+          <div className="text-[#4A6A8A] text-xs mb-1">현재 세계선</div>
+          <div className="text-[#C0D8F0] font-semibold">{wl.labelKo}</div>
+          <div className="text-xs mt-1">
+            <span className="nixie text-xs">
+              {(wl.divergence > 0 ? '+' : '') + wl.divergence.toFixed(6)}%
+            </span>
+            <span className="text-[#4A6A8A]"> · {wl.attractorField.replace('AF_', '')}</span>
           </div>
         </div>
       )}
@@ -81,8 +84,8 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
           href={worldlineWikiUrl(wl)}
           target="_blank"
           rel="noopener noreferrer"
-          className="block text-center bg-deep-orange-600 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors"
-          style={{ background: '#ea580c' }}
+          className="block text-center text-white py-2 px-4 rounded transition-colors hover:brightness-110"
+          style={{ background: '#C25200' }}
         >
           📖 위키에서 자세히 보기 →
         </a>
@@ -94,8 +97,8 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <dt className="text-slate-400 w-16 flex-shrink-0">{label}</dt>
-      <dd className="text-slate-200">{value}</dd>
+      <dt className="text-[#4A6A8A] w-16 flex-shrink-0">{label}</dt>
+      <dd className="text-[#C0D8F0]">{value}</dd>
     </div>
   )
 }

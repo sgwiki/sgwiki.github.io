@@ -51,7 +51,7 @@ export function App() {
 
       {/* 사용 가능한 시리즈가 1개면 안내 (S;G0 데이터 추가 시 자동 활성화) */}
       {availableSeries.length === 1 && (
-        <div className="bg-slate-800/50 text-slate-400 text-xs px-4 py-1 text-center border-b border-slate-800">
+        <div className="bg-[#0A1525]/60 text-[#4A6A8A] text-xs px-4 py-1 text-center border-b border-[#152240]">
           📌 현재 애니메이션 시리즈만 제공됩니다. 추가 시리즈(S;G0 게임 등)는 데이터 저작 후 순차 공개됩니다.
         </div>
       )}
