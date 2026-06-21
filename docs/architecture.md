@@ -155,7 +155,7 @@ docker/holyclaude/data/claude/
 | `qaset_with_rag` | 주제 선정·QA 근거 | ❌ 산문 처리 |
 | `sg_game_sg0_en` | 영어 원문 교차 확인 | ❌ 파라프레이즈만 |
 | `sg_paper` | 팬 분석 논문 근거 | ✅ 각주 인용 허용 |
-| `sg_game_sge` | **배제 감사 전용** | ❌ 절대 금지 |
+| `sg_game_sge` | 한글 패치 교차 확인 | ❌ 파라프레이즈만 |
 
 ---
 

@@ -1,0 +1,2722 @@
+@prefix sg: <http://example.org/steinsgate#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix swrl: <http://www.w3.org/2003/11/swrl#> .
+@prefix swrla: <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sgsh: <http://example.org/steinsgate/shapes#> .
+
+sg:OntologyConcept3 a owl:Ontology ;
+    rdfs:label "슈타인즈 게이트 사건 온톨로지 v3"@ko ;
+    rdfs:comment """
+사건 질의 응답용 단순화 버전.
+
+설계 원칙:
+- Character 노드는 두지 않는다.
+- 기억, 성격, 믿음, 관측 전용 모델은 제거한다.
+- 사건의 식별은 EventVariation/Event ID로 하고, 시간은 정렬 좌표로만 사용한다.
+- WorldLine은 다이버전스 미터에 표시되는 소수점 이하 6자리 좌표를 기준으로 식별한다.
+- 같은 6자리 divergence 아래에서도 더 미세한 차이가 남을 수 있으므로, 작품이 구분하는 시나리오 차이는 EventVariation으로 표현한다.
+- 과학 레이어의 sub-display 세계선 이동은 hidden WorldLine/WorldLineShift로 만들지 않고 ScienceTopic과 EvidenceSource로 설명한다.
+- 동일한 로컬 시각에 여러 세계선/변형의 사건이 동시에 존재할 수 있다.
+- 타임리프 반복은 별도 iteration 클래스로 모델링하지 않고, 작품에서 구분 가능한 시나리오만 EventVariation으로 남긴다.
+"""@ko .
+
+
+### =============================================
+### Core Classes
+### =============================================
+
+sg:AttractorField a owl:Class ;
+    rdfs:label "어트랙터 필드"@ko ;
+    rdfs:comment "여러 세계선에 걸친 거시적 수속 결과 패턴의 묶음."@ko .
+
+sg:WorldLine a owl:Class ;
+    rdfs:label "세계선"@ko ;
+    rdfs:comment "다이버전스 미터에 표시되는 소수점 이하 6자리 좌표를 기준으로 식별한 관측 가능한 세계선 단위."@ko .
+
+sg:MacroEvent a owl:Class ;
+    rdfs:label "거시 사건"@ko ;
+    rdfs:comment "특정 테마나 기간을 가진 큰 서사 구간."@ko .
+
+sg:EventVariation a owl:Class ;
+    rdfs:label "사건 변형"@ko ;
+    rdfs:comment "같은 거시 사건 안에서 작품이 구분하는 시나리오 단위. 동일한 6자리 divergence 아래의 하위 분기도 여기서 분리한다."@ko .
+
+sg:Event a owl:Class ;
+    rdfs:label "사건"@ko ;
+    rdfs:comment """질의 가능한 원자 사건.
+
+eventType 값:
+  actual / intervention / communication / travel / death
+
+mechanismType 값:
+  dmail / timeleap / physicaltravel / videodmail / none
+"""@ko .
+
+sg:ConvergencePattern a owl:Class ;
+    rdfs:label "수속 패턴"@ko ;
+    rdfs:comment "여러 세계선에서 반복되는 공통 결과 패턴."@ko .
+
+sg:WorldLineShift a owl:Class ;
+    rdfs:label "세계선 이동"@ko ;
+    rdfs:comment "활성 세계선 전환 기록."@ko .
+
+sg:MediaSource a owl:Class ;
+    rdfs:label "미디어 소스"@ko ;
+    rdfs:comment "사건이 등장하는 특정 미디어의 최소 단위(화, 챕터, 권)."@ko .
+
+sg:ScienceTopic a owl:Class ;
+    rdfs:label "과학 해설 주제"@ko ;
+    rdfs:comment "세계선 과학 원리와 답변 라벨을 기존 온톨로지 인스턴스에 연결하는 해설 노드."@ko .
+
+sg:EvidenceSource a owl:Class ;
+    rdfs:label "근거 소스"@ko ;
+    rdfs:comment "과학 해설 주제를 뒷받침하는 구조화 데이터, 공식자료, 제작진 인터뷰, 보조 자료 출처."@ko .
+
+
+### =============================================
+### Object Properties
+### =============================================
+
+sg:hasVariation a owl:ObjectProperty ;
+    rdfs:domain sg:MacroEvent ;
+    rdfs:range sg:EventVariation ;
+    rdfs:label "변형을 가진다"@ko .
+
+sg:partOfMacroEvent a owl:ObjectProperty ;
+    rdfs:domain sg:EventVariation ;
+    rdfs:range sg:MacroEvent ;
+    owl:inverseOf sg:hasVariation ;
+    rdfs:label "거시 사건에 속한다"@ko .
+
+sg:hasEvent a owl:ObjectProperty ;
+    rdfs:domain sg:EventVariation ;
+    rdfs:range sg:Event ;
+    rdfs:label "사건을 가진다"@ko .
+
+sg:partOfVariation a owl:ObjectProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range sg:EventVariation ;
+    owl:inverseOf sg:hasEvent ;
+    rdfs:label "사건 변형에 속한다"@ko .
+
+sg:hasWorldLine a owl:ObjectProperty ;
+    rdfs:domain sg:AttractorField ;
+    rdfs:range sg:WorldLine ;
+    rdfs:label "세계선을 가진다"@ko .
+
+sg:belongsToAttractorField a owl:ObjectProperty ;
+    rdfs:domain sg:WorldLine ;
+    rdfs:range sg:AttractorField ;
+    owl:inverseOf sg:hasWorldLine ;
+    rdfs:label "어트랙터 필드에 속한다"@ko .
+
+sg:belongsToWorldLine a owl:ObjectProperty ;
+    rdfs:domain sg:EventVariation ;
+    rdfs:range sg:WorldLine ;
+    rdfs:label "세계선에 속한다"@ko .
+
+sg:hasConvergencePattern a owl:ObjectProperty ;
+    rdfs:domain sg:AttractorField ;
+    rdfs:range sg:ConvergencePattern ;
+    rdfs:label "수속 패턴을 가진다"@ko .
+
+sg:hasVariantVariation a owl:ObjectProperty ;
+    rdfs:domain sg:ConvergencePattern ;
+    rdfs:range sg:EventVariation ;
+    rdfs:label "변형 시나리오를 가진다"@ko .
+
+sg:causes a owl:ObjectProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range sg:Event ;
+    rdfs:label "원인이 된다"@ko .
+
+sg:enables a owl:ObjectProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range sg:Event ;
+    rdfs:label "가능하게 한다"@ko .
+
+sg:prevents a owl:ObjectProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range sg:Event ;
+    rdfs:label "방지한다"@ko .
+
+sg:fromWorldLine a owl:ObjectProperty ;
+    rdfs:domain sg:WorldLineShift ;
+    rdfs:range sg:WorldLine ;
+    rdfs:label "이전 세계선"@ko .
+
+sg:toWorldLine a owl:ObjectProperty ;
+    rdfs:domain sg:WorldLineShift ;
+    rdfs:range sg:WorldLine ;
+    rdfs:label "이동 후 세계선"@ko .
+
+sg:triggeredByEvent a owl:ObjectProperty ;
+    rdfs:domain sg:WorldLineShift ;
+    rdfs:range sg:Event ;
+    rdfs:label "유발 사건"@ko .
+
+sg:participatesInShift a owl:ObjectProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range sg:WorldLineShift ;
+    rdfs:label "세계선 이동에 관여한다"@ko .
+
+sg:appearsIn a owl:ObjectProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range sg:MediaSource ;
+    rdfs:label "등장 미디어"@ko ;
+    rdfs:comment "해당 사건이 묘사되는 미디어 소스(화/챕터 수준)."@ko .
+
+sg:explainsEntity a owl:ObjectProperty ;
+    rdfs:domain sg:ScienceTopic ;
+    rdfs:range rdfs:Resource ;
+    rdfs:label "해설 대상"@ko ;
+    rdfs:comment "과학 해설 주제가 설명하는 기존 온톨로지 인스턴스."@ko .
+
+sg:supportedByEvidence a owl:ObjectProperty ;
+    rdfs:domain sg:ScienceTopic ;
+    rdfs:range sg:EvidenceSource ;
+    rdfs:label "근거로 지지됨"@ko .
+
+sg:relatedTopic a owl:ObjectProperty ;
+    rdfs:domain sg:ScienceTopic ;
+    rdfs:range sg:ScienceTopic ;
+    rdfs:label "관련 해설 주제"@ko .
+
+
+### =============================================
+### Datatype Properties
+### =============================================
+
+sg:id a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "식별자"@ko .
+
+sg:nameEn a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "영문 이름"@ko .
+
+sg:labelKo a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "한글 라벨"@ko .
+
+sg:description a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "설명"@ko .
+
+sg:summary a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "요약"@ko .
+
+sg:note a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "세부 노트"@ko ;
+    rdfs:comment "반복 회차, 불확실한 세부, 질의 응답용 맥락을 서술한다."@ko .
+
+sg:variationIdentity a owl:DatatypeProperty ;
+    rdfs:domain sg:EventVariation ;
+    rdfs:range xsd:string ;
+    rdfs:label "변형 식별자"@ko .
+
+sg:branchCondition a owl:DatatypeProperty ;
+    rdfs:domain sg:EventVariation ;
+    rdfs:range xsd:string ;
+    rdfs:label "분기 조건"@ko .
+
+sg:divergenceValue a owl:DatatypeProperty ;
+    rdfs:domain sg:WorldLine ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "다이버전스 수치"@ko .
+
+sg:isActive a owl:DatatypeProperty ;
+    rdfs:domain sg:WorldLine ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "현재 활성 여부"@ko .
+
+sg:localDateTime a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "세계선 로컬 시각"@ko ;
+    rdfs:comment "형식: YYYY-MM-DD HH:MM. 사건 식별자가 아니라 정렬용 좌표."@ko .
+
+sg:timePrecision a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "시간 정밀도"@ko ;
+    rdfs:comment "exact / approximate / day / unknown"@ko .
+
+
+sg:eventType a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "사건 유형"@ko .
+
+sg:mechanismType a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "메커니즘 유형"@ko .
+
+sg:place a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "발생 장소"@ko .
+
+sg:actor a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "행위자"@ko .
+
+sg:target a owl:DatatypeProperty ;
+    rdfs:domain sg:Event ;
+    rdfs:range xsd:string ;
+    rdfs:label "대상"@ko .
+
+sg:timeWindow a owl:DatatypeProperty ;
+    rdfs:domain sg:ConvergencePattern ;
+    rdfs:range xsd:string ;
+    rdfs:label "시간 창"@ko .
+
+sg:appliesToCharacter a owl:DatatypeProperty ;
+    rdfs:domain sg:ConvergencePattern ;
+    rdfs:range xsd:string ;
+    rdfs:label "대상 인물 식별 문자열"@ko .
+
+sg:shiftMoment a owl:DatatypeProperty ;
+    rdfs:domain sg:WorldLineShift ;
+    rdfs:range xsd:string ;
+    rdfs:label "이동 발생 시각"@ko .
+
+sg:shiftType a owl:DatatypeProperty ;
+    rdfs:domain sg:WorldLineShift ;
+    rdfs:range xsd:string ;
+    rdfs:label "이동 유형"@ko .
+
+sg:mediaType a owl:DatatypeProperty ;
+    rdfs:domain sg:MediaSource ;
+    rdfs:range xsd:string ;
+    rdfs:label "미디어 유형"@ko ;
+    rdfs:comment "anime / game / novel"@ko .
+
+sg:mediaTitle a owl:DatatypeProperty ;
+    rdfs:domain sg:MediaSource ;
+    rdfs:range xsd:string ;
+    rdfs:label "작품명"@ko ;
+    rdfs:comment "Steins;Gate / Steins;Gate 0 / Steins;Gate Elite 등"@ko .
+
+sg:mediaUnit a owl:DatatypeProperty ;
+    rdfs:domain sg:MediaSource ;
+    rdfs:range xsd:string ;
+    rdfs:label "화/챕터/권"@ko ;
+    rdfs:comment "애니 → '1화', 게임 → 'Chapter 3', 소설 → '상권'"@ko .
+
+sg:evidenceTier a owl:DatatypeProperty ;
+    rdfs:domain sg:EvidenceSource ;
+    rdfs:range xsd:string ;
+    rdfs:label "근거 계층"@ko .
+
+sg:sourcePath a owl:DatatypeProperty ;
+    rdfs:domain sg:EvidenceSource ;
+    rdfs:range xsd:string ;
+    rdfs:label "로컬 근거 경로"@ko .
+
+sg:sourceUrl a owl:DatatypeProperty ;
+    rdfs:domain sg:EvidenceSource ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "외부 근거 URL"@ko .
+
+sg:sourceScope a owl:DatatypeProperty ;
+    rdfs:domain sg:EvidenceSource ;
+    rdfs:range xsd:string ;
+    rdfs:label "근거 범위"@ko .
+
+sg:answerLabel a owl:DatatypeProperty ;
+    rdfs:domain sg:ScienceTopic ;
+    rdfs:range xsd:string ;
+    rdfs:label "답변 라벨"@ko ;
+    rdfs:comment "[공식], [추론], [팬추론], [모순] 중 답변에 기본으로 붙일 라벨."@ko .
+
+
+### =============================================
+### Attractor Fields
+### =============================================
+
+sg:AF_Alpha a sg:AttractorField ;
+    sg:id "AF_Alpha" ;
+    sg:nameEn "Attractor Field Alpha" ;
+    sg:labelKo "어트랙터 필드 알파" ;
+    sg:description "SERN 디스토피아가 거시적 미래로 수속하는 세계선 묶음."@ko .
+
+sg:AF_Beta a sg:AttractorField ;
+    sg:id "AF_Beta" ;
+    sg:nameEn "Attractor Field Beta" ;
+    sg:labelKo "어트랙터 필드 베타" ;
+    sg:description "크리스의 죽음과 제3차 세계대전 위험이 결부되는 세계선 묶음."@ko .
+
+sg:AF_SteinsGate a sg:AttractorField ;
+    sg:id "AF_SteinsGate" ;
+    sg:nameEn "Steins Gate" ;
+    sg:labelKo "슈타인즈 게이트" ;
+    sg:description "알파와 베타의 거시적 수속 미래에서 모두 벗어나는 특수 세계선 영역."@ko .
+
+sg:AF_Omega a sg:AttractorField ;
+    sg:id "AF_Omega" ;
+    sg:nameEn "Omega" ;
+    sg:labelKo "오메가" ;
+    sg:description "페이리스 엔딩에서 확인되는 음수 다이버전스의 특수 세계선 영역."@ko ;
+    sg:note "공식 QnA에서 -0.275349%의 Ω 세계선이 명시된다."@ko .
+
+
+### =============================================
+### World Lines
+### =============================================
+
+sg:WL_0_571024 a sg:WorldLine ;
+    sg:id "WL_0_571024" ;
+    sg:labelKo "0.571024% 세계선" ;
+    sg:divergenceValue "0.571024"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_571015 a sg:WorldLine ;
+    sg:id "WL_0_571015" ;
+    sg:labelKo "0.571015% 세계선 (로또6)" ;
+    sg:divergenceValue "0.571015"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_523299 a sg:WorldLine ;
+    sg:id "WL_0_523299" ;
+    sg:labelKo "0.523299% 세계선 (모에카)" ;
+    sg:divergenceValue "0.523299"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_456903 a sg:WorldLine ;
+    sg:id "WL_0_456903" ;
+    sg:labelKo "0.456903% 세계선 (루카 성별)" ;
+    sg:divergenceValue "0.456903"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_409420 a sg:WorldLine ;
+    sg:id "WL_0_409420" ;
+    sg:labelKo "0.409420% 세계선 (페이리스 아버지)" ;
+    sg:divergenceValue "0.409420"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_337187 a sg:WorldLine ;
+    sg:id "WL_0_337187" ;
+    sg:labelKo "0.337187% 세계선" ;
+    sg:divergenceValue "0.337187"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:note "다이버전스 미터에는 0.337187로 같게 표시되지만, 마유리 구출 루프와 스즈하 D메일 취소 직전의 여러 시나리오 변형을 함께 포함하는 관측 좌표."@ko ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_409431 a sg:WorldLine ;
+    sg:id "WL_0_409431" ;
+    sg:labelKo "0.409431% 세계선 (스즈하 D메일 취소 후)" ;
+    sg:divergenceValue "0.409431"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_456914 a sg:WorldLine ;
+    sg:id "WL_0_456914" ;
+    sg:labelKo "0.456914% 세계선 (페이리스 D메일 취소 후)" ;
+    sg:divergenceValue "0.456914"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_523307 a sg:WorldLine ;
+    sg:id "WL_0_523307" ;
+    sg:labelKo "0.523307% 세계선 (루카 D메일 취소 후)" ;
+    sg:divergenceValue "0.523307"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_0_571046 a sg:WorldLine ;
+    sg:id "WL_0_571046" ;
+    sg:labelKo "0.571046% 세계선 (모에카 D메일 취소 후)" ;
+    sg:divergenceValue "0.571046"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Alpha .
+
+sg:WL_Neg_0_275349 a sg:WorldLine ;
+    sg:id "WL_Neg_0_275349" ;
+    sg:labelKo "-0.275349% 세계선 (Ω, 페이리스 엔딩)" ;
+    sg:divergenceValue "-0.275349"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:note "공식 자료집 Q16에서 확인되는 음수 다이버전스 세계선."@ko ;
+    sg:belongsToAttractorField sg:AF_Omega .
+
+sg:WL_1_053649 a sg:WorldLine ;
+    sg:id "WL_1_053649" ;
+    sg:labelKo "1.053649% 세계선 (S;G 0 아마데우스 접촉)" ;
+    sg:divergenceValue "1.053649"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_055821 a sg:WorldLine ;
+    sg:id "WL_1_055821" ;
+    sg:labelKo "1.055821% 세계선 (맹세의 리나시멘토)" ;
+    sg:divergenceValue "1.055821"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_064750 a sg:WorldLine ;
+    sg:id "WL_1_064750" ;
+    sg:labelKo "1.064750% 세계선 (망실유전의 솔리튜드)" ;
+    sg:divergenceValue "1.064750"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_081163 a sg:WorldLine ;
+    sg:id "WL_1_081163" ;
+    sg:labelKo "1.081163% 세계선 (존재증명의 오토마톤)" ;
+    sg:divergenceValue "1.081163"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_123581 a sg:WorldLine ;
+    sg:id "WL_1_123581" ;
+    sg:labelKo "1.123581% 세계선 (아마데우스 삭제 후 β)" ;
+    sg:divergenceValue "1.123581"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_130426 a sg:WorldLine ;
+    sg:id "WL_1_130426" ;
+    sg:labelKo "1.130426% 세계선 (베타 시작점)" ;
+    sg:divergenceValue "1.130426"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_130205 a sg:WorldLine ;
+    sg:id "WL_1_130205" ;
+    sg:labelKo "1.130205% 세계선 (알파 탈출 직후 베타)" ;
+    sg:divergenceValue "1.130205"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_130209 a sg:WorldLine ;
+    sg:id "WL_1_130209" ;
+    sg:labelKo "1.130209% 세계선 (스쿨드 작전 직전 베타)" ;
+    sg:divergenceValue "1.130209"^^xsd:decimal ;
+    sg:isActive "false"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_Beta .
+
+sg:WL_1_048596 a sg:WorldLine ;
+    sg:id "WL_1_048596" ;
+    sg:labelKo "1.048596% 세계선 (슈타인즈 게이트)" ;
+    sg:divergenceValue "1.048596"^^xsd:decimal ;
+    sg:isActive "true"^^xsd:boolean ;
+    sg:belongsToAttractorField sg:AF_SteinsGate .
+
+sg:AF_Alpha sg:hasWorldLine
+    sg:WL_0_571024,
+    sg:WL_0_571015,
+    sg:WL_0_523299,
+    sg:WL_0_456903,
+    sg:WL_0_409420,
+    sg:WL_0_337187,
+    sg:WL_0_409431,
+    sg:WL_0_456914,
+    sg:WL_0_523307,
+    sg:WL_0_571046 .
+
+sg:AF_Beta sg:hasWorldLine
+    sg:WL_1_053649,
+    sg:WL_1_055821,
+    sg:WL_1_064750,
+    sg:WL_1_081163,
+    sg:WL_1_123581,
+    sg:WL_1_130426,
+    sg:WL_1_130205,
+    sg:WL_1_130209 .
+
+sg:AF_SteinsGate sg:hasWorldLine
+    sg:WL_1_048596 .
+
+sg:AF_Omega sg:hasWorldLine
+    sg:WL_Neg_0_275349 .
+
+
+### =============================================
+### Convergence Patterns
+### =============================================
+
+sg:CP_MayuriDies_Alpha a sg:ConvergencePattern ;
+    sg:id "CP_MayuriDies_Alpha" ;
+    sg:labelKo "알파에서 마유리 사망 수속" ;
+    sg:description "알파 어트랙터 필드에서 2010-08-13 밤 마유리의 죽음이 다양한 방식으로 반복된다."@ko ;
+    sg:timeWindow "2010-08-13 night" ;
+    sg:appliesToCharacter "Char_Mayuri" .
+
+sg:CP_KurisuDies_Beta a sg:ConvergencePattern ;
+    sg:id "CP_KurisuDies_Beta" ;
+    sg:labelKo "베타에서 크리스 사망 수속"@ko ;
+    sg:description "베타 어트랙터 필드에서 2010-07-28 크리스의 죽음이 반복된다."@ko ;
+    sg:timeWindow "2010-07-28" ;
+    sg:appliesToCharacter "Char_Kurisu" .
+
+sg:CP_SERNTimeMachineCompleted_Alpha a sg:ConvergencePattern ;
+    sg:id "CP_SERNTimeMachineCompleted_Alpha" ;
+    sg:labelKo "알파에서 2034년 SERN 타임머신 완성 수속"@ko ;
+    sg:description "알파 어트랙터 필드에서 SERN이 2034년에 타임머신을 완성하는 거시적 준비 단계."@ko ;
+    sg:timeWindow "2034" .
+
+sg:CP_SERNDystopia_Alpha a sg:ConvergencePattern ;
+    sg:id "CP_SERNDystopia_Alpha" ;
+    sg:labelKo "알파에서 SERN 디스토피아 수속"@ko ;
+    sg:description "알파 어트랙터 필드에서 2036년 스즈하가 경험하는 완성형 SERN 디스토피아 미래."@ko ;
+    sg:note "2034년 타임머신 완성과 2036년 완성형 디스토피아를 분리해 기록한다."@ko ;
+    sg:timeWindow "2036" .
+
+sg:CP_WW3_Beta a sg:ConvergencePattern ;
+    sg:id "CP_WW3_Beta" ;
+    sg:labelKo "베타에서 제3차 세계대전 수속"@ko ;
+    sg:description "베타 어트랙터 필드에서 나카바치 논문 유출로 발생하는 전쟁 수속 패턴."@ko ;
+    sg:timeWindow "2025" .
+
+sg:AF_Alpha sg:hasConvergencePattern
+    sg:CP_MayuriDies_Alpha,
+    sg:CP_SERNTimeMachineCompleted_Alpha,
+    sg:CP_SERNDystopia_Alpha .
+
+sg:AF_Beta sg:hasConvergencePattern
+    sg:CP_KurisuDies_Beta,
+    sg:CP_WW3_Beta .
+
+
+### =============================================
+### Macro Events
+### =============================================
+
+sg:ME_Prologue_Beta a sg:MacroEvent ;
+    sg:id "ME_Prologue_Beta" ;
+    sg:labelKo "프롤로그: 시작과 끝의 1% (β)" ;
+    sg:note "2010년 7월 28일 라디오 회관에서 시작되는 사건군."@ko .
+
+sg:ME_Alpha_Exploration a sg:MacroEvent ;
+    sg:id "ME_Alpha_Exploration" ;
+    sg:labelKo "알파 세계선 탐색 및 실험" ;
+    sg:note "알파 안착 직후 실험, IBN 5100 수색, D메일 연쇄 사용."@ko .
+
+sg:ME_MayuriRescue_Loop a sg:MacroEvent ;
+    sg:id "ME_MayuriRescue_Loop" ;
+    sg:labelKo "마유리 구출 루프" ;
+    sg:note "8월 13일 밤, 마유리의 죽음을 막기 위해 반복되는 시도 전체."@ko .
+
+sg:ME_Alpha_Escape a sg:MacroEvent ;
+    sg:id "ME_Alpha_Escape" ;
+    sg:labelKo "알파 탈출" ;
+    sg:note "과거 D메일들을 취소하고 첫 D메일 삭제까지 이어지는 탈출 구간."@ko .
+
+sg:ME_OperationSkuld a sg:MacroEvent ;
+    sg:id "ME_OperationSkuld" ;
+    sg:labelKo "오퍼레이션 스쿨드" ;
+    sg:note "크리스를 살리고 슈타인즈 게이트에 도달하기 위한 최종 작전."@ko .
+
+sg:ME_TimeLeap_Activation a sg:MacroEvent ;
+    sg:id "ME_TimeLeap_Activation" ;
+    sg:labelKo "타임리프 머신 가동" ;
+    sg:note "8월 13일 밤, 첫 타임리프가 이루어지고 이후 마유리 구출 루프가 시작된다."@ko .
+
+sg:ME_SG0_Beta_Branches a sg:MacroEvent ;
+    sg:id "ME_SG0_Beta_Branches" ;
+    sg:labelKo "Steins;Gate 0 베타 분기군" ;
+    sg:note "크리스 구출 포기 후 β 어트랙터 필드에서 전개되는 아마데우스/마호/레스키넨 분기."@ko .
+
+sg:ME_NostalgiaDrive a sg:MacroEvent ;
+    sg:id "ME_NostalgiaDrive" ;
+    sg:labelKo "노스탤지어 드라이브 준비" ;
+    sg:note "2025년 영상 D메일 송신과 2010년 수신을 통해 스쿨드 작전이 가능해지는 구간."@ko .
+
+
+### =============================================
+### Event Variations
+### =============================================
+
+sg:EV_Prologue_Beta_Discovery a sg:EventVariation ;
+    sg:id "EV_Prologue_Beta_Discovery" ;
+    sg:partOfMacroEvent sg:ME_Prologue_Beta ;
+    sg:variationIdentity "베타 세계선 시작 시나리오" ;
+    sg:branchCondition "오카베가 라디오 회관에서 크리스의 시신을 발견하고 첫 D메일을 보낸다."@ko ;
+    sg:note "세계선 이동의 출발점이 되는 2010-07-28 사건군."@ko ;
+    sg:belongsToWorldLine sg:WL_1_130426 .
+
+sg:EV_Alpha_IBN_Search a sg:EventVariation ;
+    sg:id "EV_Alpha_IBN_Search" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Exploration ;
+    sg:variationIdentity "IBN 5100 확보 시나리오" ;
+    sg:branchCondition "크리스와 협력해 야나바야시 신사에서 IBN 5100을 찾는다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_571024 .
+
+sg:EV_Alpha_DMail_Loto6_Send a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Loto6_Send" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Exploration ;
+    sg:variationIdentity "로또6 D메일 송신 시나리오" ;
+    sg:branchCondition "오카베가 과거의 자신에게 로또6 번호를 보낸다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_571024 .
+
+sg:EV_Alpha_DMail_Moeka_Send a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Moeka_Send" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Exploration ;
+    sg:variationIdentity "모에카 D메일 송신 시나리오" ;
+    sg:branchCondition "모에카가 과거의 자신에게 IBN 5100 수색 중단 메시지를 보낸다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_571015 .
+
+sg:EV_Alpha_DMail_Luka_Send a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Luka_Send" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Exploration ;
+    sg:variationIdentity "루카 D메일 송신 시나리오" ;
+    sg:branchCondition "루카의 성별에 영향을 주기 위한 호출기 메시지를 보낸다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_523299 .
+
+sg:EV_Alpha_DMail_Faris_Send a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Faris_Send" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Exploration ;
+    sg:variationIdentity "페이리스 D메일 송신 시나리오" ;
+    sg:branchCondition "페이리스가 아버지에게 사고를 피하라는 메일을 보낸다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_456903 .
+
+sg:EV_Alpha_DMail_SuzuhaChase_Send a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_SuzuhaChase_Send" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Exploration ;
+    sg:variationIdentity "스즈하 미행 중지 D메일 시나리오" ;
+    sg:branchCondition "오카베가 과거의 자신에게 스즈하를 쫓지 말라고 보낸다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_409420 .
+
+sg:EV_Rescue_LabShot a sg:EventVariation ;
+    sg:id "EV_Rescue_LabShot" ;
+    sg:partOfMacroEvent sg:ME_MayuriRescue_Loop ;
+    sg:variationIdentity "라보 내부 총격 수속 시나리오" ;
+    sg:branchCondition "타임리프를 부정하거나 마유리에게 전화를 걸지 않는다."@ko ;
+    sg:note "1~2회차 근방의 시도."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_Rescue_CarAccident a sg:EventVariation ;
+    sg:id "EV_Rescue_CarAccident" ;
+    sg:partOfMacroEvent sg:ME_MayuriRescue_Loop ;
+    sg:variationIdentity "탈출 도중 차량 사고 시나리오" ;
+    sg:branchCondition "파티 취소 후 라보를 탈출해 야나바야시 신사 방면으로 도주한다."@ko ;
+    sg:note "3회차 근방의 시도."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_Rescue_NaePush a sg:EventVariation ;
+    sg:id "EV_Rescue_NaePush" ;
+    sg:partOfMacroEvent sg:ME_MayuriRescue_Loop ;
+    sg:variationIdentity "신오차노미즈역 선로 추락 시나리오" ;
+    sg:branchCondition "지하철 탈출을 시도하며 승강장에서 대기한다."@ko ;
+    sg:note "대략 100회차 근방의 시도."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_Rescue_TaxiStab a sg:EventVariation ;
+    sg:id "EV_Rescue_TaxiStab" ;
+    sg:partOfMacroEvent sg:ME_MayuriRescue_Loop ;
+    sg:variationIdentity "택시 내부 칼부림 시나리오" ;
+    sg:branchCondition "택시를 타고 아키하바라를 완전히 벗어나려 한다."@ko ;
+    sg:note "정확한 분 단위는 작품상 불명확해 대략 시각으로 기록."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_Rescue_YodobashiShot a sg:EventVariation ;
+    sg:id "EV_Rescue_YodobashiShot" ;
+    sg:partOfMacroEvent sg:ME_MayuriRescue_Loop ;
+    sg:variationIdentity "요도바시 카메라 총격 오인 시나리오" ;
+    sg:branchCondition "요도바시 건물 내부에 은신하던 중 폭발과 오인 사격이 발생한다."@ko ;
+    sg:note "정확한 분 단위는 작품상 불명확해 대략 시각으로 기록."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_Alpha_DMail_SuzuhaChase_Cancel a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_SuzuhaChase_Cancel" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Escape ;
+    sg:variationIdentity "스즈하 D메일 취소 시나리오" ;
+    sg:branchCondition "스즈하 미행 중지 D메일을 취소한다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_Alpha_DMail_Faris_Cancel a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Faris_Cancel" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Escape ;
+    sg:variationIdentity "페이리스 D메일 취소 시나리오" ;
+    sg:branchCondition "페이리스의 아버지 생존 D메일을 무효화한다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_409431 .
+
+sg:EV_Alpha_DMail_Luka_Cancel a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Luka_Cancel" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Escape ;
+    sg:variationIdentity "루카 D메일 취소 시나리오" ;
+    sg:branchCondition "루카 관련 D메일을 취소해 성별을 되돌린다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_456914 .
+
+sg:EV_Alpha_DMail_Moeka_Cancel a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Moeka_Cancel" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Escape ;
+    sg:variationIdentity "모에카 D메일 취소 시나리오" ;
+    sg:branchCondition "모에카의 IBN 5100 관련 D메일을 취소한다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_523307 .
+
+sg:EV_Alpha_DMail_Loto6_Cancel a sg:EventVariation ;
+    sg:id "EV_Alpha_DMail_Loto6_Cancel" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Escape ;
+    sg:variationIdentity "로또6 D메일 취소 시나리오" ;
+    sg:branchCondition "최초의 로또6 D메일을 무효화한다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_571046 .
+
+sg:EV_Alpha_Echelon_Delete a sg:EventVariation ;
+    sg:id "EV_Alpha_Echelon_Delete" ;
+    sg:partOfMacroEvent sg:ME_Alpha_Escape ;
+    sg:variationIdentity "에셜론 기록 삭제 시나리오" ;
+    sg:branchCondition "첫 D메일이 SERN 에셜론에 포착된 기록을 삭제한다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_571024 .
+
+sg:EV_Skuld_Fail a sg:EventVariation ;
+    sg:id "EV_Skuld_Fail" ;
+    sg:partOfMacroEvent sg:ME_OperationSkuld ;
+    sg:variationIdentity "스쿨드 작전 1차 실패 시나리오" ;
+    sg:branchCondition "미래의 영상 지시 없이 과거로 이동해 크리스를 구하려다 실수한다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_130205 .
+
+# EV_Skuld_Success.belongsToWorldLine = WL_1_048596(SG세계선)은 '도착 세계선'을 나타낸다.
+# 출발은 베타 세계선(WL_1_130209)이지만, 이 변형의 결과로 도달하는 세계선이 SG세계선.
+# 물리적 타임트래블로 인한 미세 세계선 차이는 Topic_PhysicalTimeTravel_MicroShift 참조.
+sg:EV_Skuld_Success a sg:EventVariation ;
+    sg:id "EV_Skuld_Success" ;
+    sg:partOfMacroEvent sg:ME_OperationSkuld ;
+    sg:variationIdentity "스쿨드 작전 최종 성공 시나리오" ;
+    sg:branchCondition "미래 영상 메시지를 확인하고 세계를 속이는 연출을 완성한다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_048596 .
+
+sg:EV_Alpha_TimeLeap_FirstUse a sg:EventVariation ;
+    sg:id "EV_Alpha_TimeLeap_FirstUse" ;
+    sg:partOfMacroEvent sg:ME_TimeLeap_Activation ;
+    sg:variationIdentity "타임리프 머신 첫 사용 시나리오" ;
+    sg:branchCondition "마유리 사망 직후 오카베가 미실험 타임리프 머신으로 3시간 전으로 도약한다."@ko ;
+    sg:belongsToWorldLine sg:WL_0_337187 .
+
+sg:EV_SG0_Amadeus_Contact a sg:EventVariation ;
+    sg:id "EV_SG0_Amadeus_Contact" ;
+    sg:partOfMacroEvent sg:ME_SG0_Beta_Branches ;
+    sg:variationIdentity "아마데우스 접촉 시나리오" ;
+    sg:branchCondition "오카베가 아마데우스의 전화를 받아 제로의 베타 분기군에 본격 진입한다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_053649 .
+
+sg:EV_SG0_Promised_Rinascimento a sg:EventVariation ;
+    sg:id "EV_SG0_Promised_Rinascimento" ;
+    sg:partOfMacroEvent sg:ME_SG0_Beta_Branches ;
+    sg:variationIdentity "맹세의 리나시멘토 시나리오" ;
+    sg:branchCondition "오카베가 카가리에서 크리스 기억을 제거하고 자신에게 D메일을 보내는 분기."@ko ;
+    sg:belongsToWorldLine sg:WL_1_055821 .
+
+sg:EV_SG0_Solitude a sg:EventVariation ;
+    sg:id "EV_SG0_Solitude" ;
+    sg:partOfMacroEvent sg:ME_SG0_Beta_Branches ;
+    sg:variationIdentity "망실유전의 솔리튜드 시나리오" ;
+    sg:branchCondition "오카베가 휴대전화를 꺼 아마데우스와의 연결이 끊긴다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_064750 .
+
+sg:EV_SG0_Twin_Automata a sg:EventVariation ;
+    sg:id "EV_SG0_Twin_Automata" ;
+    sg:partOfMacroEvent sg:ME_SG0_Beta_Branches ;
+    sg:variationIdentity "존재증명의 오토마톤 시나리오" ;
+    sg:branchCondition "오카베가 아마데우스 전화를 받지 않아 마호 중심 분기로 이동한다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_081163 .
+
+sg:EV_SG0_Amadeus_Deleted a sg:EventVariation ;
+    sg:id "EV_SG0_Amadeus_Deleted" ;
+    sg:partOfMacroEvent sg:ME_SG0_Beta_Branches ;
+    sg:variationIdentity "아마데우스 삭제 후 β 시나리오" ;
+    sg:branchCondition "아마데우스가 삭제되고 오카베가 호오인 쿄우마를 회복한다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_123581 .
+
+sg:EV_NostalgiaDrive_Preparation a sg:EventVariation ;
+    sg:id "EV_NostalgiaDrive_Preparation" ;
+    sg:partOfMacroEvent sg:ME_NostalgiaDrive ;
+    sg:variationIdentity "노스탤지어 드라이브 준비 시나리오" ;
+    sg:branchCondition "2025년 오카베가 영상 D메일을 녹화하고 2010년 오카베가 이를 확인한다."@ko ;
+    sg:belongsToWorldLine sg:WL_1_130209 .
+
+sg:CP_MayuriDies_Alpha sg:hasVariantVariation
+    sg:EV_Rescue_LabShot,
+    sg:EV_Rescue_CarAccident,
+    sg:EV_Rescue_NaePush,
+    sg:EV_Rescue_TaxiStab,
+    sg:EV_Rescue_YodobashiShot .
+
+sg:CP_KurisuDies_Beta sg:hasVariantVariation
+    sg:EV_Prologue_Beta_Discovery,
+    sg:EV_Skuld_Fail .
+
+
+### =============================================
+### MacroEvent Memberships
+### =============================================
+
+sg:ME_Prologue_Beta sg:hasVariation
+    sg:EV_Prologue_Beta_Discovery .
+
+sg:ME_Alpha_Exploration sg:hasVariation
+    sg:EV_Alpha_IBN_Search,
+    sg:EV_Alpha_DMail_Loto6_Send,
+    sg:EV_Alpha_DMail_Moeka_Send,
+    sg:EV_Alpha_DMail_Luka_Send,
+    sg:EV_Alpha_DMail_Faris_Send,
+    sg:EV_Alpha_DMail_SuzuhaChase_Send .
+
+sg:ME_MayuriRescue_Loop sg:hasVariation
+    sg:EV_Rescue_LabShot,
+    sg:EV_Rescue_CarAccident,
+    sg:EV_Rescue_NaePush,
+    sg:EV_Rescue_TaxiStab,
+    sg:EV_Rescue_YodobashiShot .
+
+sg:ME_Alpha_Escape sg:hasVariation
+    sg:EV_Alpha_DMail_SuzuhaChase_Cancel,
+    sg:EV_Alpha_DMail_Faris_Cancel,
+    sg:EV_Alpha_DMail_Luka_Cancel,
+    sg:EV_Alpha_DMail_Moeka_Cancel,
+    sg:EV_Alpha_DMail_Loto6_Cancel,
+    sg:EV_Alpha_Echelon_Delete .
+
+sg:ME_OperationSkuld sg:hasVariation
+    sg:EV_Skuld_Fail,
+    sg:EV_Skuld_Success .
+
+sg:ME_TimeLeap_Activation sg:hasVariation
+    sg:EV_Alpha_TimeLeap_FirstUse .
+
+sg:ME_SG0_Beta_Branches sg:hasVariation
+    sg:EV_SG0_Amadeus_Contact,
+    sg:EV_SG0_Promised_Rinascimento,
+    sg:EV_SG0_Solitude,
+    sg:EV_SG0_Twin_Automata,
+    sg:EV_SG0_Amadeus_Deleted .
+
+sg:ME_NostalgiaDrive sg:hasVariation
+    sg:EV_NostalgiaDrive_Preparation .
+
+
+### =============================================
+### Events
+### =============================================
+
+sg:Event_Prologue_MetalUpa a sg:Event ;
+    sg:id "Event_Prologue_MetalUpa" ;
+    sg:labelKo "메탈 우파 획득" ;
+    sg:summary "오카베가 메탈 우파를 확보한다."@ko ;
+    sg:note "나카바치 논문이 불타지 않게 되는 원인을 제공하는 복선."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:00" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Metal Upa" ;
+    sg:place "라디오 회관 부근" ;
+    sg:partOfVariation sg:EV_Prologue_Beta_Discovery .
+
+sg:Event_KurisuDies_Beta_Actual a sg:Event ;
+    sg:id "Event_KurisuDies_Beta_Actual" ;
+    sg:labelKo "베타 수속: 크리스 사망" ;
+    sg:summary "베타 세계선에서 라디오 회관의 크리스가 사망한다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:39" ;
+    sg:timePrecision "exact" ;
+    sg:target "Char_Kurisu" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Prologue_Beta_Discovery .
+
+sg:Event_FirstDMail a sg:Event ;
+    sg:id "Event_FirstDMail" ;
+    sg:labelKo "첫 D메일 전송" ;
+    sg:summary "오카베가 다루에게 첫 D메일을 보낸다."@ko ;
+    sg:note """
+- 전화레인지(임시)와 연결된 상태에서 우연히 발송된다.
+- 이 메시지가 에셜론에 포착되며 β에서 α로의 이동 계기가 된다.
+"""@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-07-28 12:41" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Daru" ;
+    sg:place "라디오 회관 옥상 인근" ;
+    sg:partOfVariation sg:EV_Prologue_Beta_Discovery .
+
+sg:Event_IBN_Discovery a sg:Event ;
+    sg:id "Event_IBN_Discovery" ;
+    sg:labelKo "신사 창고에서 IBN 5100 발견" ;
+    sg:summary "오카베 일행이 야나바야시 신사 창고에서 IBN 5100을 확보한다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-01 15:00" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "IBN 5100" ;
+    sg:place "야나바야시 신사" ;
+    sg:partOfVariation sg:EV_Alpha_IBN_Search .
+
+sg:Event_DMail_Loto6 a sg:Event ;
+    sg:id "Event_DMail_Loto6" ;
+    sg:labelKo "D메일: 로또6 번호 송신" ;
+    sg:summary "오카베가 과거의 자신에게 로또6 번호를 보낸다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-03 12:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Loto6_Send .
+
+sg:Event_DMail_Moeka a sg:Event ;
+    sg:id "Event_DMail_Moeka" ;
+    sg:labelKo "D메일: 모에카 기종 변경 지시" ;
+    sg:summary "모에카가 과거의 자신에게 IBN 5100 수색 중단 명령을 보낸다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-04 14:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Moeka" ;
+    sg:target "Char_Moeka_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Moeka_Send .
+
+sg:Event_DMail_Luka a sg:Event ;
+    sg:id "Event_DMail_Luka" ;
+    sg:labelKo "D메일: 루카 어머니에게 호출기 메시지" ;
+    sg:summary "루카의 성별에 영향을 주기 위한 메시지를 보낸다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-05 16:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Luka" ;
+    sg:target "Char_Luka_Mother" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Luka_Send .
+
+sg:Event_DMail_Faris a sg:Event ;
+    sg:id "Event_DMail_Faris" ;
+    sg:labelKo "D메일: 페이리스 아버지 생존 지시" ;
+    sg:summary "페이리스가 아버지에게 비행기를 타지 말라는 메시지를 보낸다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-06 18:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Faris" ;
+    sg:target "Char_Faris_Father" ;
+    sg:place "메이드 카페 메이퀸 냥냥" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Faris_Send .
+
+sg:Event_DMail_SuzuhaChase a sg:Event ;
+    sg:id "Event_DMail_SuzuhaChase" ;
+    sg:labelKo "D메일: 스즈하 미행 중지" ;
+    sg:summary "오카베가 과거의 자신에게 스즈하를 쫓지 말라고 보낸다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-08 11:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_SuzuhaChase_Send .
+
+sg:Event_Rescue_LabShot_Attack a sg:Event ;
+    sg:id "Event_Rescue_LabShot_Attack" ;
+    sg:labelKo "라운더의 라보 습격" ;
+    sg:summary "모에카 일당이 연구소에 진입한다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 19:56" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Moeka" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Rescue_LabShot .
+
+sg:Event_Rescue_LabShot_MayuriDeath a sg:Event ;
+    sg:id "Event_Rescue_LabShot_MayuriDeath" ;
+    sg:labelKo "마유리 총격 사망" ;
+    sg:summary "라보 습격 직후 마유리가 총에 맞아 사망한다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 19:56" ;
+    sg:timePrecision "approximate" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Rescue_LabShot .
+
+sg:Event_Rescue_CarAccident_Escape a sg:Event ;
+    sg:id "Event_Rescue_CarAccident_Escape" ;
+    sg:labelKo "라보 탈출 및 도주" ;
+    sg:summary "오카베 일행이 마유리를 데리고 라보를 빠져나온다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 18:30" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "아키하바라 일대" ;
+    sg:partOfVariation sg:EV_Rescue_CarAccident .
+
+sg:Event_Rescue_CarAccident_MayuriDeath a sg:Event ;
+    sg:id "Event_Rescue_CarAccident_MayuriDeath" ;
+    sg:labelKo "마유리 차량 사고 사망" ;
+    sg:summary "도주 중이던 마유리가 차량과 충돌해 사망한다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:00" ;
+    sg:timePrecision "exact" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "야나바야시 신사 방면 도로" ;
+    sg:partOfVariation sg:EV_Rescue_CarAccident .
+
+sg:Event_Rescue_NaePush_Wait a sg:Event ;
+    sg:id "Event_Rescue_NaePush_Wait" ;
+    sg:labelKo "승강장 대기" ;
+    sg:summary "오카베와 마유리가 신오차노미즈역 승강장에서 열차를 기다린다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:17" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "신오차노미즈역" ;
+    sg:partOfVariation sg:EV_Rescue_NaePush .
+
+sg:Event_Rescue_NaePush_MayuriDeath a sg:Event ;
+    sg:id "Event_Rescue_NaePush_MayuriDeath" ;
+    sg:labelKo "마유리 선로 추락 사망" ;
+    sg:summary "나에의 돌발 행동으로 마유리가 선로로 떨어져 사망한다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:20" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Nae" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "신오차노미즈역" ;
+    sg:partOfVariation sg:EV_Rescue_NaePush .
+
+sg:Event_Rescue_TaxiStab_Escape a sg:Event ;
+    sg:id "Event_Rescue_TaxiStab_Escape" ;
+    sg:labelKo "택시를 이용한 탈출 시도" ;
+    sg:summary "오카베 일행이 택시로 아키하바라를 벗어나려 한다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:10" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "아키하바라 도로" ;
+    sg:partOfVariation sg:EV_Rescue_TaxiStab .
+
+sg:Event_Rescue_TaxiStab_MayuriDeath a sg:Event ;
+    sg:id "Event_Rescue_TaxiStab_MayuriDeath" ;
+    sg:labelKo "마유리 택시 내 피습 사망" ;
+    sg:summary "택시 내부에 침입한 라운더에게 마유리가 찔려 사망한다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:15" ;
+    sg:timePrecision "approximate" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "택시 내부" ;
+    sg:partOfVariation sg:EV_Rescue_TaxiStab .
+
+sg:Event_Rescue_YodobashiShot_Hide a sg:Event ;
+    sg:id "Event_Rescue_YodobashiShot_Hide" ;
+    sg:labelKo "요도바시 카메라 은신" ;
+    sg:summary "오카베 일행이 요도바시 건물 내부에 몸을 숨긴다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:05" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "요도바시 카메라" ;
+    sg:partOfVariation sg:EV_Rescue_YodobashiShot .
+
+sg:Event_Rescue_YodobashiShot_MayuriDeath a sg:Event ;
+    sg:id "Event_Rescue_YodobashiShot_MayuriDeath" ;
+    sg:labelKo "마유리 오인 사격 사망" ;
+    sg:summary "폭발 이후 경찰이 마유리를 오인 사격해 사망한다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 20:06" ;
+    sg:timePrecision "approximate" ;
+    sg:target "Char_Mayuri" ;
+    sg:place "요도바시 카메라" ;
+    sg:partOfVariation sg:EV_Rescue_YodobashiShot .
+
+sg:Event_DMail_Cancel_SuzuhaChase a sg:Event ;
+    sg:id "Event_DMail_Cancel_SuzuhaChase" ;
+    sg:labelKo "D메일 취소: 스즈하 미행 재개" ;
+    sg:summary "스즈하 미행 중지 D메일을 무효화한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-15 13:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_SuzuhaChase_Cancel .
+
+sg:Event_DMail_Cancel_Faris a sg:Event ;
+    sg:id "Event_DMail_Cancel_Faris" ;
+    sg:labelKo "D메일 취소: 페이리스 아버지 사건 복구" ;
+    sg:summary "페이리스의 D메일을 무효화해 원래 사고 흐름을 복구한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-16 14:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Faris_Father" ;
+    sg:place "아키하바라 일대" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Faris_Cancel .
+
+sg:Event_DMail_Cancel_Luka a sg:Event ;
+    sg:id "Event_DMail_Cancel_Luka" ;
+    sg:labelKo "D메일 취소: 루카 성별 복구" ;
+    sg:summary "루카 관련 D메일을 무효화해 남성으로 되돌린다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-16 18:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Luka_Mother" ;
+    sg:place "야나바야시 신사" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Luka_Cancel .
+
+sg:Event_DMail_Cancel_Moeka a sg:Event ;
+    sg:id "Event_DMail_Cancel_Moeka" ;
+    sg:labelKo "D메일 취소: 모에카 IBN 5100 회수 복구" ;
+    sg:summary "모에카 관련 D메일을 무효화해 원래 IBN 5100 회수 흐름을 복구한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-17 13:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Moeka_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Moeka_Cancel .
+
+sg:Event_DMail_Cancel_Loto6 a sg:Event ;
+    sg:id "Event_DMail_Cancel_Loto6" ;
+    sg:labelKo "D메일 취소: 로또6 당첨 취소" ;
+    sg:summary "로또6 D메일을 무효화해 원래 알파 시작점으로 되돌린다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2010-08-17 15:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Loto6_Cancel .
+
+sg:Event_EchelonCracking a sg:Event ;
+    sg:id "Event_EchelonCracking" ;
+    sg:labelKo "에셜론 포착 기록 삭제" ;
+    sg:summary "다루가 첫 D메일의 에셜론 포착 기록을 삭제해 알파를 탈출한다."@ko ;
+    sg:note """
+- IBN 5100이 있어야 해석 가능한 독자 코드가 필요하다.
+- 이 삭제로 SERN이 첫 D메일을 인지하지 못하게 된다.
+"""@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-17 17:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Daru" ;
+    sg:target "First D-Mail Echelon Record" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_Echelon_Delete .
+
+sg:Event_Skuld_Fail_Travel a sg:Event ;
+    sg:id "Event_Skuld_Fail_Travel" ;
+    sg:labelKo "스쿨드 1차: 과거 이동" ;
+    sg:summary "오카베가 크리스를 구하기 위해 과거로 물리 이동한다."@ko ;
+    sg:eventType "travel" ;
+    sg:mechanismType "physicaltravel" ;
+    sg:localDateTime "2010-07-28 12:10" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Skuld_Fail .
+
+sg:Event_Skuld_Fail_KurisuDeath a sg:Event ;
+    sg:id "Event_Skuld_Fail_KurisuDeath" ;
+    sg:labelKo "스쿨드 1차 실패: 오카베 손에 의한 크리스 사망" ;
+    sg:summary "구출 시도 중 오카베의 실수로 크리스가 죽는다."@ko ;
+    sg:eventType "death" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:39" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Kurisu" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Skuld_Fail .
+
+sg:Event_Skuld_Success_UpaSwap a sg:Event ;
+    sg:id "Event_Skuld_Success_UpaSwap" ;
+    sg:labelKo "메탈 우파 사전 확보" ;
+    sg:summary "스쿨드 성공 조건을 맞추기 위해 메탈 우파를 확보한다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 11:50" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Metal Upa" ;
+    sg:place "라디오 회관 부근" ;
+    sg:partOfVariation sg:EV_Skuld_Success .
+
+sg:Event_OperationSkuldTravel a sg:Event ;
+    sg:id "Event_OperationSkuldTravel" ;
+    sg:labelKo "스쿨드 작전: 과거 이동" ;
+    sg:summary "오카베가 최종 구출을 위해 과거로 물리 이동한다."@ko ;
+    sg:eventType "travel" ;
+    sg:mechanismType "physicaltravel" ;
+    sg:localDateTime "2010-07-28 12:10" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Skuld_Success .
+
+sg:Event_Skuld_Success_SelfStab a sg:Event ;
+    sg:id "Event_Skuld_Success_SelfStab" ;
+    sg:labelKo "자해를 통한 피웅덩이 생성" ;
+    sg:summary "오카베가 스스로를 찔러 피를 흘리고 연출 조건을 만든다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:35" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Skuld_Success .
+
+sg:Event_KurisuAppearsDeadToPastOkabe a sg:Event ;
+    sg:id "Event_KurisuAppearsDeadToPastOkabe" ;
+    sg:labelKo "크리스가 죽은 것처럼 보이게 연출" ;
+    sg:summary "과거 오카베가 크리스의 죽음으로 오인하도록 현장을 조성한다."@ko ;
+    sg:note "관측 자체를 모델링하지 않고, 그렇게 보이게 만드는 연출 사건만 남긴다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:39" ;
+    sg:timePrecision "exact" ;
+    sg:actor "Char_Okabe_Future" ;
+    sg:target "Char_Kurisu" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Skuld_Success .
+
+sg:Event_KurisuSurvives_SG a sg:Event ;
+    sg:id "Event_KurisuSurvives_SG" ;
+    sg:labelKo "슈타인즈 게이트에서 크리스 생존" ;
+    sg:summary "실제 결과로서 크리스는 살아남는다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:40" ;
+    sg:timePrecision "approximate" ;
+    sg:target "Char_Kurisu" ;
+    sg:place "라디오 회관" ;
+    sg:partOfVariation sg:EV_Skuld_Success .
+
+sg:Event_TimeLeap_FirstUse a sg:Event ;
+    sg:id "Event_TimeLeap_FirstUse" ;
+    sg:labelKo "타임리프 머신 첫 사용" ;
+    sg:summary "오카베가 총상을 입은 상태에서 타임리프 머신으로 약 3시간 전으로 도약한다."@ko ;
+    sg:note "42형 브라운관이 리프터 역할을 하는 상태에서, 실험하지 않은 장치를 즉시 사용한 첫 사례다."@ko ;
+    sg:eventType "travel" ;
+    sg:mechanismType "timeleap" ;
+    sg:localDateTime "2010-08-13 19:57" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe_Past" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_Alpha_TimeLeap_FirstUse .
+
+sg:Event_SG0_AmadeusCall a sg:Event ;
+    sg:id "Event_SG0_AmadeusCall" ;
+    sg:labelKo "아마데우스 첫 통화" ;
+    sg:summary "오카베가 아키하바라역 인근에서 아마데우스 크리스와 통화한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-11-29 18:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Amadeus_Kurisu" ;
+    sg:target "Char_Okabe" ;
+    sg:place "아키하바라역 인근" ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Contact .
+
+sg:Event_SG0_RemoveKurisuMemory a sg:Event ;
+    sg:id "Event_SG0_RemoveKurisuMemory" ;
+    sg:labelKo "카가리에서 크리스 기억 제거" ;
+    sg:summary "오카베가 카가리에게 이식된 크리스 기억을 제거하는 선택을 한다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2011-01-15 20:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Kagari" ;
+    sg:place "빅토르 콘도리아 관련 거점" ;
+    sg:partOfVariation sg:EV_SG0_Promised_Rinascimento .
+
+sg:Event_SG0_PhonePowerOff a sg:Event ;
+    sg:id "Event_SG0_PhonePowerOff" ;
+    sg:labelKo "휴대전화 전원 종료" ;
+    sg:summary "오카베가 휴대전화를 꺼 아마데우스와의 접촉을 차단한다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2010-12-15 18:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Smartphone" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_SG0_Solitude .
+
+sg:Event_SG0_IgnoreAmadeusCall a sg:Event ;
+    sg:id "Event_SG0_IgnoreAmadeusCall" ;
+    sg:labelKo "아마데우스 전화 미수신" ;
+    sg:summary "오카베가 라보에서 걸려온 아마데우스의 전화를 받지 않는다."@ko ;
+    sg:eventType "intervention" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2011-01-02 18:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Amadeus_Kurisu" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_SG0_Twin_Automata .
+
+sg:Event_SG0_SelfDMail a sg:Event ;
+    sg:id "Event_SG0_SelfDMail" ;
+    sg:labelKo "자기 자신에게 보내는 D메일" ;
+    sg:summary "오카베가 자신에게 D메일을 보내 1.123581β로의 이동을 유발한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "dmail" ;
+    sg:localDateTime "2011-01-23 20:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Char_Okabe_Past" ;
+    sg:place "다루 은신처" ;
+    sg:partOfVariation sg:EV_SG0_Promised_Rinascimento .
+
+sg:Event_SG0_AmadeusDeleted a sg:Event ;
+    sg:id "Event_SG0_AmadeusDeleted" ;
+    sg:labelKo "아마데우스 삭제" ;
+    sg:summary "아마데우스 크리스가 삭제되어 β 세계선의 상태가 다시 재구성된다."@ko ;
+    sg:eventType "actual" ;
+    sg:mechanismType "none" ;
+    sg:localDateTime "2011-01-23 20:10" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe" ;
+    sg:target "Amadeus_Kurisu" ;
+    sg:place "다루 은신처" ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Deleted .
+
+sg:Event_NostalgiaDrive_Record a sg:Event ;
+    sg:id "Event_NostalgiaDrive_Record" ;
+    sg:labelKo "노스탤지어 드라이브 녹화" ;
+    sg:summary "2025년의 오카베가 스쿨드 작전 지시를 담은 영상 D메일을 준비한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "videodmail" ;
+    sg:localDateTime "2025-08-21 18:00" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe_2025" ;
+    sg:target "Char_Okabe_2010" ;
+    sg:place "레지스탕스 거점" ;
+    sg:partOfVariation sg:EV_NostalgiaDrive_Preparation .
+
+sg:Event_NostalgiaDrive_View a sg:Event ;
+    sg:id "Event_NostalgiaDrive_View" ;
+    sg:labelKo "노스탤지어 드라이브 확인" ;
+    sg:summary "2010년의 오카베가 미래의 자신이 보낸 영상 D메일을 확인한다."@ko ;
+    sg:eventType "communication" ;
+    sg:mechanismType "videodmail" ;
+    sg:localDateTime "2010-08-21 17:30" ;
+    sg:timePrecision "approximate" ;
+    sg:actor "Char_Okabe_2025" ;
+    sg:target "Char_Okabe" ;
+    sg:place "미래 가제트 연구소" ;
+    sg:partOfVariation sg:EV_NostalgiaDrive_Preparation .
+
+
+### =============================================
+### Variation Memberships
+### =============================================
+
+sg:EV_Prologue_Beta_Discovery sg:hasEvent
+    sg:Event_Prologue_MetalUpa,
+    sg:Event_KurisuDies_Beta_Actual,
+    sg:Event_FirstDMail .
+
+sg:EV_Alpha_IBN_Search sg:hasEvent
+    sg:Event_IBN_Discovery .
+
+sg:EV_Alpha_DMail_Loto6_Send sg:hasEvent
+    sg:Event_DMail_Loto6 .
+
+sg:EV_Alpha_DMail_Moeka_Send sg:hasEvent
+    sg:Event_DMail_Moeka .
+
+sg:EV_Alpha_DMail_Luka_Send sg:hasEvent
+    sg:Event_DMail_Luka .
+
+sg:EV_Alpha_DMail_Faris_Send sg:hasEvent
+    sg:Event_DMail_Faris .
+
+sg:EV_Alpha_DMail_SuzuhaChase_Send sg:hasEvent
+    sg:Event_DMail_SuzuhaChase .
+
+sg:EV_Rescue_LabShot sg:hasEvent
+    sg:Event_Rescue_LabShot_Attack,
+    sg:Event_Rescue_LabShot_MayuriDeath .
+
+sg:EV_Rescue_CarAccident sg:hasEvent
+    sg:Event_Rescue_CarAccident_Escape,
+    sg:Event_Rescue_CarAccident_MayuriDeath .
+
+sg:EV_Rescue_NaePush sg:hasEvent
+    sg:Event_Rescue_NaePush_Wait,
+    sg:Event_Rescue_NaePush_MayuriDeath .
+
+sg:EV_Rescue_TaxiStab sg:hasEvent
+    sg:Event_Rescue_TaxiStab_Escape,
+    sg:Event_Rescue_TaxiStab_MayuriDeath .
+
+sg:EV_Rescue_YodobashiShot sg:hasEvent
+    sg:Event_Rescue_YodobashiShot_Hide,
+    sg:Event_Rescue_YodobashiShot_MayuriDeath .
+
+sg:EV_Alpha_DMail_SuzuhaChase_Cancel sg:hasEvent
+    sg:Event_DMail_Cancel_SuzuhaChase .
+
+sg:EV_Alpha_DMail_Faris_Cancel sg:hasEvent
+    sg:Event_DMail_Cancel_Faris .
+
+sg:EV_Alpha_DMail_Luka_Cancel sg:hasEvent
+    sg:Event_DMail_Cancel_Luka .
+
+sg:EV_Alpha_DMail_Moeka_Cancel sg:hasEvent
+    sg:Event_DMail_Cancel_Moeka .
+
+sg:EV_Alpha_DMail_Loto6_Cancel sg:hasEvent
+    sg:Event_DMail_Cancel_Loto6 .
+
+sg:EV_Alpha_Echelon_Delete sg:hasEvent
+    sg:Event_EchelonCracking .
+
+sg:EV_Skuld_Fail sg:hasEvent
+    sg:Event_Skuld_Fail_Travel,
+    sg:Event_Skuld_Fail_KurisuDeath .
+
+sg:EV_Skuld_Success sg:hasEvent
+    sg:Event_Skuld_Success_UpaSwap,
+    sg:Event_OperationSkuldTravel,
+    sg:Event_Skuld_Success_SelfStab,
+    sg:Event_KurisuAppearsDeadToPastOkabe,
+    sg:Event_KurisuSurvives_SG .
+
+sg:EV_Alpha_TimeLeap_FirstUse sg:hasEvent
+    sg:Event_TimeLeap_FirstUse .
+
+sg:EV_SG0_Amadeus_Contact sg:hasEvent
+    sg:Event_SG0_AmadeusCall .
+
+sg:EV_SG0_Promised_Rinascimento sg:hasEvent
+    sg:Event_SG0_RemoveKurisuMemory,
+    sg:Event_SG0_SelfDMail .
+
+sg:EV_SG0_Solitude sg:hasEvent
+    sg:Event_SG0_PhonePowerOff .
+
+sg:EV_SG0_Twin_Automata sg:hasEvent
+    sg:Event_SG0_IgnoreAmadeusCall .
+
+sg:EV_SG0_Amadeus_Deleted sg:hasEvent
+    sg:Event_SG0_AmadeusDeleted .
+
+sg:EV_NostalgiaDrive_Preparation sg:hasEvent
+    sg:Event_NostalgiaDrive_Record,
+    sg:Event_NostalgiaDrive_View .
+
+
+### =============================================
+### Causal Links
+### =============================================
+
+sg:Event_FirstDMail sg:causes sg:Event_DMail_Loto6 .
+sg:Event_FirstDMail sg:causes sg:Event_EchelonCracking .
+sg:Event_IBN_Discovery sg:enables sg:Event_EchelonCracking .
+sg:Event_Skuld_Success_UpaSwap sg:enables sg:Event_KurisuSurvives_SG .
+sg:Event_Skuld_Success_SelfStab sg:causes sg:Event_KurisuAppearsDeadToPastOkabe .
+sg:Event_KurisuAppearsDeadToPastOkabe sg:enables sg:Event_FirstDMail .
+sg:Event_KurisuSurvives_SG sg:prevents sg:Event_Skuld_Fail_KurisuDeath .
+sg:Event_TimeLeap_FirstUse sg:enables sg:Event_Rescue_CarAccident_Escape .
+sg:Event_SG0_AmadeusCall sg:enables sg:Event_SG0_RemoveKurisuMemory .
+sg:Event_SG0_RemoveKurisuMemory sg:causes sg:Event_SG0_SelfDMail .
+sg:Event_SG0_SelfDMail sg:causes sg:Event_SG0_AmadeusDeleted .
+sg:Event_NostalgiaDrive_Record sg:enables sg:Event_NostalgiaDrive_View .
+sg:Event_NostalgiaDrive_View sg:enables sg:Event_OperationSkuldTravel .
+
+### 내러티브 시퀀스 인과 링크 (EV 내부 순서)
+sg:Event_KurisuDies_Beta_Actual sg:causes sg:Event_FirstDMail .
+sg:Event_Rescue_LabShot_Attack sg:causes sg:Event_Rescue_LabShot_MayuriDeath .
+sg:Event_Rescue_CarAccident_Escape sg:causes sg:Event_Rescue_CarAccident_MayuriDeath .
+sg:Event_Rescue_TaxiStab_Escape sg:causes sg:Event_Rescue_TaxiStab_MayuriDeath .
+sg:Event_Rescue_YodobashiShot_Hide sg:causes sg:Event_Rescue_YodobashiShot_MayuriDeath .
+sg:Event_Skuld_Fail_Travel sg:causes sg:Event_Skuld_Fail_KurisuDeath .
+sg:Event_Skuld_Success_UpaSwap sg:causes sg:Event_KurisuAppearsDeadToPastOkabe .
+sg:Event_OperationSkuldTravel sg:causes sg:Event_Skuld_Success_SelfStab .
+sg:Event_KurisuAppearsDeadToPastOkabe sg:causes sg:Event_KurisuSurvives_SG .
+
+
+### =============================================
+### WorldLine Shifts
+### =============================================
+
+sg:Shift_BetaToAlpha a sg:WorldLineShift ;
+    sg:id "Shift_BetaToAlpha" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-07-28 12:41" ;
+    sg:summary "첫 D메일에 의해 β(1.130426)에서 α(0.571024)로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_1_130426 ;
+    sg:toWorldLine sg:WL_0_571024 ;
+    sg:triggeredByEvent sg:Event_FirstDMail .
+
+sg:Shift_AlphaInternal_01 a sg:WorldLineShift ;
+    sg:id "Shift_AlphaInternal_01" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-03 12:00" ;
+    sg:summary "로또6 D메일로 0.571024에서 0.571015로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_571024 ;
+    sg:toWorldLine sg:WL_0_571015 ;
+    sg:triggeredByEvent sg:Event_DMail_Loto6 .
+
+sg:Shift_AlphaInternal_02 a sg:WorldLineShift ;
+    sg:id "Shift_AlphaInternal_02" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-04 14:00" ;
+    sg:summary "모에카 D메일로 0.571015에서 0.523299로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_571015 ;
+    sg:toWorldLine sg:WL_0_523299 ;
+    sg:triggeredByEvent sg:Event_DMail_Moeka .
+
+sg:Shift_AlphaInternal_03 a sg:WorldLineShift ;
+    sg:id "Shift_AlphaInternal_03" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-05 16:00" ;
+    sg:summary "루카 D메일로 0.523299에서 0.456903으로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_523299 ;
+    sg:toWorldLine sg:WL_0_456903 ;
+    sg:triggeredByEvent sg:Event_DMail_Luka .
+
+sg:Shift_AlphaInternal_04 a sg:WorldLineShift ;
+    sg:id "Shift_AlphaInternal_04" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-06 18:00" ;
+    sg:summary "페이리스 D메일로 0.456903에서 0.409420으로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_456903 ;
+    sg:toWorldLine sg:WL_0_409420 ;
+    sg:triggeredByEvent sg:Event_DMail_Faris .
+
+sg:Shift_AlphaInternal_05 a sg:WorldLineShift ;
+    sg:id "Shift_AlphaInternal_05" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-08 11:00" ;
+    sg:summary "스즈하 미행 중지 D메일로 0.409420에서 0.337187로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_409420 ;
+    sg:toWorldLine sg:WL_0_337187 ;
+    sg:triggeredByEvent sg:Event_DMail_SuzuhaChase .
+
+sg:Shift_Alpha_337187_to_409431 a sg:WorldLineShift ;
+    sg:id "Shift_Alpha_337187_to_409431" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-15 13:00" ;
+    sg:summary "스즈하 D메일 취소로 0.337187에서 0.409431로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_337187 ;
+    sg:toWorldLine sg:WL_0_409431 ;
+    sg:triggeredByEvent sg:Event_DMail_Cancel_SuzuhaChase .
+
+sg:Shift_Alpha_409431_to_456914 a sg:WorldLineShift ;
+    sg:id "Shift_Alpha_409431_to_456914" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-16 14:00" ;
+    sg:summary "페이리스 D메일 취소로 0.409431에서 0.456914로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_409431 ;
+    sg:toWorldLine sg:WL_0_456914 ;
+    sg:triggeredByEvent sg:Event_DMail_Cancel_Faris .
+
+sg:Shift_Alpha_456914_to_523307 a sg:WorldLineShift ;
+    sg:id "Shift_Alpha_456914_to_523307" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-16 18:00" ;
+    sg:summary "루카 D메일 취소로 0.456914에서 0.523307로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_456914 ;
+    sg:toWorldLine sg:WL_0_523307 ;
+    sg:triggeredByEvent sg:Event_DMail_Cancel_Luka .
+
+sg:Shift_Alpha_523307_to_571046 a sg:WorldLineShift ;
+    sg:id "Shift_Alpha_523307_to_571046" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-17 13:00" ;
+    sg:summary "모에카 D메일 취소로 0.523307에서 0.571046로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_523307 ;
+    sg:toWorldLine sg:WL_0_571046 ;
+    sg:triggeredByEvent sg:Event_DMail_Cancel_Moeka .
+
+sg:Shift_Alpha_571046_to_571024 a sg:WorldLineShift ;
+    sg:id "Shift_Alpha_571046_to_571024" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2010-08-17 15:00" ;
+    sg:summary "로또6 D메일 취소로 0.571046에서 0.571024로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_0_571046 ;
+    sg:toWorldLine sg:WL_0_571024 ;
+    sg:triggeredByEvent sg:Event_DMail_Cancel_Loto6 .
+
+sg:Shift_AlphaToBeta a sg:WorldLineShift ;
+    sg:id "Shift_AlphaToBeta" ;
+    sg:shiftType "presentAction" ;
+    sg:shiftMoment "2010-08-17 17:00" ;
+    sg:summary "에셜론 기록 삭제로 알파에서 베타(1.130205)로 복귀한다."@ko ;
+    sg:fromWorldLine sg:WL_0_571024 ;
+    sg:toWorldLine sg:WL_1_130205 ;
+    sg:triggeredByEvent sg:Event_EchelonCracking .
+
+sg:Shift_SG0_053649_to_055821 a sg:WorldLineShift ;
+    sg:id "Shift_SG0_053649_to_055821" ;
+    sg:shiftType "presentAction" ;
+    sg:shiftMoment "2011-01-15 20:00" ;
+    sg:summary "카가리에서 크리스 기억을 제거하는 선택으로 1.053649에서 1.055821로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_1_053649 ;
+    sg:toWorldLine sg:WL_1_055821 ;
+    sg:triggeredByEvent sg:Event_SG0_RemoveKurisuMemory .
+
+sg:Shift_SG0_064750_to_081163 a sg:WorldLineShift ;
+    sg:id "Shift_SG0_064750_to_081163" ;
+    sg:shiftType "presentAction" ;
+    sg:shiftMoment "2011-01-02 18:00" ;
+    sg:summary "아마데우스 전화를 받지 않아 1.064750에서 1.081163으로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_1_064750 ;
+    sg:toWorldLine sg:WL_1_081163 ;
+    sg:triggeredByEvent sg:Event_SG0_IgnoreAmadeusCall .
+
+sg:Shift_SG0_055821_to_123581 a sg:WorldLineShift ;
+    sg:id "Shift_SG0_055821_to_123581" ;
+    sg:shiftType "dmail" ;
+    sg:shiftMoment "2011-01-23 20:00" ;
+    sg:summary "오카베가 자신에게 보낸 D메일로 1.055821에서 1.123581로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_1_055821 ;
+    sg:toWorldLine sg:WL_1_123581 ;
+    sg:triggeredByEvent sg:Event_SG0_SelfDMail .
+
+sg:Shift_BetaToSteinsGate a sg:WorldLineShift ;
+    sg:id "Shift_BetaToSteinsGate" ;
+    sg:shiftType "physicaltravel+videodmail" ;
+    sg:shiftMoment "2010-07-28 12:40" ;
+    sg:summary "스쿨드 작전 성공으로 β(1.130209)에서 슈타인즈 게이트(1.048596)로 이동한다."@ko ;
+    sg:fromWorldLine sg:WL_1_130209 ;
+    sg:toWorldLine sg:WL_1_048596 ;
+    sg:triggeredByEvent sg:Event_OperationSkuldTravel .
+
+sg:Event_FirstDMail sg:participatesInShift sg:Shift_BetaToAlpha .
+sg:Event_DMail_Loto6 sg:participatesInShift sg:Shift_AlphaInternal_01 .
+sg:Event_DMail_Moeka sg:participatesInShift sg:Shift_AlphaInternal_02 .
+sg:Event_DMail_Luka sg:participatesInShift sg:Shift_AlphaInternal_03 .
+sg:Event_DMail_Faris sg:participatesInShift sg:Shift_AlphaInternal_04 .
+sg:Event_DMail_SuzuhaChase sg:participatesInShift sg:Shift_AlphaInternal_05 .
+sg:Event_DMail_Cancel_SuzuhaChase sg:participatesInShift sg:Shift_Alpha_337187_to_409431 .
+sg:Event_DMail_Cancel_Faris sg:participatesInShift sg:Shift_Alpha_409431_to_456914 .
+sg:Event_DMail_Cancel_Luka sg:participatesInShift sg:Shift_Alpha_456914_to_523307 .
+sg:Event_DMail_Cancel_Moeka sg:participatesInShift sg:Shift_Alpha_523307_to_571046 .
+sg:Event_DMail_Cancel_Loto6 sg:participatesInShift sg:Shift_Alpha_571046_to_571024 .
+sg:Event_EchelonCracking sg:participatesInShift sg:Shift_AlphaToBeta .
+sg:Event_SG0_RemoveKurisuMemory sg:participatesInShift sg:Shift_SG0_053649_to_055821 .
+sg:Event_SG0_IgnoreAmadeusCall sg:participatesInShift sg:Shift_SG0_064750_to_081163 .
+sg:Event_SG0_SelfDMail sg:participatesInShift sg:Shift_SG0_055821_to_123581 .
+sg:Event_OperationSkuldTravel sg:participatesInShift sg:Shift_BetaToSteinsGate .
+
+
+### =============================================
+### MediaSource Instances
+### =============================================
+
+sg:MS_SG_Anime_Ep01 a sg:MediaSource ;
+    sg:id "MS_SG_Anime_Ep01" ;
+    sg:labelKo "슈타인즈 게이트 애니 1화" ;
+    sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "1화" .
+
+sg:MS_SG_Anime_Ep22 a sg:MediaSource ;
+    sg:id "MS_SG_Anime_Ep22" ;
+    sg:labelKo "슈타인즈 게이트 애니 22화" ;
+    sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "22화" .
+
+sg:MS_SG_Anime_Ep23 a sg:MediaSource ;
+    sg:id "MS_SG_Anime_Ep23" ;
+    sg:labelKo "슈타인즈 게이트 애니 23화" ;
+    sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "23화" .
+
+sg:MS_SG_Anime_Ep24 a sg:MediaSource ;
+    sg:id "MS_SG_Anime_Ep24" ;
+    sg:labelKo "슈타인즈 게이트 애니 24화" ;
+    sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "24화" .
+
+sg:MS_SG_VN_Ch01 a sg:MediaSource ;
+    sg:id "MS_SG_VN_Ch01" ;
+    sg:labelKo "슈타인즈 게이트 VN Chapter 1" ;
+    sg:mediaType "game" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "Chapter 1" .
+
+sg:MS_SG_VN_Ch09 a sg:MediaSource ;
+    sg:id "MS_SG_VN_Ch09" ;
+    sg:labelKo "슈타인즈 게이트 VN Chapter 9" ;
+    sg:mediaType "game" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "Chapter 9" .
+
+sg:MS_SG_VN_Ch10A a sg:MediaSource ;
+    sg:id "MS_SG_VN_Ch10A" ;
+    sg:labelKo "슈타인즈 게이트 VN Chapter 10A" ;
+    sg:mediaType "game" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "Chapter 10A" .
+
+sg:MS_SG_VN_Ch10B a sg:MediaSource ;
+    sg:id "MS_SG_VN_Ch10B" ;
+    sg:labelKo "슈타인즈 게이트 VN Chapter 10B" ;
+    sg:mediaType "game" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "Chapter 10B" .
+
+sg:MS_SG_VN_Ch11 a sg:MediaSource ;
+    sg:id "MS_SG_VN_Ch11" ;
+    sg:labelKo "슈타인즈 게이트 VN Chapter 11" ;
+    sg:mediaType "game" ;
+    sg:mediaTitle "Steins;Gate" ;
+    sg:mediaUnit "Chapter 11" .
+
+
+### =============================================
+### appearsIn Links
+### =============================================
+
+sg:Event_Prologue_MetalUpa sg:appearsIn sg:MS_SG_Anime_Ep01 , sg:MS_SG_VN_Ch01 .
+sg:Event_KurisuDies_Beta_Actual sg:appearsIn sg:MS_SG_Anime_Ep01 , sg:MS_SG_VN_Ch01 .
+sg:Event_FirstDMail sg:appearsIn sg:MS_SG_Anime_Ep01 , sg:MS_SG_VN_Ch01 .
+sg:Event_DMail_Cancel_Moeka sg:appearsIn sg:MS_SG_VN_Ch09 .
+sg:Event_EchelonCracking sg:appearsIn sg:MS_SG_Anime_Ep22 , sg:MS_SG_VN_Ch10A , sg:MS_SG_VN_Ch10B .
+
+sg:Event_Skuld_Fail_Travel sg:appearsIn sg:MS_SG_Anime_Ep23 , sg:MS_SG_VN_Ch11 .
+sg:Event_Skuld_Fail_KurisuDeath sg:appearsIn sg:MS_SG_Anime_Ep23 , sg:MS_SG_VN_Ch11 .
+
+sg:Event_Skuld_Success_UpaSwap sg:appearsIn sg:MS_SG_Anime_Ep24 , sg:MS_SG_VN_Ch11 .
+sg:Event_OperationSkuldTravel sg:appearsIn sg:MS_SG_Anime_Ep24 , sg:MS_SG_VN_Ch11 .
+sg:Event_Skuld_Success_SelfStab sg:appearsIn sg:MS_SG_Anime_Ep24 , sg:MS_SG_VN_Ch11 .
+sg:Event_KurisuAppearsDeadToPastOkabe sg:appearsIn sg:MS_SG_Anime_Ep24 , sg:MS_SG_VN_Ch11 .
+sg:Event_KurisuSurvives_SG sg:appearsIn sg:MS_SG_Anime_Ep24 , sg:MS_SG_VN_Ch11 .
+
+
+### =============================================
+### Science Layer Evidence Sources
+### =============================================
+
+sg:Evidence_CurrentTTL_WorldLineModel a sg:EvidenceSource ;
+    sg:id "Evidence_CurrentTTL_WorldLineModel" ;
+    sg:labelKo "현재 TTL의 WorldLine/EventVariation 모델" ;
+    sg:evidenceTier "canonical_structured" ;
+    sg:sourcePath "슈타인즈게이트_온톨로지.ttl" ;
+    sg:sourceScope "설계 원칙, WorldLine/EventVariation 정의, WL_0_337187 note" ;
+    sg:summary "현재 TTL은 WorldLine을 6자리 관측 좌표로 두고, 같은 표시값 아래의 세부 시나리오 차이를 EventVariation으로 접어 표현한다."@ko .
+
+sg:Evidence_SGWorldLine_DivergenceMeter a sg:EvidenceSource ;
+    sg:id "Evidence_SGWorldLine_DivergenceMeter" ;
+    sg:labelKo "세계선 자료의 다이버전스 미터 설명" ;
+    sg:evidenceTier "official_material" ;
+    sg:sourcePath "data/슈타게관련자료/슈타인즈게이트_세계선.md" ;
+    sg:sourceScope "세계선 관련 용어: 변동률, 다이버전스 미터" ;
+    sg:summary "다이버전스 미터는 세계선 변동률을 수치로 표시하며, 세계선 변동률은 세계선 이동 후 세계 차이를 나타내는 상대값으로 설명된다."@ko .
+
+sg:Evidence_SGTimeline_Alpha337187Variations a sg:EvidenceSource ;
+    sg:id "Evidence_SGTimeline_Alpha337187Variations" ;
+    sg:labelKo "0.337187 알파 시나리오 변형 근거" ;
+    sg:evidenceTier "official_material" ;
+    sg:sourcePath "data/슈타게관련자료/Steins;Gate_애니메이션_연표.md" ;
+    sg:sourceScope "2010-08-10~2010-08-13, 세계선 변동률 0.337187 구간" ;
+    sg:summary "0.337187로 표시되는 구간 안에서 타임리프와 마유리 사망 회피 시도가 반복되며, 마유리 사망 방식이 여러 형태로 나타난다."@ko .
+
+sg:Evidence_SGTimeline_ShiftMechanisms a sg:EvidenceSource ;
+    sg:id "Evidence_SGTimeline_ShiftMechanisms" ;
+    sg:labelKo "세계선 변동 사건 목록" ;
+    sg:evidenceTier "official_material" ;
+    sg:sourcePath "data/슈타게관련자료/Steins;Gate_애니메이션_연표.md" ;
+    sg:sourceScope "세계선을 바꾸게 된 사건 목록" ;
+    sg:summary "D메일처럼 과거가 개변되는 경우 세계선이 변동되고, 타임리프처럼 자신의 의지로 과거 행동을 바꾸는 경우에는 변동 폭이 작다고 정리한다."@ko .
+
+sg:Evidence_Famitsu_ShikuraDisplayPrecision a sg:EvidenceSource ;
+    sg:id "Evidence_Famitsu_ShikuraDisplayPrecision" ;
+    sg:labelKo "치요마루 인터뷰의 하위 자리 수속 근거" ;
+    sg:evidenceTier "creator_interview" ;
+    sg:sourcePath "data/공식 자료집/인터뷰-'아노니마스 코드' 시쿠라 치요마루 씨 인터뷰. 본작은 빈약한 오타쿠들에게의 도전장!? 「슈타게」등 과학 어드벤처 시리즈와의 연결도 분명히!.md" ;
+    sg:sourceUrl "https://www.famitsu.com/news/202207/07267624.html"^^xsd:anyURI ;
+    sg:sourceScope "Famitsu interview, 2022-07-07" ;
+    sg:summary "제작진 인터뷰는 매우 작은 변동률 차이에서는 세계선이 거의 같은 결과로 수속하고, 표시되는 자리 수준의 차이는 큰 변화로 드러난다는 해설 근거로 사용한다."@ko .
+
+sg:Evidence_Famitsu_ShikuraWorldLayerSync a sg:EvidenceSource ;
+    sg:id "Evidence_Famitsu_ShikuraWorldLayerSync" ;
+    sg:labelKo "치요마루 인터뷰의 세계선-세계층 동기화 근거" ;
+    sg:evidenceTier "creator_interview" ;
+    sg:sourcePath "data/공식 자료집/인터뷰-'아노니마스 코드' 시쿠라 치요마루 씨 인터뷰. 본작은 빈약한 오타쿠들에게의 도전장!? 「슈타게」등 과학 어드벤처 시리즈와의 연결도 분명히!.md" ;
+    sg:sourceUrl "https://www.famitsu.com/news/202207/07267624.html"^^xsd:anyURI ;
+    sg:sourceScope "『아노니마스 코드』와 『슈타인즈 게이트2』 의미 관련 문답, 다이버전스 미터 숫자의 송신원 설명" ;
+    sg:summary "시쿠라 인터뷰는 슈타인즈 게이트의 세계선과 아노니마스 코드의 세계층이 동기화될 수밖에 없다고 설명하고, 다이버전스 미터에 표시되는 숫자가 D메일과 같은 구조로 과거에 송신된 값이라는 해설을 제공한다."@ko .
+
+sg:Evidence_OfficialQnA_WorldLineMechanics a sg:EvidenceSource ;
+    sg:id "Evidence_OfficialQnA_WorldLineMechanics" ;
+    sg:labelKo "본편 공식 자료집 Q&A: 세계선과 다이버전스 규칙" ;
+    sg:evidenceTier "official_material_translation" ;
+    sg:sourcePath "data/공식 자료집/본편공식자료집QnA번역.md" ;
+    sg:sourceUrl "https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=25342"^^xsd:anyURI ;
+    sg:sourceUrl "https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=25397"^^xsd:anyURI ;
+    sg:sourceScope "Q16, Q25, Q27-Q30" ;
+    sg:summary "공식 Q&A는 Ω 세계선의 음수 다이버전스, 에셜론 기록 삭제에 따른 알파-베타 재구성, 슈타인즈 게이트 도달 조건, 타임리프 기억 모델, 물리적 타임트래블의 미세 변동, 크리스 사망 수속의 패러독스 해소를 설명한다."@ko .
+
+sg:Evidence_OfficialQnA_SERNSurveillance a sg:EvidenceSource ;
+    sg:id "Evidence_OfficialQnA_SERNSurveillance" ;
+    sg:labelKo "본편 공식 자료집 Q&A: SERN 감시와 라운더 습격" ;
+    sg:evidenceTier "official_material_translation" ;
+    sg:sourcePath "data/공식 자료집/본편공식자료집QnA번역.md" ;
+    sg:sourceScope "Q5-Q10" ;
+    sg:summary "공식 Q&A는 알파 세계선에서 다루의 해킹이 들켰을 가능성, 모에카가 8월 3일 오카베에게 D메일을 듣고 FB에게 보고했을 가능성, 타임리프 머신 완성과 공표 의사가 라운더 습격의 결정타가 된 흐름을 설명한다."@ko .
+
+sg:Evidence_OfficialQnA_IBN5100Chain a sg:EvidenceSource ;
+    sg:id "Evidence_OfficialQnA_IBN5100Chain" ;
+    sg:labelKo "본편 공식 자료집 Q&A: IBN 5100 보관 경로" ;
+    sg:evidenceTier "official_material_translation" ;
+    sg:sourcePath "data/공식 자료집/본편공식자료집QnA번역.md" ;
+    sg:sourceScope "Q11-Q15" ;
+    sg:summary "공식 Q&A는 스즈하가 1975년으로 가기 전에 2010년에 들른 경위, 1975년의 IBN 5100 관리 이유, 스즈하 사후 페이리스 아버지와 페이리스 측을 거쳐 야나바야시 신사에 봉납되는 흐름을 설명한다."@ko .
+
+sg:Evidence_OfficialQnA_AlphaFutureConvergence a sg:EvidenceSource ;
+    sg:id "Evidence_OfficialQnA_AlphaFutureConvergence" ;
+    sg:labelKo "본편 공식 자료집 Q&A: 알파 미래와 인물 수속" ;
+    sg:evidenceTier "official_material_translation" ;
+    sg:sourcePath "data/공식 자료집/본편공식자료집QnA번역.md" ;
+    sg:sourceScope "Q18, Q21-Q23" ;
+    sg:summary "공식 Q&A는 루카 엔딩 이후에도 SERN 디스토피아가 구축되는 점, 알파 세계선에서 다루가 레지스탕스 활동으로 잠복하는 점, 마유리 죽음과 달리 페이리스 아버지의 죽음은 2000년 분기 영향으로 확정되지 않는 점을 설명한다."@ko .
+
+sg:Evidence_OfficialQnA_ReadingSteiner a sg:EvidenceSource ;
+    sg:id "Evidence_OfficialQnA_ReadingSteiner" ;
+    sg:labelKo "본편 공식 자료집 Q&A: 리딩 슈타이너와 기억 모델" ;
+    sg:evidenceTier "official_material_translation" ;
+    sg:sourcePath "data/공식 자료집/본편공식자료집QnA번역.md" ;
+    sg:sourceScope "Q24, Q26, Q28" ;
+    sg:summary "공식 Q&A는 1999년 고열과 2000년 문제의 거대 분기가 오카베의 리딩 슈타이너 각성과 관련된 점, 물리적 타임트래블 중 발동을 인지하지 못했을 가능성, 타임리프 기억이 덮어쓰기보다 복수 미래 가능성의 병존으로 설명되는 점을 제공한다."@ko .
+
+
+### =============================================
+### Science Layer Topics
+### =============================================
+
+sg:Topic_ObservedWorldLineCoordinate a sg:ScienceTopic ;
+    sg:id "Topic_ObservedWorldLineCoordinate" ;
+    sg:labelKo "관측 세계선 좌표" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "다이버전스 미터에 표시되는 6자리 좌표로 WorldLine을 식별하는 해설 주제."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_CurrentTTL_WorldLineModel,
+        sg:Evidence_SGWorldLine_DivergenceMeter,
+        sg:Evidence_Famitsu_ShikuraWorldLayerSync ;
+    sg:explainsEntity
+        sg:WL_0_337187,
+        sg:WL_0_571024,
+        sg:WL_1_130426,
+        sg:WL_1_048596 ;
+    sg:relatedTopic
+        sg:Topic_DisplayPrecisionLimit,
+        sg:Topic_MeasurableWorldLineShift,
+        sg:Topic_DivergenceMeterSignalSource .
+
+sg:Topic_DisplayPrecisionLimit a sg:ScienceTopic ;
+    sg:id "Topic_DisplayPrecisionLimit" ;
+    sg:labelKo "다이버전스 표시 정밀도 한계" ;
+    sg:answerLabel "[추론]" ;
+    sg:summary "6자리 표시값은 관측 좌표이고, 그 아래 하위 자리 차이는 hidden divergence 값 없이 해설 계층에서만 다룬다는 주제."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_CurrentTTL_WorldLineModel,
+        sg:Evidence_SGWorldLine_DivergenceMeter,
+        sg:Evidence_Famitsu_ShikuraDisplayPrecision,
+        sg:Evidence_Famitsu_ShikuraWorldLayerSync,
+        sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity
+        sg:WL_0_337187,
+        sg:EV_Rescue_LabShot,
+        sg:EV_Rescue_CarAccident,
+        sg:EV_Rescue_NaePush,
+        sg:EV_Rescue_TaxiStab,
+        sg:EV_Rescue_YodobashiShot ;
+    sg:relatedTopic
+        sg:Topic_ObservedWorldLineCoordinate,
+        sg:Topic_MicroWorldLineDifference,
+        sg:Topic_SubDisplayWorldLineShift,
+        sg:Topic_OmegaNegativeDivergence,
+        sg:Topic_DivergenceMeterSignalSource .
+
+sg:Topic_EventVariationBranching a sg:ScienceTopic ;
+    sg:id "Topic_EventVariationBranching" ;
+    sg:labelKo "EventVariation 기반 시나리오 분기" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "작품이 구분하는 시나리오 차이를 EventVariation으로 묶고 질의하는 모델링 주제."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_CurrentTTL_WorldLineModel,
+        sg:Evidence_SGTimeline_Alpha337187Variations ;
+    sg:explainsEntity
+        sg:EV_Rescue_LabShot,
+        sg:EV_Rescue_CarAccident,
+        sg:EV_Rescue_NaePush,
+        sg:EV_Rescue_TaxiStab,
+        sg:EV_Rescue_YodobashiShot,
+        sg:EV_Alpha_DMail_SuzuhaChase_Cancel,
+        sg:EV_Alpha_TimeLeap_FirstUse ;
+    sg:relatedTopic
+        sg:Topic_MicroWorldLineDifference,
+        sg:Topic_SubDisplayWorldLineShift .
+
+sg:Topic_MicroWorldLineDifference a sg:ScienceTopic ;
+    sg:id "Topic_MicroWorldLineDifference" ;
+    sg:labelKo "미세 세계선 차이" ;
+    sg:answerLabel "[추론]" ;
+    sg:summary "같은 6자리 좌표 아래의 여러 EventVariation을 실제로는 근접한 미세 세계선 차이의 표현으로 설명하는 주제."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_CurrentTTL_WorldLineModel,
+        sg:Evidence_SGTimeline_Alpha337187Variations,
+        sg:Evidence_Famitsu_ShikuraDisplayPrecision,
+        sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity
+        sg:EV_Rescue_LabShot,
+        sg:EV_Rescue_CarAccident,
+        sg:EV_Rescue_NaePush,
+        sg:EV_Rescue_TaxiStab,
+        sg:EV_Rescue_YodobashiShot ;
+    sg:relatedTopic
+        sg:Topic_DisplayPrecisionLimit,
+        sg:Topic_EventVariationBranching,
+        sg:Topic_SubDisplayWorldLineShift,
+        sg:Topic_PhysicalTimeTravel_MicroShift .
+
+sg:Topic_SubDisplayWorldLineShift a sg:ScienceTopic ;
+    sg:id "Topic_SubDisplayWorldLineShift" ;
+    sg:labelKo "표시값 아래 세계선 이동" ;
+    sg:answerLabel "[추론]" ;
+    sg:summary "다이버전스 미터에 새 6자리 좌표로 표시되지 않는 작은 이동을 hidden WorldLine/WorldLineShift 없이 EventVariation 해설 링크로 답변하는 주제."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_CurrentTTL_WorldLineModel,
+        sg:Evidence_SGTimeline_ShiftMechanisms,
+        sg:Evidence_Famitsu_ShikuraDisplayPrecision,
+        sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity
+        sg:EV_Alpha_TimeLeap_FirstUse,
+        sg:EV_Rescue_LabShot,
+        sg:EV_Rescue_CarAccident,
+        sg:EV_Rescue_NaePush,
+        sg:EV_Rescue_TaxiStab,
+        sg:EV_Rescue_YodobashiShot ;
+    sg:relatedTopic
+        sg:Topic_DisplayPrecisionLimit,
+        sg:Topic_MicroWorldLineDifference,
+        sg:Topic_MeasurableWorldLineShift,
+        sg:Topic_PhysicalTimeTravel_MicroShift .
+
+sg:Topic_MeasurableWorldLineShift a sg:ScienceTopic ;
+    sg:id "Topic_MeasurableWorldLineShift" ;
+    sg:labelKo "측정 가능한 세계선 이동" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "메인 TTL의 명시적 WorldLineShift 인스턴스로 기록된 표시 가능한 좌표 간 이동을 설명하는 주제."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_CurrentTTL_WorldLineModel,
+        sg:Evidence_SGTimeline_ShiftMechanisms,
+        sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity
+        sg:Shift_BetaToAlpha,
+        sg:Shift_AlphaInternal_01,
+        sg:Shift_AlphaInternal_02,
+        sg:Shift_AlphaInternal_03,
+        sg:Shift_AlphaInternal_04,
+        sg:Shift_AlphaInternal_05,
+        sg:Shift_Alpha_337187_to_409431,
+        sg:Shift_Alpha_409431_to_456914,
+        sg:Shift_Alpha_456914_to_523307,
+        sg:Shift_Alpha_523307_to_571046,
+        sg:Shift_Alpha_571046_to_571024,
+        sg:Shift_AlphaToBeta,
+        sg:Shift_SG0_053649_to_055821,
+        sg:Shift_SG0_064750_to_081163,
+        sg:Shift_SG0_055821_to_123581,
+        sg:Shift_BetaToSteinsGate ;
+    sg:relatedTopic
+        sg:Topic_ObservedWorldLineCoordinate,
+        sg:Topic_SubDisplayWorldLineShift .
+
+sg:Topic_EchelonDeletion_WorldLineShift a sg:ScienceTopic ;
+    sg:id "Topic_EchelonDeletion_WorldLineShift" ;
+    sg:labelKo "에셜론 기록 삭제와 세계선 재구성" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "현재 시점에서 에셜론의 D메일 포착 기록을 삭제하는 행위가 알파→베타 세계선 재구성을 유발하는 원리. 존 타이타의 '다이버전스가 변할 만한 큰 사건이 발생하면 과거와 인과율에 따라 모순 없도록 재구성된다'는 원칙에 해당. 시간 여행이 아닌 현재 행위도 인과에 큰 영향을 미치면 세계선 변동을 일으킨다. (공식 자료집 Q25)" ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity sg:Event_EchelonCracking ;
+    sg:explainsEntity sg:Shift_AlphaToBeta ;
+    sg:relatedTopic
+        sg:Topic_MeasurableWorldLineShift,
+        sg:Topic_SERNSurveillanceRounderRaid .
+
+sg:Topic_NakabachiPaper_SGCondition a sg:ScienceTopic ;
+    sg:id "Topic_NakabachiPaper_SGCondition" ;
+    sg:labelKo "나카바치 논문 소각과 슈타인즈 게이트 세계선 진입 조건" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "슈타인즈 게이트 세계선 진입의 결정적 요인은 나카바치 논문의 소실. 논문이 탄 것은 8월 21일 타임머신을 타고 돌아오기 직전으로, 이 시점에서 슈타인즈 게이트 도달 조건이 충족된다. 스즈하와 타임머신이 사라져야 오카베는 슈타인즈 게이트에 도달한 것이 된다. (공식 자료집 Q27 노트)" ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity sg:WL_1_048596 ;
+    sg:explainsEntity sg:Shift_BetaToSteinsGate ;
+    sg:relatedTopic
+        sg:Topic_Bootstrap_KurisuDeath,
+        sg:Topic_PhysicalTimeTravel_MicroShift .
+
+sg:Topic_PhysicalTimeTravel_MicroShift a sg:ScienceTopic ;
+    sg:id "Topic_PhysicalTimeTravel_MicroShift" ;
+    sg:labelKo "물리적 타임트래블의 미세 세계선 변동" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "물리적 타임트래블은 도약 전후 사이에 0.000001~0.000003% 정도의 세계선 변동을 유발한다. 도약 시간이 길수록 오차가 커진다. 스쿨드 작전 왕복 2회 결과: 출발 1.130205% → 도달 1.130212% (오차 0.000007%). 이 때문에 1차·2차 이동 오카베는 미세하게 다른 세계선에 도착해 동일 시공간에서 마주치지 않는다. (공식 자료집 Q29)" ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity sg:Event_Skuld_Fail_Travel ;
+    sg:explainsEntity sg:Event_OperationSkuldTravel ;
+    sg:explainsEntity sg:Shift_BetaToSteinsGate ;
+    sg:relatedTopic
+        sg:Topic_SubDisplayWorldLineShift,
+        sg:Topic_MicroWorldLineDifference,
+        sg:Topic_NakabachiPaper_SGCondition .
+
+sg:Topic_Bootstrap_KurisuDeath a sg:ScienceTopic ;
+    sg:id "Topic_Bootstrap_KurisuDeath" ;
+    sg:labelKo "크리스 사망의 부트스트랩 패러독스 해소" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "스쿨드 1차 이동에서 오카베가 크리스를 죽인 것은 '가능성의 하나'일 뿐이다. 오카베가 죽이지 않았더라도 마유시 구출 루프처럼 같은 결과(크리스 사망)로 수속된다. 크리스를 한 번 죽인 것이 타임머신 개발의 필요조건이 아니라 가능성 중 하나. 끊임없이 저항한 끝에 최종 성공한 과정만이 본편에 묘사된 것. (공식 자료집 Q30)" ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity sg:Event_Skuld_Fail_KurisuDeath ;
+    sg:explainsEntity sg:CP_KurisuDies_Beta ;
+    sg:relatedTopic
+        sg:Topic_NakabachiPaper_SGCondition,
+        sg:Topic_PhysicalTimeTravel_MicroShift .
+
+
+### 공식 자료집 Q&A 보강 주제
+
+sg:Topic_OmegaNegativeDivergence a sg:ScienceTopic ;
+    sg:id "Topic_OmegaNegativeDivergence" ;
+    sg:labelKo "Ω 세계선의 음수 다이버전스" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "페이리스 엔딩의 세계선 변동률은 -0.275349%의 Ω 세계선이다. 세계선 변동률은 상대 수치라서 음수도 존재하며, 오카베가 만든 다이버전스 미터에는 음수 기호 표시부가 없어 오류처럼 보이는 표시가 발생한다. (공식 자료집 Q16)"@ko ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_WorldLineMechanics ;
+    sg:explainsEntity
+        sg:AF_Omega,
+        sg:WL_Neg_0_275349 ;
+    sg:relatedTopic
+        sg:Topic_ObservedWorldLineCoordinate,
+        sg:Topic_DisplayPrecisionLimit .
+
+sg:Topic_SERNSurveillanceRounderRaid a sg:ScienceTopic ;
+    sg:id "Topic_SERNSurveillanceRounderRaid" ;
+    sg:labelKo "SERN 감시와 라운더 습격 조건" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "알파 세계선에서 SERN 측이 라보를 주시하게 된 직접 계기는 모에카가 D메일과 타임머신 개발 정보를 알고 FB에게 보고한 흐름이다. 첫 D메일은 에셜론에 이미 포착되어 있었지만 감시의 직접 원인은 아니며, 타임리프 머신 완성과 공표 의사가 라운더 습격의 결정타가 된다. (공식 자료집 Q5-Q10)"@ko ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_SERNSurveillance ;
+    sg:explainsEntity
+        sg:Event_FirstDMail,
+        sg:Event_DMail_Moeka,
+        sg:Event_Rescue_LabShot_Attack,
+        sg:Event_TimeLeap_FirstUse ;
+    sg:relatedTopic
+        sg:Topic_EchelonDeletion_WorldLineShift,
+        sg:Topic_AlphaDystopiaVariantFutures .
+
+sg:Topic_IBN5100CustodyChain a sg:ScienceTopic ;
+    sg:id "Topic_IBN5100CustodyChain" ;
+    sg:labelKo "IBN 5100 보관 경로" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "스즈하는 2010년에 IBN 5100이 야나바야시 신사에 있어야 한다는 정보를 알고 있었지만, 라운더의 방해와 장기 보관 문제 때문에 직접 봉납하지 않고 가까운 곳에서 관리하려 했다. 스즈하 사후에는 페이리스의 아버지에게 남긴 유언이 페이리스와 집사에게 이어져 신사 봉납으로 연결된다. (공식 자료집 Q14)"@ko ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_IBN5100Chain ;
+    sg:explainsEntity
+        sg:Event_IBN_Discovery,
+        sg:EV_Alpha_IBN_Search ;
+    sg:relatedTopic
+        sg:Topic_EchelonDeletion_WorldLineShift,
+        sg:Topic_SERNSurveillanceRounderRaid .
+
+sg:Topic_AlphaDystopiaVariantFutures a sg:ScienceTopic ;
+    sg:id "Topic_AlphaDystopiaVariantFutures" ;
+    sg:labelKo "알파 디스토피아와 인물별 미래 차이" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "루카 엔딩 계열에서도 SERN 디스토피아 구축은 확정되지만, 오카베가 타임리프 머신을 파기하면 감시를 받더라도 즉시 죽지는 않는 등 개인의 미래 양상은 달라질 수 있다. 마유리 죽음은 알파 수속 결과지만, 페이리스 아버지의 죽음은 2000년 어트랙터 필드 분기 영향으로 확정되지 않는다. (공식 자료집 Q18, Q21-Q23)"@ko ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_AlphaFutureConvergence ;
+    sg:explainsEntity
+        sg:AF_Alpha,
+        sg:CP_SERNTimeMachineCompleted_Alpha,
+        sg:CP_SERNDystopia_Alpha,
+        sg:CP_MayuriDies_Alpha,
+        sg:EV_Alpha_DMail_Luka_Send ;
+    sg:relatedTopic
+        sg:Topic_SERNSurveillanceRounderRaid,
+        sg:Topic_EventVariationBranching .
+
+sg:Topic_ReadingSteiner2000Branch a sg:ScienceTopic ;
+    sg:id "Topic_ReadingSteiner2000Branch" ;
+    sg:labelKo "2000년 분기와 리딩 슈타이너 각성" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "오카베가 1999년에 고열로 한 달간 쓰러졌던 사건은 리딩 슈타이너 각성과 관련되지만, 각성 이유 자체는 불명이다. 공식 Q&A는 이를 2000년 문제와 관련된 어트랙터 필드의 거대한 분기와 연결해 설명한다. (공식 자료집 Q24)"@ko ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_ReadingSteiner ;
+    sg:relatedTopic
+        sg:Topic_TimeLeapMemoryAccumulation,
+        sg:Topic_SubDisplayWorldLineShift .
+
+sg:Topic_TimeLeapMemoryAccumulation a sg:ScienceTopic ;
+    sg:id "Topic_TimeLeapMemoryAccumulation" ;
+    sg:labelKo "타임리프 기억의 병존 모델" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "타임리프는 과거 오카베의 기억을 단순히 덮어쓰는 것이 아니라 미래의 기억을 떠올리는 방식으로 설명된다. 여러 번의 타임리프 기억은 A와 B처럼 서로 다른 미래 가능성으로 별도 보관되며, 그래서 반복 착신에도 의식이 날아가거나 혼란으로 붕괴하지 않는다. (공식 자료집 Q28)"@ko ;
+    sg:supportedByEvidence sg:Evidence_OfficialQnA_ReadingSteiner ;
+    sg:explainsEntity
+        sg:EV_Alpha_TimeLeap_FirstUse,
+        sg:Event_TimeLeap_FirstUse ;
+    sg:relatedTopic
+        sg:Topic_ReadingSteiner2000Branch,
+        sg:Topic_SubDisplayWorldLineShift .
+
+sg:Topic_DivergenceMeterSignalSource a sg:ScienceTopic ;
+    sg:id "Topic_DivergenceMeterSignalSource" ;
+    sg:labelKo "다이버전스 미터 숫자의 송신원" ;
+    sg:answerLabel "[공식]" ;
+    sg:summary "시쿠라 인터뷰는 다이버전스 미터에 표시되는 숫자가 D메일과 같은 구조로 과거에 송신된 값이라고 설명한다. D메일의 6문자 제한은 전화레인지(임시)의 제한이면서 다이버전스 미터의 소수점 이하 6자리 표시와도 대응하며, 소수점 아래 20자리 수준의 작은 차이에서는 세계선이 거의 수속한다고 설명된다."@ko ;
+    sg:supportedByEvidence
+        sg:Evidence_Famitsu_ShikuraDisplayPrecision,
+        sg:Evidence_Famitsu_ShikuraWorldLayerSync ;
+    sg:explainsEntity
+        sg:WL_0_337187,
+        sg:WL_1_048596 ;
+    sg:relatedTopic
+        sg:Topic_ObservedWorldLineCoordinate,
+        sg:Topic_DisplayPrecisionLimit .
+
+
+### =============================================
+### OWL-DL Axioms: Property Characteristics
+### =============================================
+
+# 인과관계 속성: 비반사적(자기 원인 불가) + 비대칭적(상호 원인 불가)
+sg:causes a owl:IrreflexiveProperty, owl:AsymmetricProperty .
+sg:enables a owl:IrreflexiveProperty .
+sg:prevents a owl:IrreflexiveProperty, owl:AsymmetricProperty .
+
+# 함수형 속성: Event는 정확히 하나의 EventVariation에 속한다
+sg:partOfVariation a owl:FunctionalProperty .
+
+# 함수형 속성: EventVariation은 정확히 하나의 WorldLine에 속한다
+sg:belongsToWorldLine a owl:FunctionalProperty .
+
+# 함수형 속성: WorldLine은 정확히 하나의 AttractorField에 속한다
+sg:belongsToAttractorField a owl:FunctionalProperty .
+
+# WorldLineShift 관계: 각각 함수형
+sg:fromWorldLine a owl:FunctionalProperty .
+sg:toWorldLine a owl:FunctionalProperty .
+sg:triggeredByEvent a owl:FunctionalProperty .
+
+
+### =============================================
+### OWL-DL Axioms: Class Restrictions
+### =============================================
+
+sg:Event rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty sg:partOfVariation ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:eventType ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:mechanismType ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:localDateTime ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] .
+
+sg:EventVariation rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty sg:belongsToWorldLine ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:partOfMacroEvent ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:variationIdentity ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] .
+
+sg:WorldLine rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty sg:belongsToAttractorField ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:divergenceValue ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:isActive ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+sg:WorldLineShift rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty sg:fromWorldLine ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:toWorldLine ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:triggeredByEvent ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ;
+      owl:onProperty sg:shiftMoment ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] .
+
+
+### =============================================
+### SWRL Rules (FOL Horn-clause 표현)
+###
+### 참고: pySHACL은 SWRL을 직접 실행하지 않는다.
+### 동일 의미의 논리 제약은 아래 SHACL 섹션의 SPARQL Constraint로 시행된다.
+### 이 선언은 OWL Reasoner(HermiT/Pellet/OWL-RL) 호환 및 문서화 목적이다.
+### =============================================
+
+### Rule 1 — 인과관계 전이 (Causal Transitivity)
+### FOL: ∀E1,E2,E3 ∈ Event: causes(E1,E2) ∧ causes(E2,E3) → causes(E1,E3)
+
+sg:Rule_CausalTransitivity a swrl:Imp ;
+    swrla:isRuleEnabled "true"^^xsd:boolean ;
+    rdfs:label "인과관계 전이 규칙"@ko ;
+    rdfs:comment "E1이 E2의 원인이고 E2가 E3의 원인이면, E1은 E3의 원인이다."@ko ;
+    swrl:body [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:causes ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "e1"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e2"^^xsd:string ]
+        ] ;
+        rdf:rest [
+            a swrl:AtomList ;
+            rdf:first [
+                a swrl:IndividualPropertyAtom ;
+                swrl:propertyPredicate sg:causes ;
+                swrl:argument1 [ a swrl:Variable ; swrl:varName "e2"^^xsd:string ] ;
+                swrl:argument2 [ a swrl:Variable ; swrl:varName "e3"^^xsd:string ]
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] ;
+    swrl:head [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:causes ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "e1"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e3"^^xsd:string ]
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+
+### Rule 2 — enables 전이 (Enabling Transitivity)
+### FOL: ∀E1,E2,E3 ∈ Event: enables(E1,E2) ∧ enables(E2,E3) → enables(E1,E3)
+
+sg:Rule_EnablingTransitivity a swrl:Imp ;
+    swrla:isRuleEnabled "true"^^xsd:boolean ;
+    rdfs:label "가능화 전이 규칙"@ko ;
+    rdfs:comment "E1이 E2를 가능하게 하고 E2가 E3를 가능하게 하면, E1은 E3를 가능하게 한다."@ko ;
+    swrl:body [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:enables ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "e1"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e2"^^xsd:string ]
+        ] ;
+        rdf:rest [
+            a swrl:AtomList ;
+            rdf:first [
+                a swrl:IndividualPropertyAtom ;
+                swrl:propertyPredicate sg:enables ;
+                swrl:argument1 [ a swrl:Variable ; swrl:varName "e2"^^xsd:string ] ;
+                swrl:argument2 [ a swrl:Variable ; swrl:varName "e3"^^xsd:string ]
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] ;
+    swrl:head [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:enables ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "e1"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e3"^^xsd:string ]
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+
+### Rule 3 — causes → enables 함의
+### FOL: ∀E1,E2 ∈ Event: causes(E1,E2) → enables(E1,E2)
+
+sg:Rule_CausesImpliesEnables a swrl:Imp ;
+    swrla:isRuleEnabled "true"^^xsd:boolean ;
+    rdfs:label "원인 → 가능화 함의 규칙"@ko ;
+    rdfs:comment "E1이 E2의 원인이면 E1은 E2를 가능하게 한다."@ko ;
+    swrl:body [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:causes ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "e1"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e2"^^xsd:string ]
+        ] ;
+        rdf:rest rdf:nil
+    ] ;
+    swrl:head [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:enables ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "e1"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e2"^^xsd:string ]
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+
+### Rule 4 — WorldLineShift 출발 세계선 귀속 추론
+### FOL: ∀S ∈ WorldLineShift, ∀E ∈ Event, ∀EV ∈ EventVariation, ∀WL ∈ WorldLine:
+###   triggeredByEvent(S,E) ∧ partOfVariation(E,EV) ∧ belongsToWorldLine(EV,WL)
+###   → fromWorldLine(S,WL)
+
+sg:Rule_ShiftOriginWorldLine a swrl:Imp ;
+    swrla:isRuleEnabled "true"^^xsd:boolean ;
+    rdfs:label "세계선 이동 출발점 귀속 규칙"@ko ;
+    rdfs:comment """세계선 이동을 유발한 Event가 속한 EventVariation의 WorldLine이
+해당 WorldLineShift의 fromWorldLine이어야 한다."""@ko ;
+    swrl:body [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:triggeredByEvent ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "s"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "e"^^xsd:string ]
+        ] ;
+        rdf:rest [
+            a swrl:AtomList ;
+            rdf:first [
+                a swrl:IndividualPropertyAtom ;
+                swrl:propertyPredicate sg:partOfVariation ;
+                swrl:argument1 [ a swrl:Variable ; swrl:varName "e"^^xsd:string ] ;
+                swrl:argument2 [ a swrl:Variable ; swrl:varName "ev"^^xsd:string ]
+            ] ;
+            rdf:rest [
+                a swrl:AtomList ;
+                rdf:first [
+                    a swrl:IndividualPropertyAtom ;
+                    swrl:propertyPredicate sg:belongsToWorldLine ;
+                    swrl:argument1 [ a swrl:Variable ; swrl:varName "ev"^^xsd:string ] ;
+                    swrl:argument2 [ a swrl:Variable ; swrl:varName "wl"^^xsd:string ]
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] ;
+    swrl:head [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:fromWorldLine ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "s"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "wl"^^xsd:string ]
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+
+### Rule 5 — ConvergencePattern → EventVariation 어트랙터 필드 연결
+### FOL: ∀CP ∈ ConvergencePattern, ∀EV ∈ EventVariation, ∀AF ∈ AttractorField:
+###   hasVariantVariation(CP,EV) ∧ hasConvergencePattern(AF,CP) ∧ belongsToWorldLine(EV,WL)
+###   → hasWorldLine(AF,WL)
+
+sg:Rule_ConvergencePatternWorldLine a swrl:Imp ;
+    swrla:isRuleEnabled "true"^^xsd:boolean ;
+    rdfs:label "수속 패턴 세계선 귀속 규칙"@ko ;
+    rdfs:comment """ConvergencePattern에 속한 EventVariation의 WorldLine은
+해당 ConvergencePattern을 보유한 AttractorField의 WorldLine이어야 한다."""@ko ;
+    swrl:body [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:hasConvergencePattern ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "af"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "cp"^^xsd:string ]
+        ] ;
+        rdf:rest [
+            a swrl:AtomList ;
+            rdf:first [
+                a swrl:IndividualPropertyAtom ;
+                swrl:propertyPredicate sg:hasVariantVariation ;
+                swrl:argument1 [ a swrl:Variable ; swrl:varName "cp"^^xsd:string ] ;
+                swrl:argument2 [ a swrl:Variable ; swrl:varName "ev"^^xsd:string ]
+            ] ;
+            rdf:rest [
+                a swrl:AtomList ;
+                rdf:first [
+                    a swrl:IndividualPropertyAtom ;
+                    swrl:propertyPredicate sg:belongsToWorldLine ;
+                    swrl:argument1 [ a swrl:Variable ; swrl:varName "ev"^^xsd:string ] ;
+                    swrl:argument2 [ a swrl:Variable ; swrl:varName "wl"^^xsd:string ]
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] ;
+    swrl:head [
+        a swrl:AtomList ;
+        rdf:first [
+            a swrl:IndividualPropertyAtom ;
+            swrl:propertyPredicate sg:hasWorldLine ;
+            swrl:argument1 [ a swrl:Variable ; swrl:varName "af"^^xsd:string ] ;
+            swrl:argument2 [ a swrl:Variable ; swrl:varName "wl"^^xsd:string ]
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+
+### =============================================
+### SHACL Shapes
+### =============================================
+
+### Shape 1 — Event 구조 제약
+
+sgsh:EventShape a sh:NodeShape ;
+    sh:targetClass sg:Event ;
+    rdfs:label "Event 구조 제약"@ko ;
+    sh:property [
+        sh:path sg:partOfVariation ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:EventVariation ;
+        sh:message "Event는 반드시 정확히 하나의 EventVariation에 속해야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:eventType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "actual" "intervention" "communication" "travel" "death" ) ;
+        sh:message "eventType은 actual/intervention/communication/travel/death 중 하나여야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:mechanismType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "dmail" "timeleap" "physicaltravel" "videodmail" "none" ) ;
+        sh:message "mechanismType은 dmail/timeleap/physicaltravel/videodmail/none 중 하나여야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:localDateTime ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$" ;
+        sh:message "localDateTime 형식은 YYYY-MM-DD HH:MM 이어야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:timePrecision ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "exact" "approximate" "day" "unknown" ) ;
+        sh:message "timePrecision은 exact/approximate/day/unknown 중 하나여야 한다."@ko
+    ] .
+
+
+### Shape 2 — EventVariation 세계선 논리 제약
+
+sgsh:EventVariationShape a sh:NodeShape ;
+    sh:targetClass sg:EventVariation ;
+    rdfs:label "EventVariation 세계선 논리 제약"@ko ;
+    sh:property [
+        sh:path sg:belongsToWorldLine ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:WorldLine ;
+        sh:message "EventVariation은 반드시 정확히 하나의 WorldLine에 속해야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:partOfMacroEvent ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:MacroEvent ;
+        sh:message "EventVariation은 반드시 정확히 하나의 MacroEvent에 속해야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:variationIdentity ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "variationIdentity는 필수 속성이다."@ko
+    ] .
+
+
+### Shape 3 — WorldLine 구조 제약
+
+sgsh:WorldLineShape a sh:NodeShape ;
+    sh:targetClass sg:WorldLine ;
+    rdfs:label "WorldLine 구조 제약"@ko ;
+    sh:property [
+        sh:path sg:belongsToAttractorField ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:AttractorField ;
+        sh:message "WorldLine은 반드시 정확히 하나의 AttractorField에 속해야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:divergenceValue ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:message "WorldLine에는 divergenceValue가 필요하다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:isActive ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "WorldLine에는 isActive 값이 필요하다."@ko
+    ] .
+
+
+### Shape 4 — WorldLineShift 구조 및 논리 제약
+
+sgsh:WorldLineShiftShape a sh:NodeShape ;
+    sh:targetClass sg:WorldLineShift ;
+    rdfs:label "WorldLineShift 구조 및 논리 제약"@ko ;
+    sh:property [
+        sh:path sg:fromWorldLine ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:WorldLine ;
+        sh:message "WorldLineShift는 반드시 fromWorldLine을 가져야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:toWorldLine ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:WorldLine ;
+        sh:message "WorldLineShift는 반드시 toWorldLine을 가져야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:triggeredByEvent ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class sg:Event ;
+        sh:message "WorldLineShift는 반드시 triggeredByEvent를 가져야 한다."@ko
+    ] ;
+    sh:property [
+        sh:path sg:shiftMoment ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$" ;
+        sh:message "shiftMoment 형식은 YYYY-MM-DD HH:MM 이어야 한다."@ko
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        rdfs:label "출발-도착 세계선 동일성 금지"@ko ;
+        sh:message "WorldLineShift의 fromWorldLine과 toWorldLine이 동일할 수 없다."@ko ;
+        sh:select """
+            PREFIX sg: <http://example.org/steinsgate#>
+            SELECT $this WHERE {
+                $this sg:fromWorldLine ?from ;
+                      sg:toWorldLine ?to .
+                FILTER(?from = ?to)
+            }
+        """
+    ] .
+
+
+### Shape 5 — 인과관계 제약: 자기 causes 금지 (비반사성)
+
+sgsh:NoSelfCausationShape a sh:NodeShape ;
+    sh:targetClass sg:Event ;
+    rdfs:label "자기 인과 금지"@ko ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        rdfs:label "자기 자신을 causes 하는 Event 금지"@ko ;
+        sh:message "Event가 자기 자신을 원인으로 가질 수 없다 (sg:causes 비반사성)."@ko ;
+        sh:select """
+            PREFIX sg: <http://example.org/steinsgate#>
+            SELECT $this WHERE {
+                $this sg:causes $this .
+            }
+        """
+    ] .
+
+
+### Shape 6 — 인과관계 제약: causes 비대칭성 (상호 원인 금지)
+
+sgsh:CausesAsymmetryShape a sh:NodeShape ;
+    sh:targetClass sg:Event ;
+    rdfs:label "인과관계 비대칭성"@ko ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        rdfs:label "상호 causes 금지"@ko ;
+        sh:message "Event E1이 E2의 원인이면 E2는 E1의 원인이 될 수 없다 (sg:causes 비대칭성)."@ko ;
+        sh:select """
+            PREFIX sg: <http://example.org/steinsgate#>
+            SELECT $this WHERE {
+                $this sg:causes ?e2 .
+                ?e2 sg:causes $this .
+                FILTER($this != ?e2)
+            }
+        """
+    ] .
+
+
+
+### Shape 8 — AttractorField: 최소 하나의 WorldLine 보유
+
+sgsh:AttractorFieldShape a sh:NodeShape ;
+    sh:targetClass sg:AttractorField ;
+    rdfs:label "AttractorField 구조 제약"@ko ;
+    sh:property [
+        sh:path sg:hasWorldLine ;
+        sh:minCount 1 ;
+        sh:class sg:WorldLine ;
+        sh:message "AttractorField는 반드시 하나 이상의 WorldLine을 가져야 한다."@ko
+    ] .
+
+
+### Shape 9 — MacroEvent: 최소 하나의 EventVariation 보유
+
+sgsh:MacroEventShape a sh:NodeShape ;
+    sh:targetClass sg:MacroEvent ;
+    rdfs:label "MacroEvent 구조 제약"@ko ;
+    sh:property [
+        sh:path sg:hasVariation ;
+        sh:minCount 1 ;
+        sh:class sg:EventVariation ;
+        sh:message "MacroEvent는 반드시 하나 이상의 EventVariation을 가져야 한다."@ko
+    ] .
