@@ -59,9 +59,9 @@ function parseArgs(argv) {
   }
 
   if (!args.command) {
-    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4> --run-id <id> [--dry-run]');
+    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5> --run-id <id> [--dry-run]');
   }
-  if (!['p1', 'p2', 'p3', 'p4'].includes(args.command)) {
+  if (!['p1', 'p2', 'p3', 'p4', 'p5'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
@@ -305,6 +305,64 @@ function buildP4Prompt(runId) {
 - 완료 시 총 파일 수, fail/warn/pass 건수, 주요 위반 항목 요약을 보고하세요.`;
 }
 
+function buildP5Prompt(runId) {
+  return `파이프라인 5 - 위키 정비를 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-maintenance-lead.md, wiki-restructurer.md, wiki-rewriter.md, source-sanitizer.md 규칙을 준수하세요.
+
+당신은 파이프라인 5의 wiki-maintenance-lead(위키 정비 팀장)입니다.
+
+파이프라인 5는 기존 wiki/*.md 페이지를 정비합니다. 새 페이지를 만들지 않습니다.
+
+목표:
+1. \`find /workspace/wiki -name "*.md"\` 로 전체 파일 목록을 수집하세요.
+2. \`node /workspace/scripts/wiki_work_registry.mjs list\` 로 진행 중인 파일을 확인하고 제외하세요.
+3. 최근 품질 감사 리포트(\`/workspace/.admin/quality-audit-*.json\`)가 있으면 우선 참조해 정비 대상을 선정하세요.
+4. 1회 실행에서 최대 5개 파일을 선정해 순차 처리하세요.
+
+파일당 처리 순서:
+1. registry 예약:
+   node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file wiki/{category}/{slug}.md --topic "p5:maintenance:{slug}"
+   실패 시 해당 파일 건너뜀.
+
+2. wiki-restructurer 에이전트 스폰 → 섹션 구조·헤더·frontmatter 정비.
+   보고가 \`changed: false\`이면 restructurer 단계 완료로 간주.
+
+3. wiki-rewriter 에이전트 스폰 → 문체·표현·용어 일관성 교정.
+   보고가 \`changed: false\`이면 rewriter 단계 완료로 간주.
+
+4. source-sanitizer 에이전트 스폰 → 내부 식별자 누출 검사.
+   fail이면 rewriter에게 최대 1회 재작성 요청. 재작성 후에도 fail이면 git checkout으로 되돌리고 registry release.
+
+5. 팀장 diff 검토:
+   - 사실 관계 변경 없음 확인
+   - 스포일러 등급 변경 없음 확인
+   - source 식별자 미노출 확인
+
+6. 통과 시 commit/push:
+   node /workspace/scripts/wiki_work_registry.mjs status --run-id ${runId} --file wiki/{category}/{slug}.md --status committing
+   git add wiki/{category}/{slug}.md
+   git commit -m "chore(wiki): {slug} 정비 — {변경 요약}"
+   git push
+
+7. registry 정리:
+   완료: node /workspace/scripts/wiki_work_registry.mjs complete --run-id ${runId} --file wiki/{category}/{slug}.md
+   실패: node /workspace/scripts/wiki_work_registry.mjs release --run-id ${runId} --file wiki/{category}/{slug}.md --status rejected
+
+운영 제약:
+- 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- 신규 페이지 생성 금지.
+- 사실 관계·스포일러 등급 변경 금지.
+- sanitizer fail 상태에서 commit 금지.
+- 팀장 diff 검토 없이 commit 금지.
+- 하위 에이전트에게 git commit/push 위임 금지.
+- 내부 경로, chunk ID, source_filter 이름은 공개 위키에 노출하지 마세요.
+- 완료 시 처리 파일 목록, 각 파일의 변경 요약, commit hash 또는 미커밋 사유를 보고하세요.`;
+}
+
 function buildPrompt(command, runId) {
   if (command === 'p1') {
     return buildP1Prompt(runId);
@@ -314,6 +372,9 @@ function buildPrompt(command, runId) {
   }
   if (command === 'p4') {
     return buildP4Prompt(runId);
+  }
+  if (command === 'p5') {
+    return buildP5Prompt(runId);
   }
   return buildP2Prompt(runId);
 }
