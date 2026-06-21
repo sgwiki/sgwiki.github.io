@@ -78,7 +78,7 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
       {/* 느슨한 위키 링크 */}
       {wl && (
         <a
-          href={worldlineWikiUrl(wl.divergence)}
+          href={worldlineWikiUrl(wl)}
           target="_blank"
           rel="noopener noreferrer"
           className="block text-center bg-deep-orange-600 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors"

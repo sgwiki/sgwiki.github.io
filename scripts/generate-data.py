@@ -33,6 +33,7 @@ from rdflib import Graph
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_TTL = REPO_ROOT / "docker/holyclaude/ontology/src/슈타인즈게이트_온톨로지.ttl"
 DEFAULT_OUT = REPO_ROOT / "sg-worldline-map/src/data"
+WIKI_WORLDLINE_DIR = REPO_ROOT / "wiki/세계선"
 
 PREFIXES = """
 PREFIX sg: <http://example.org/steinsgate#>
@@ -77,6 +78,28 @@ def compute_y(af_id: str, divergence: float, siblings_sorted: list[float]) -> in
     span = bottom - top
     step = span / (n - 1) if n > 1 else 0
     return int(round(top + rank * step))
+
+
+def build_wiki_slug_map(wiki_dir: Path) -> dict[str, str]:
+    """wiki/세계선/*.md 파일명에서 발산률 prefix → slug 매핑 생성.
+    파일명 형식: {divergence}-세계선*.md (예: 1.048596-세계선-슈타인즈게이트.md).
+    발산률을 6자리 소수로 정규화해 키로 사용.
+    """
+    result: dict[str, str] = {}
+    if not wiki_dir.exists():
+        return result
+    for p in wiki_dir.glob("*.md"):
+        stem = p.stem  # e.g. "1.048596-세계선-슈타인즈게이트"
+        first = stem.split("-")[0]
+        if not first or not (first[0].isdigit()):
+            continue
+        try:
+            div_val = float(first)
+            key = f"{div_val:.6f}"
+            result[key] = stem
+        except ValueError:
+            continue
+    return result
 
 
 def build_band_meta() -> list[dict]:
@@ -201,6 +224,7 @@ def generate(ttl_path: Path, out_dir: Path) -> dict:
         return rows
 
     # --- WorldLines (Y 좌표 계산 포함) ---
+    wiki_slug_map = build_wiki_slug_map(WIKI_WORLDLINE_DIR)
     wl_raw = run(Q_WORLDLINES)
     # AF별 divergence 정렬 목록
     by_af: dict[str, list[float]] = {}
@@ -212,6 +236,7 @@ def generate(ttl_path: Path, out_dir: Path) -> dict:
 
     worldlines = []
     wl_y_map: dict[str, int] = {}   # worldLineId(local) -> y
+    unmatched_slugs: list[str] = []
     for row in wl_raw:
         wl_local = local(row["wl"])
         af_local = local(row["af"])
@@ -220,6 +245,9 @@ def generate(ttl_path: Path, out_dir: Path) -> dict:
             raise SystemExit(f"Unknown attractor field: {af_local}")
         y = compute_y(af_local, div, by_af[af_local])
         wl_y_map[wl_local] = y
+        slug = wiki_slug_map.get(f"{div:.6f}")
+        if slug is None:
+            unmatched_slugs.append(f"{wl_local} (div={div:.6f})")
         worldlines.append({
             "id": str(row["id"]),
             "uri": wl_local,
@@ -228,8 +256,13 @@ def generate(ttl_path: Path, out_dir: Path) -> dict:
             "isActive": bool(row["active"]),
             "attractorField": af_local,
             "y": y,
+            "wikiSlug": slug,
         })
     worldlines.sort(key=lambda w: w["y"])
+    if unmatched_slugs:
+        print(f"⚠️  wiki slug 미매칭 세계선 {len(unmatched_slugs)}개:", file=sys.stderr)
+        for u in unmatched_slugs:
+            print(f"   {u}", file=sys.stderr)
 
     # --- Events (worldLineId 2홉 평탄화) ---
     events = []

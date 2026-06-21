@@ -6,7 +6,8 @@
     "divergence": -0.275349,
     "isActive": false,
     "attractorField": "AF_Omega",
-    "y": 80
+    "y": 80,
+    "wikiSlug": null
   },
   {
     "id": "WL_0_337187",
@@ -15,7 +16,8 @@
     "divergence": 0.337187,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 150
+    "y": 150,
+    "wikiSlug": "0.337187-세계선"
   },
   {
     "id": "WL_0_409420",
@@ -24,7 +26,8 @@
     "divergence": 0.40942,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 186
+    "y": 186,
+    "wikiSlug": "0.409420-세계선-페이리스-아버지"
   },
   {
     "id": "WL_0_409431",
@@ -33,7 +36,8 @@
     "divergence": 0.409431,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 221
+    "y": 221,
+    "wikiSlug": null
   },
   {
     "id": "WL_0_456903",
@@ -42,7 +46,8 @@
     "divergence": 0.456903,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 257
+    "y": 257,
+    "wikiSlug": "0.456903-세계선-루카-성별"
   },
   {
     "id": "WL_0_456914",
@@ -51,7 +56,8 @@
     "divergence": 0.456914,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 292
+    "y": 292,
+    "wikiSlug": "0.456914-세계선-페이리스-D메일-취소"
   },
   {
     "id": "WL_0_523299",
@@ -60,7 +66,8 @@
     "divergence": 0.523299,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 328
+    "y": 328,
+    "wikiSlug": "0.523299-세계선-모에카"
   },
   {
     "id": "WL_0_523307",
@@ -69,7 +76,8 @@
     "divergence": 0.523307,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 363
+    "y": 363,
+    "wikiSlug": "0.523307-세계선-루카-D메일-취소"
   },
   {
     "id": "WL_0_571015",
@@ -78,7 +86,8 @@
     "divergence": 0.571015,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 399
+    "y": 399,
+    "wikiSlug": "0.571015-세계선-로또6"
   },
   {
     "id": "WL_0_571024",
@@ -87,7 +96,8 @@
     "divergence": 0.571024,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 434
+    "y": 434,
+    "wikiSlug": null
   },
   {
     "id": "WL_0_571046",
@@ -96,7 +106,8 @@
     "divergence": 0.571046,
     "isActive": false,
     "attractorField": "AF_Alpha",
-    "y": 470
+    "y": 470,
+    "wikiSlug": "0.571046-세계선-모에카-D메일-취소"
   },
   {
     "id": "WL_1_048596",
@@ -105,7 +116,8 @@
     "divergence": 1.048596,
     "isActive": true,
     "attractorField": "AF_SteinsGate",
-    "y": 530
+    "y": 530,
+    "wikiSlug": "1.048596-세계선-슈타인즈게이트"
   },
   {
     "id": "WL_1_053649",
@@ -114,7 +126,8 @@
     "divergence": 1.053649,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 600
+    "y": 600,
+    "wikiSlug": "1.053649-세계선-아마데우스-접촉"
   },
   {
     "id": "WL_1_055821",
@@ -123,7 +136,8 @@
     "divergence": 1.055821,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 643
+    "y": 643,
+    "wikiSlug": "1.055821-세계선-리나시멘토"
   },
   {
     "id": "WL_1_064750",
@@ -132,7 +146,8 @@
     "divergence": 1.06475,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 686
+    "y": 686,
+    "wikiSlug": "1.064750-세계선-솔리튜드"
   },
   {
     "id": "WL_1_081163",
@@ -141,7 +156,8 @@
     "divergence": 1.081163,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 729
+    "y": 729,
+    "wikiSlug": "1.081163-세계선-오토마톤"
   },
   {
     "id": "WL_1_123581",
@@ -150,7 +166,8 @@
     "divergence": 1.123581,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 771
+    "y": 771,
+    "wikiSlug": "1.123581-세계선-제로-베타-엔딩"
   },
   {
     "id": "WL_1_130205",
@@ -159,7 +176,8 @@
     "divergence": 1.130205,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 814
+    "y": 814,
+    "wikiSlug": "1.130205-세계선-크리스-사망"
   },
   {
     "id": "WL_1_130209",
@@ -168,7 +186,8 @@
     "divergence": 1.130209,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 857
+    "y": 857,
+    "wikiSlug": "1.130209-세계선-스쿨드-작전-직전"
   },
   {
     "id": "WL_1_130426",
@@ -177,6 +196,7 @@
     "divergence": 1.130426,
     "isActive": false,
     "attractorField": "AF_Beta",
-    "y": 900
+    "y": 900,
+    "wikiSlug": "1.130426-세계선-베타-시작점"
   }
 ]

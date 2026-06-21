@@ -33,6 +33,8 @@ export interface WorldLine {
   isActive: boolean
   attractorField: AttractorFieldId
   y: number           // SVG Y 좌표 (generate-data.py에서 계산)
+  /** wiki/세계선/{slug}/ 문서 slug. 매칭 실패 시 null (검색 폴백). */
+  wikiSlug?: string | null
 }
 
 export type EventType =

@@ -103,25 +103,17 @@ export const EVENT_ICON: Record<EventType, string> = {
   actual: '#icon-dot',
 }
 
-// ─── 위키 링크 빌더 (느슨한 양방향 링크) ─────────────────────────────
+// ─── 위키 링크 빌더 ──────────────────────────────────────────────────
 /**
- * 세계선 id → 위키 문서 경로. wiki/세계선/ 아래 slug는 기존 파일명 규칙을 따름.
- * 예: WL_1_130426 → /세계선/1.130426-세계선-베타-시작점/
- * 정확한 slug 매핑은 별도 manifest로 관리 가능하지만, v1은 발산률 기반 추정.
+ * 세계선 → 위키 문서 URL.
+ * wikiSlug가 있으면 정확한 문서로, 없으면 검색 폴백.
  */
-export function worldlineWikiUrl(divergence: number): string {
-  // 기존 위키 파일명 패턴: {divergence}-세계선-*.md
-  // 발산률을 6자리로 정규화
-  const divStr = divergence < 0
-    ? `Neg_${Math.abs(divergence).toFixed(6).replace('.', '_')}`
-    : divergence.toFixed(6).replace('.', '_')
-  // 정확 매핑은 위키에 물어봐야 하지만, v1은 세계선 디렉토리로 보내고 사용자가 검색
-  return `/세계선/#${divStr}`
-}
-
-export function eventWikiAnchor(eventId: string): string {
-  // 이벤트 id → 관련 위키 문서 앵커 (느슨한 연결)
-  return `/lore/#${eventId}`
+export function worldlineWikiUrl(wl: { divergence: number; wikiSlug?: string | null }): string {
+  if (wl.wikiSlug) {
+    return `/세계선/${wl.wikiSlug}/`
+  }
+  // slug 미등록 → 검색 페이지 폴백
+  return `/search/?q=${encodeURIComponent(wl.divergence.toFixed(6))}`
 }
 
 // ─── 데이터 검증 (런타임 안전망) ─────────────────────────────────────

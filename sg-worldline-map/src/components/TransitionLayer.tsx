@@ -5,7 +5,7 @@
  */
 
 import type { WorldLineShift } from '@/types/ontology'
-import { shiftColor } from '@/lib/scales'
+import { shiftColor, SHIFT_COLOR } from '@/lib/scales'
 
 interface Props {
   shifts: WorldLineShift[]
@@ -40,7 +40,8 @@ export function TransitionLayer({ shifts, x, highlightedShiftId, onSelectShift }
               strokeWidth={isHighlighted ? 4 : 2.5}
               fill="none"
               opacity={opacity}
-              markerEnd="url(#arrowhead)"
+              color={color}
+              markerEnd={`url(#arrowhead-${s.shiftType in SHIFT_COLOR ? s.shiftType.replace(/\+/g, '-') : 'default'})`}
               style={
                 isHighlighted
                   ? { filter: `drop-shadow(0 0 4px ${color})` }
@@ -50,17 +51,30 @@ export function TransitionLayer({ shifts, x, highlightedShiftId, onSelectShift }
           </g>
         )
       })}
-      {/* 화살표 마커 정의 */}
+      {/* 화살표 마커 — shiftType별 색상 */}
       <defs>
+        {Object.entries(SHIFT_COLOR).map(([type, c]) => (
+          <marker
+            key={type}
+            id={`arrowhead-${type.replace(/\+/g, '-')}`}
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="4"
+            orient="auto"
+          >
+            <path d="M 0,0 L 8,4 L 0,8 z" fill={c} />
+          </marker>
+        ))}
         <marker
-          id="arrowhead"
+          id="arrowhead-default"
           markerWidth="8"
           markerHeight="8"
-          refX="4"
+          refX="6"
           refY="4"
           orient="auto"
         >
-          <path d="M 0,0 L 8,4 L 0,8 z" fill="currentColor" />
+          <path d="M 0,0 L 8,4 L 0,8 z" fill="#94a3b8" />
         </marker>
       </defs>
     </g>

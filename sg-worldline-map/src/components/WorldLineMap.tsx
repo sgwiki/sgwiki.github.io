@@ -14,6 +14,7 @@ import { WorldLineLayer } from './WorldLineLayer'
 import { TransitionLayer } from './TransitionLayer'
 import { EventLayer } from './EventLayer'
 import { ConvergenceLayer } from './ConvergenceLayer'
+import { Legend } from './Legend'
 
 interface Props {
   dataset: SeriesDataset
@@ -134,6 +135,9 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
       >
         ⟲ 초기 화면
       </button>
+
+      {/* 범례 */}
+      <Legend />
 
       {/* 현재 줌 표시 */}
       <div className="absolute bottom-3 left-3 text-xs text-slate-500 bg-slate-900/60 px-2 py-1 rounded">
