@@ -1,5 +1,6 @@
 ---
 spoiler: endgame
+description: "Z 프로그램(Z-Program, ゼットプログラム)은 《Steins;Gate》 세계관에서 SERN이 1973년에 입안한 타임머신 개발 극비 계획의 총칭이다."
 ---
 
 !!! warning "스포일러 (endgame)"

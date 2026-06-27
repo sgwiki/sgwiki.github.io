@@ -3,6 +3,7 @@ slug: faris-father-dmail-cancellation
 date: 2026-06-20
 category: lore
 spoiler: main_story
+description: "슈타인즈;게이트 본편 챕터 7에 해당하는 이 에피소드는, 알파 어트랙터 필드 안에서 일어나는 가장 감정적으로 무거운 D-메일 사건 중 하나로 꼽힌다."
 ---
 
 !!! warning "스포일러"

@@ -3,6 +3,7 @@ title: 첫 번째 D메일 (First D-Mail)
 category: lore
 tags: [dmail, echelon, sern, alpha-worldline, beta-worldline, kurisu, okabe, spoiler-endgame]
 spoiler: endgame
+description: "첫 번째 D메일은 2010년 7월 28일 아키하바라 라디오 회관 8층 옥상에서 오카베 린타로가 마키세 크리스의 피살 현장을 목격한 뒤, 하시다 이타루(다루)의 휴대전화로 보낸 단문 메시지가 전화렌지(가칭)에 의해 우발적으로 과거로 전송된 사건을 가리킨다."
 ---
 
 !!! warning "스포일러"

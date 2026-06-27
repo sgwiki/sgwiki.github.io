@@ -1,5 +1,6 @@
 ---
 spoiler: endgame
+description: "우리의 마지막 원칙은 간단합니다. 가능한 경우, 세상은 시간 여행이 자체 일관성 있는 닫힌 루프를 형성하도록 배열할 것입니다."
 ---
 
 !!! warning "스포일러 — endgame"

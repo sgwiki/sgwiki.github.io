@@ -1,5 +1,6 @@
 ---
 spoiler: main_story
+description: "SERN(세른)이 지하에 설치한 LHC(대형 강입자 충돌기, Large Hadron Collider)로 생성하는 미니 블랙홀(마이크로 블랙홀)과, 이를 회전시켜 구현하는 Kerr 블랙홀(회전 블랙홀)의 설정이 《Steins;Gate》 시리즈의 시간 이동 기술 전반의 기반을 이룬다."
 ---
 
 !!! warning "스포일러"

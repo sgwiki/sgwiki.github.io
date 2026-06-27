@@ -1,5 +1,6 @@
 ---
 spoiler: late_story
+description: "D-RINE(디-라인, Dライン)은 《Steins;Gate 0》에 등장하는 D메일의"
 ---
 
 !!! warning "스포일러"

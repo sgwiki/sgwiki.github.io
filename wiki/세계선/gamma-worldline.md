@@ -1,5 +1,6 @@
 ---
 spoiler: endgame
+description: "감마 세계선은 알파(α), 베타(β)에 이은 세 번째 어트랙터 필드에 속하는 세계선으로,"
 ---
 
 !!! warning "스포일러"

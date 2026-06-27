@@ -1,5 +1,6 @@
 ---
 spoiler: zero_story
+description: "DURPA(더파)는 《Steins;Gate 0》의 β 어트랙터 필드 서사에 등장하는 가공의 미국 국방부 산하 연구 기관이다. 현실의 미국 국방고등연구계획국(DARPA, Defense Advanced Research Projects Agency)을 모티브로 삼아 허구화한 조직으로,"
 ---
 
 !!! warning "스포일러"

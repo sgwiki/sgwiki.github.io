@@ -1,5 +1,6 @@
 ---
 spoiler: endgame
+description: "이 문서는 오카베 린타로가 《Steins;Gate 0》 시점에서 겪는 외상후 스트레스 장애(PTSD)와"
 ---
 
 !!! warning "스포일러 (endgame)"
