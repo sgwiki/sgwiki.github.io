@@ -6,6 +6,7 @@ on:
     paths:
       - "wiki/**"
       - "mkdocs.yml"
+      - "overrides/**"
       - "sg-worldline-map/**"
       - "scripts/generate-data.py"
       - "docker/holyclaude/ontology/**"
