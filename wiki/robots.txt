@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sgwiki.github.io/sitemap.xml

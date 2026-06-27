@@ -4,6 +4,7 @@ site_description: 슈타인즈 게이트 공식·팬 분석 한국어 위키
 
 theme:
   name: material
+  custom_dir: overrides
   language: ko
   features:
     - content.code.copy

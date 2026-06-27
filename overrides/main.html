@@ -1,0 +1,45 @@
+{#-
+  SEO 오버라이드: Open Graph + Twitter 카드 + JSON-LD 구조화 데이터.
+  base.html의 extrahead 블록만 확장하므로 다른 테마 동작(맵 버튼 등)에 영향 없음.
+  Material 9.7.6 기준 변수: page.title / page.meta.description / page.canonical_url / config.*
+-#}
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {%- set _title = page.title if page.title else config.site_name %}
+  {%- set _desc = page.meta.description if page.meta and page.meta.description else config.site_description %}
+  {%- set _url = page.canonical_url if page.canonical_url else config.site_url %}
+  {%- set _img = config.site_url ~ "assets/og-default.png" %}
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="{{ _title }}">
+  <meta property="og:description" content="{{ _desc }}">
+  <meta property="og:url" content="{{ _url }}">
+  <meta property="og:image" content="{{ _img }}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ _title }}">
+  <meta name="twitter:description" content="{{ _desc }}">
+  <meta name="twitter:image" content="{{ _img }}">
+
+  <!-- JSON-LD -->
+  {%- set _ld = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": _title,
+    "description": _desc,
+    "url": _url,
+    "inLanguage": "ko",
+    "image": _img,
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": config.site_name,
+      "url": config.site_url
+    }
+  } %}
+  <script type="application/ld+json">{{ _ld | tojson }}</script>
+{% endblock %}
