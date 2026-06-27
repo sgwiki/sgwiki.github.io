@@ -91,12 +91,12 @@ spoiler: endgame
 
 ## 연관 문서
 
-- [시이나 마유리](../characters/mayuri-shiina.md)
-- [어트랙터 필드](../lore/attractor-field.md)
-- [알파 세계선](../lore/alpha-worldline.md)
-- [베르단디 작전](../lore/operation-verdandi.md)
-- [마유리의 사망 수속](../lore/mayuri-death-convergence.md)
-- [라운더](../organization/rounders.md)
+- [시이나 마유리](../캐릭터/시이나-마유리.md)
+- [어트랙터 필드](../lore/어트랙터-필드와-수속.md)
+- [알파 세계선](../세계선/알파-어트랙터-필드.md)
+- [베르단디 작전](../lore/오퍼레이션-베르단디.md)
+- [마유리의 사망 수속](../lore/마유리-사망-수속.md)
+- [라운더](../organization/rounder.md)
 
 ## 인용 출처
 

@@ -205,16 +205,16 @@ SG 세계선 소속 여부는 불명이다.
 
 - [미래 가젯 연구소](../organization/future-gadget-laboratory.md)
 - [300인 위원회](../organization/committee-of-300.md)
-- [SERN](../organization/sern.md)
+- [SERN](../lore/SERN.md)
 - [DURPA](../organization/durpa.md)
 - [Stratfor](../organization/stratfor.md)
-- [노스탤지어 드라이브 (ND메일)](../technology/nostalgia-drive.md)
-- [오퍼레이션 아크라이트](../events/operation-arclight.md)
-- [오퍼레이션 스쿨드](../events/operation-skuld.md)
-- [오퍼레이션 발할라](../events/operation-valhalla.md)
-- [아마네 스즈하](../characters/amanne-suzuha.md)
-- [하시다 이타루](../characters/hashida-itaru.md)
-- [아마네 유키](../characters/amanne-yuki.md)
+- [노스탤지어 드라이브 (ND메일)](../lore/노스탤지어-드라이브.md)
+- [오퍼레이션 아크라이트](../lore/오퍼레이션-아크라이트.md)
+- [오퍼레이션 스쿨드](../lore/오퍼레이션-스쿨드.md)
+- 오퍼레이션 발할라
+- [아마네 스즈하](../캐릭터/아마네-스즈하.md)
+- [하시다 이타루](../캐릭터/하시다-이타루.md)
+- [아마네 유키](../캐릭터/아마네-유키.md)
 
 ## 인용 출처
 

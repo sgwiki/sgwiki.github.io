@@ -57,7 +57,7 @@ spoiler: main_story
 
 ## 관련 문서
 
-- [SERN](../organization/sern.md)
-- [유고 박사](../person/yugo.md)
-- [마키사 히스토릉](../person/makise_kurisu.md)
-- [시간 여행](../concept/time_travel.md)
+- [SERN](../lore/SERN.md)
+- [텐노지 유고](../캐릭터/텐노지-유고.md)
+- [마키세 크리스](../캐릭터/마키세-크리스.md)
+- [시간 여행](../lore/시간여행-방법-비교.md)
