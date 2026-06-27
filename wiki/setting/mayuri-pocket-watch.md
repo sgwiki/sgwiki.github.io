@@ -47,7 +47,7 @@ spoiler: endgame
 
 ## 상징 해석
 
-> **[팬 분석]** "알파 어트랙터 필드 내에서는 마유리가 얼마나 다양한 경로를 거치든 결국 같은 시각에 사망에 이른다. 시간 측정 도구가 동시에 정지하는 연출은, 이 수속이 마치 시간 자체가 멈추어 결과를 고정시키는 것처럼 불가항력적임을 시각적으로 표현한다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.4.1 Gel Mayuri[^1]
+> **[팬 분석]** "알파 어트랙터 필드 내에서는 마유리가 얼마나 다양한 경로를 거치든 결국 같은 시각에 사망에 이른다. 시간 측정 도구가 동시에 정지하는 연출은, 이 수속이 마치 시간 자체가 멈추어 결과를 고정시키는 것처럼 불가항력적임을 시각적으로 표현한다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), §2.4.1 Gel Mayuri[^1]
 
 ### 불길한 징조와 SERN의 시간 통제
 
@@ -100,4 +100,4 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §2.4.1 Gel Mayuri 및 §2.1 Attractor Field Theory 요약
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md) — §2.4.1 Gel Mayuri 및 §2.1 Attractor Field Theory 요약

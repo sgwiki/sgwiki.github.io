@@ -124,6 +124,7 @@ wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-r
 - 근거 체계·문서 구조 템플릿은 `wiki/README.md`와 `wiki/_template/`.
 - `wiki/캐릭터/`와 `wiki/lore/` 파일명은 한국어 독자를 기준으로 한 실제 작품 통용 명칭을 사용한다. 단, `SERN`, `D-RINE`, `D메일`, `IBN 5100`처럼 한국어 팬덤에서 원문·약어 표기가 통용되는 항목은 그 표기를 유지한다.
 - 위키 파일명을 바꿀 때는 먼저 기존 내부 링크를 조사하고, 파일 이동과 동시에 모든 Markdown 상대 링크를 새 경로로 갱신한다. 변경 후 템플릿을 제외한 실사용 내부 링크가 깨지지 않는지 확인하고 `make wiki-build`를 통과시킨다.
+- `The Mechanics of Steins;Gate v1.0.3` 인용은 GitHub PDF URL로 되돌리지 말고 `wiki/근거자료/비공식/mechanics-of-steins-gate/`의 로컬 번역본에 연결한다. 절 번호의 첫 자리로 `ch1.md`~`ch4.md`를 고르고, 로컬 번역본에 대응 장이 없는 부록성 인용만 `index.md`에 연결한다.
 - **직접 인용·식별자 노출 위반은 가장 흔한 reject 원인**. `sg_game_sge`·`sg_game_sg0_en` 모두 간접 사용(파라프레이즈)만 허용되며, 원문 블록 직접 인용·소스명·파일명·chunk ID 노출 시 reject.
 
 ## 코드 변경 시 주의

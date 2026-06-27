@@ -317,4 +317,4 @@ D-RINE과 자주 혼동되거나 함께 언급되는 개념으로
 - [오카베 린타로](../캐릭터/오카베-린타로.md) · [미래 오카베](../캐릭터/미래의-오카베-린타로.md) —
   D-RINE의 발신과 수신 양쪽 주체.
 - [슈타인즈 게이트 세계선](슈타인즈-게이트-세계선.md) — D-RINE이 열어주는 도달처.
-- [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — 시간 통신 계열 변형의 메커니즘 정리.
+- [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) — 시간 통신 계열 변형의 메커니즘 정리.

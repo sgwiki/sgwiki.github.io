@@ -50,7 +50,7 @@ spoiler: endgame
 
     최초의 D메일 이후 세계선이 베타에서 알파로 이동하면, 아키하바라는 여전히 라보멤의 활동 무대가 되지만 동시에 마유리 사망이 수속되는 비극의 현장이 된다. 크리스를 중심으로 타임 리프 머신이 완성되고, 오카베은 아키하바라 거리를 무대로 마유리를 살리기 위한 시간 리프를 반복한다. 크리스가 제시한 "기억 전송은 48시간 이내"라는 한계는 아키하바라에서의 일상과 비극이 교차하는 시간 구조의 뼈대를 형성한다.
 
-    > **[팬 분석]** 타임 리프의 48시간 한계는 뇌 구조의 유사성과 장비의 불완전함이 결합된 결과로 해석된다. 하시다 이타루(다루)가 이후 하드웨어를 개선하면 두 주까지 연장할 수 있다. — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §3.2.1[^1]
+    > **[팬 분석]** 타임 리프의 48시간 한계는 뇌 구조의 유사성과 장비의 불완전함이 결합된 결과로 해석된다. 하시다 이타루(다루)가 이후 하드웨어를 개선하면 두 주까지 연장할 수 있다. — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), §3.2.1[^1]
 
     ### 라운더의 라보 습격과 아키하바라 탈출 시도
 
@@ -68,7 +68,7 @@ spoiler: endgame
 
     최종적으로 오퍼레이션 스쿨드가 성공하면, 오카베은 1.048596% 슈타인즈 게이트 세계선에 도달한다. 이 세계선에서도 아키하바라는 사라지지 않는다. 라보는 여전히 오오히야마 빌딩 2층에 존재하며, 라보멤의 인연은 아키하바라라는 지리적 근접성을 통해 수속된다. 다루가 메이퀸이 사라진 세계선에서도 라보멤이 되는 것은 "도보 3분 거리"라는 인연의 수속으로 해석되며, 아키하바라라는 토지 자체가 인물 간 결속의 물리적 조건이 되는 셈이다.
 
-    > **[팬 분석]** 슈타인즈 게이트 세계선은 알파·베타 어트랙터 필드의 경계에 위치한 "골짜기"로, 어느 쪽으로도 쉽게 수속되지 않는 안정적 영역이다. — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §3.1.1[^2]
+    > **[팬 분석]** 슈타인즈 게이트 세계선은 알파·베타 어트랙터 필드의 경계에 위치한 "골짜기"로, 어느 쪽으로도 쉽게 수속되지 않는 안정적 영역이다. — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), §3.1.1[^2]
 
 ## 주요 장소
 
@@ -114,6 +114,6 @@ spoiler: endgame
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) §3.2.1 — 타임 리프 48시간 한계와 그 기술적 원인 요약.
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) §3.2.1 — 타임 리프 48시간 한계와 그 기술적 원인 요약.
 
-[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) §3.1.1 — 슈타인즈 게이트 세계선의 어트랙터 필드 경계 해석 요약.
+[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) §3.1.1 — 슈타인즈 게이트 세계선의 어트랙터 필드 경계 해석 요약.

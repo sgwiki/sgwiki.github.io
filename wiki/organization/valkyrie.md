@@ -83,7 +83,7 @@ spoiler: endgame
 > [팬 분석] "왈큐레의 핵심 인원은 라보멤들을 그대로 계승한다. α 세계선에서는
 > 히야죠 마호가 본명을 감추고 '크리스'라는 코드네임으로 합류해 타임머신 개발에
 > 중요한 역할을 수행했으며, β 세계선에서는 마유리·루카·페이리스까지 가세한
-> 전원 체제로 운영된다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §3.3.1[^1]
+> 전원 체제로 운영된다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), §3.3.1[^1]
 
 ## 본부 위치
 
@@ -135,7 +135,7 @@ spoiler: endgame
 > 수 있었으며, 이는 스즈하가 그 수치를 알고 있었다는 점에서 뒷받침된다.
 > 따라서 그들이 오카베의 크리스 구출 실패 결과 세계선(1.130209%)의 수치도
 > 알고 있었고, 메일이 그곳에서만 열리도록 암호화한 것은 충분히 설득력 있는
-> 해석이다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §3.2.2[^3]
+> 해석이다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), §3.2.2[^3]
 
 ## 주요 작전과의 연결
 
@@ -199,7 +199,7 @@ SG 세계선 소속 여부는 불명이다.
 > 세계선 경험 위에 놓인다. α에서 다이버전스 미터를 개발하고 어트랙터 필드
 > 경계를 1% 부근으로 예측한 뒤, β에서 완성형 타임머신과 영상 D메일을
 > 완성하는 일련의 흐름은 동일 인물·동일 연구소의 연속적 기술 축적으로
-> 해석할 수 있다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §3.3.1[^1]
+> 해석할 수 있다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), §3.3.1[^1]
 
 ## 관련 문서
 
@@ -218,6 +218,6 @@ SG 세계선 소속 여부는 불명이다.
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §3.3.1 Series Chronology II, Future Gadget Lab 기술 발전사 및 발키리 연계 해석 요약
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) — §3.3.1 Series Chronology II, Future Gadget Lab 기술 발전사 및 발키리 연계 해석 요약
 [^2]: 세계선 인과 분석 결과, 2025년에 라보멤들이 녹화한 노스탤지어 드라이브(ND메일) 영상이 2010년 오카베에게 전달되어 확인되는 인과 사슬을 통해, 그 정보가 스쿨드 작전(과거 이동)을 가능하게 했으며, 이 작전의 성공이 베타 어트랙터 필드에서 슈타인즈 게이트 세계선으로의 이동을 유도한다는 사슬이 검증되었다.
-[^3]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §3.2.2 Video D-mail Mechanics, 다이버전스 정밀 계량과 영상 D메일 암호화 이론 요약
+[^3]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) — §3.2.2 Video D-mail Mechanics, 다이버전스 정밀 계량과 영상 D메일 암호화 이론 요약

@@ -26,7 +26,7 @@ spoiler: endgame
 
 이 OVA는 본편 24화에서 오카베 린타로가 스쿨드 작전(Operation Skuld)을 완수하고 슈타인즈 게이트 세계선(1.048596%)에 도달한 직후의 이야기를 다룹니다. 슈타인즈 게이트 세계선은 알파 어트랙터 필드와 베타 어트랙터 필드 사이의 경계에 위치한 미지의 세계선으로, 두 수렴 미래(SERN의 디스토피아, 제3차 세계 대전) 중 어느 쪽으로도 빠지지 않는 평화로운 미래의 가능성을 열어둔 세계선입니다.
 
-> **[팬 분석]** "슈타인즈 게이트 진입의 결정적 요인은 나카바치 논문의 소각이며, 이 조건은 8월 21일 타임머신으로 돌아오기 직전에 충족된다. 스즈하와 타임머신이 사라져야 오카베는 슈타인즈 게이트에 도달한 것으로 확정된다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §3.1.3 스쿨드 작전[^1]
+> **[팬 분석]** "슈타인즈 게이트 진입의 결정적 요인은 나카바치 논문의 소각이며, 이 조건은 8월 21일 타임머신으로 돌아오기 직전에 충족된다. 스즈하와 타임머신이 사라져야 오카베는 슈타인즈 게이트에 도달한 것으로 확정된다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md), §3.1.3 스쿨드 작전[^1]
 
 이 메커니즘이 완료된 이후의 일상 후일담이 바로 폴리오매니아 OVA입니다.
 
@@ -39,7 +39,7 @@ spoiler: endgame
 - 하시다 이타루(다루)의 아내가 등장하는 등, 본편에서 직접 다루지 않았던 라보 멤버들의 후일담이 짧게나마 소개됩니다.
 - 발렌타인데이를 소재로 한 일상 장면도 포함되어 있어, 전반적으로 크리스와 오카베의 관계 발전을 중심으로 한 팬 서비스적 요소가 강합니다.
 
-> **[팬 분석]** "OVA에는 오카베와 크리스가 약간 꽁냥대는 장면과 다루의 아내가 등장하는 내용이 있으며, 발렌타인 데이와 미국 여행 내용이 포함되어 있다. 크리스를 좋아한다면 꼭 봐야 하고, 완벽한 해피엔딩으로 끝맺음하고 싶을 때 추천된다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.6.1 시리즈 연대기[^2]
+> **[팬 분석]** "OVA에는 오카베와 크리스가 약간 꽁냥대는 장면과 다루의 아내가 등장하는 내용이 있으며, 발렌타인 데이와 미국 여행 내용이 포함되어 있다. 크리스를 좋아한다면 꼭 봐야 하고, 완벽한 해피엔딩으로 끝맺음하고 싶을 때 추천된다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), §2.6.1 시리즈 연대기[^2]
 
 ### 시청 가이드
 
@@ -127,5 +127,5 @@ OVA·스페셜이 시리즈 전체에서 차지하는 위치를 정리하면 다
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §3.1.3 스쿨드 작전: 슈타인즈 게이트 세계선(1.048596%) 도달 메커니즘 및 나카바치 논문 소각 조건
-[^2]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §2.6.1 시리즈 연대기: OVA·극장판 등 후속 자료 위치 및 슈타인즈 게이트 도달 이후 서사 정리
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch3.md) — §3.1.3 스쿨드 작전: 슈타인즈 게이트 세계선(1.048596%) 도달 메커니즘 및 나카바치 논문 소각 조건
+[^2]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md) — §2.6.1 시리즈 연대기: OVA·극장판 등 후속 자료 위치 및 슈타인즈 게이트 도달 이후 서사 정리

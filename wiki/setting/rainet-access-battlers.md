@@ -96,7 +96,7 @@ spoiler: main_story
 
 본편 제6장에서 다루(하시다 이타루)는 라이넷 액세스 배틀러스의 승부를 조작하기 위해 D메일을 이용해 과거로 정보를 보내려 시도한다. 그러나 결과는 실패로 끝난다.
 
-> **[팬 분석]** 다루가 D메일로 라이넷 시합 결과를 조작하려 시도한 사례는, 왜 D메일이 기술이 아닌 운이 지배하는 게임에서는 신뢰할 수 있는 예측을 만들어낼 수 없는지를 보여주는 가장 명확한 사례 중 하나로 분석된다. 운 요소가 극히 적기 때문에 단서 하나가 만들어내는 나비효과만으로는 페이리스와 대전 상대 사이의 실력 격차를 뒤집기에 충분하지 않다는 것이다. — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.5.1[^1]
+> **[팬 분석]** 다루가 D메일로 라이넷 시합 결과를 조작하려 시도한 사례는, 왜 D메일이 기술이 아닌 운이 지배하는 게임에서는 신뢰할 수 있는 예측을 만들어낼 수 없는지를 보여주는 가장 명확한 사례 중 하나로 분석된다. 운 요소가 극히 적기 때문에 단서 하나가 만들어내는 나비효과만으로는 페이리스와 대전 상대 사이의 실력 격차를 뒤집기에 충분하지 않다는 것이다. — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), §2.5.1[^1]
 
 즉, 라이넷 액세스 배틀러스는 운 의존도가 매우 낮기 때문에 D메일 한 통으로 결과를 뒤집기 어렵다는 점이 본편의 중요한 설정적 함의로 작용한다. 이는 "D메일이면 뭐든 바꿀 수 있다"는 단순한 기대를 정정하고, 게임의 승패가 플레이어 역량에 좌우된다는 점을 강조한다.
 
@@ -142,4 +142,4 @@ spoiler: main_story
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.5.1 — D메일을 통한 라이넷 시합 조작 시도의 한계 분석.
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), §2.5.1 — D메일을 통한 라이넷 시합 조작 시도의 한계 분석.

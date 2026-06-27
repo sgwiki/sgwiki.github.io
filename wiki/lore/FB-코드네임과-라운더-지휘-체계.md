@@ -85,7 +85,7 @@ FB가 모에카에게 행한 심리 지배는 일반적으로 **가스라이팅*
 
 텐노지 본인은 IBN 5100 회수 임무를 완수한 뒤 자신이 '처분'될 것이라는 사실을 알고 있었다. 그는 모에카에게 "IBN 5100을 손에 넣은 시점에서 넌 이미 필요 없어졌다"고 말하는데, 이 발언은 모에카에 대한 선언이자 자신의 처지에 대한 자인(自認)이기도 하다. 라운더 조직에서 임무를 달성한 말단은 예외 없이 입막음 대상이며, FB라는 중간 지휘자 역시 마찬가지다.
 
-> **[팬 분석]** "임무를 완수하면 '처분'당하게 돼. 그래서 우리는 개보다 가축에 가까워." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.6.3[^1]
+> **[팬 분석]** "임무를 완수하면 '처분'당하게 돼. 그래서 우리는 개보다 가축에 가까워." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), §2.6.3[^1]
 
 이 '임무 완수 = 소멸' 구조는 FB가 말단 조직원과 본질적으로 다를 것이 없는 소모품임을 보여준다. FB는 지휘자라는 위치에 있으면서도, 탈출구 없는 함정에 갇혀 있다.
 
@@ -136,4 +136,4 @@ FB가 모에카에게 행한 심리 지배는 일반적으로 **가스라이팅*
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §2.6.3 '모에카의 D-메일 되돌리기' 요약
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md) — §2.6.3 '모에카의 D-메일 되돌리기' 요약
