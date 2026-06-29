@@ -44,5 +44,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "claude-mem@thedotmack": true
   }
 }

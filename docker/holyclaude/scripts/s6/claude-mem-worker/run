@@ -1,0 +1,18 @@
+#!/command/with-contenv sh
+# ==============================================================================
+# s6-overlay longrun: claude-mem worker (HTTP API + observation capture).
+#
+# Supervised by s6 — auto-restarted on crash, started at container boot.
+# The entrypoint wrapper provisions the plugin (marketplace + enabledPlugins)
+# BEFORE s6 starts, so the worker finds claude-mem already installed.
+#
+# Runtime config is supplied via environment (docker-compose):
+#   CLAUDE_MEM_MODEL        summarization model (glm-5.2 — Z.AI routing)
+#   CLAUDE_MEM_WORKER_HOST  0.0.0.0 so the port-forward reaches the host browser
+#   CLAUDE_MEM_WORKER_PORT  pinned to 37700 (default drifts with uid)
+# ==============================================================================
+export HOME=/home/claude
+# `claude-mem start` (no flag) spawns a DETACHED daemon and exits, which makes
+# s6 restart-loop. `--daemon` IS the foreground worker — s6 supervises it
+# directly, giving proper crash-restart with no churn.
+exec s6-setuidgid claude npx claude-mem start --daemon

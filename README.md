@@ -105,7 +105,7 @@ make shell           # 컨테이너 bash 접속
 
 | 서비스 | 포트 | 역할 |
 |---|---|---|
-| `sg-wiki-holyclaude` | 3001 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) |
+| `sg-wiki-holyclaude` | 3001 · 37700 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) · [claude-mem 메모리 뷰어](#에이전트-메모리-claude-mem) |
 | `sg-wiki-admin` | 3002 | 관리 UI — cron 스케줄 · 수동 트리거 · 실행 현황 · 검토 |
 | `sg-wiki-ontology-http` | 8093 | P1 커버리지용 sg-ontology HTTP MCP bridge |
 
@@ -117,6 +117,18 @@ make shell           # 컨테이너 bash 접속
 - **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 대기 작업 순번·취소
 - 새로 작성되거나 변경된 `wiki/*.md` 페이지 검토: 보기 · 승인 · 거부
 - 제안 자동 처리: `suggestions/inbox/` 수신 제안과 파이프라인 2 자동 판정·작성 로그 (`GET /suggestions`)
+
+### 에이전트 메모리 (claude-mem)
+
+`sg-wiki-holyclaude` 컨테이너에 [claude-mem](https://github.com/thedotmack/claude-mem) 영속 메모리가 통합돼 있습니다. 에이전트 세션의 도구 호출·편집·명령이 자동으로 observation으로 캡처·요약되어 다음 세션에 맥락으로 주입됩니다.
+
+- **뷰어**: `http://localhost:37700` — 메모리 스트림·검색 (`mem-search`).
+- **데이터**: named volume `sg-wiki-claude-mem` → `/home/claude/.claude-mem` (SQLite + Chroma). drvfs bind mount가 아닌 Docker 로컬 볼륨이라 SQLite 락이 안전하고 컨테이너 재빌드에도 보존됩니다.
+- **격리**: sg-wiki 전용 단일 볼륨·단일 worker — 다른 프로젝트 데이터는 섞이지 않습니다.
+- **요약 LLM**: Z.AI `glm-5.2` 재사용 (`CLAUDE_MEM_MODEL`), 별도 키 불필요.
+- **동작**: 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로, `enabledPlugins`에 등록된 claude-mem 훅이 **모든 에이전트 세션에서 자동으로 캡처·주입**합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
+
+> 변경(`Dockerfile`·`docker-compose.yaml`·`scripts/claude-mem-*`·s6 서비스)은 이미지에 베이크되므로 `make up`(재빌드)으로 반영합니다.
 
 ## 파이프라인
 

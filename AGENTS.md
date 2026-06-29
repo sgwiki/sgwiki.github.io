@@ -160,6 +160,7 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 - **테스트**: FastAPI TestClient는 요청 사이에 `asyncio.create_task`로 만든 백그라운드 작업을 취소하므로, 동시성 로직 테스트 시 실제 실행 대신 task를 기록하는 방식으로 격리해야 함.
 - **동시 commit 경합**: cap 10 병렬 실행 시 `.git/index.lock` 충돌 가능. 드물게 발생하면 registry `committing` 상태 기반 직렬화 추가를 고려.
 - **세계선 맵 SPA**: `sg-worldline-map/src/data/*.json`은 tracked 배포 입력이고 `dist/`, `node_modules/`, `*.tsbuildinfo`는 로컬 산출물이다. 맵 경로는 `/maps/` 전제이므로 `vite.config.ts`의 `base`, `index.html`의 favicon 경로, SPA fallback route를 함께 확인한다.
+- **claude-mem 메모리 계층**: 에이전트 세션(도구 호출·편집·명령)을 자동 캡처·요약해 다음 세션에 맥락으로 주입. 뷰어 `http://localhost:37700`. 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로 `enabledPlugins`의 claude-mem 훅이 모든 에이전트 세션에서 자동 발화(캡처+주입). 능동 검색(`mem-search`)은 프롬프트 지시 시에만. 데이터는 named volume `sg-wiki-claude-mem`(`/home/claude/.claude-mem`, SQLite+Chroma) — drvfs bind mount가 아니라 재빌드에 보존·SQLite 락 안전. worker는 s6 longrun(`scripts/s6/claude-mem-worker` → `npx claude-mem start --daemon`)이 감독. `Dockerfile`·s6 스크립트·`docker-compose.yaml`은 이미지 베이크(재빌드 필요); `enabledPlugins`(`data/claude/settings.json`)는 마운트돼 즉시 반영.
 
 ## 컨테이너 상태 확인
 
@@ -168,6 +169,7 @@ curl -s http://127.0.0.1:3002/running    # 동시 실행 현황 (jobs/limit/runn
 curl -s http://127.0.0.1:3002/status     # 최근 실행 결과
 docker logs --tail 50 sg-wiki-admin      # admin 서버 로그
 docker logs --tail 50 sg-wiki-holyclaude # 에이전트 팀 로그
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:37700/ # claude-mem worker 헬스 (200=정상)
 ```
 
 ## 추가 문서
