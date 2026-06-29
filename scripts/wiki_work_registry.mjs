@@ -133,9 +133,11 @@ function reserve(registry, options) {
     return { status: 'ok', action: 'already_reserved', entry: existing };
   }
 
-  const absoluteFile = path.join(WORKSPACE, file);
-  if (existsSync(absoluteFile)) {
-    throw new Error(`Wiki file already exists, reject duplicate topic before writer: ${file}`);
+  if (!options['allow-existing']) {
+    const absoluteFile = path.join(WORKSPACE, file);
+    if (existsSync(absoluteFile)) {
+      throw new Error(`Wiki file already exists, reject duplicate topic before writer: ${file}`);
+    }
   }
 
   const entry = {
