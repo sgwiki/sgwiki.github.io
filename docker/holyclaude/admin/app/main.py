@@ -92,9 +92,19 @@ async def index(request: Request):
     return templates.TemplateResponse(request, "index.html")
 
 
+class TriggerBody(BaseModel):
+    """수동 트리거 본문. user_instruction은 팀장 에이전트 프롬프트에 추가로 전달되는 선택 지시.
+    제안 decision JSON의 instruction 필드와는 별개 기능이다.
+    """
+
+    user_instruction: str | None = None
+
+
 @app.post("/trigger/p1")
-async def trigger_p1():
-    run_id, started_at, status = _start_active_job("p1", "holyclaude 콘텐츠 생성 파이프라인 실행 준비 중")
+async def trigger_p1(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p1", "holyclaude 콘텐츠 생성 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
     if status == "running":
         asyncio.create_task(_run_p1(run_id, started_at))
         return {"status": "started", "pipeline": "p1", "run_id": run_id}
@@ -102,8 +112,10 @@ async def trigger_p1():
 
 
 @app.post("/trigger/p2")
-async def trigger_p2():
-    run_id, started_at, status = _start_active_job("p2", "holyclaude 제안 처리 파이프라인 실행 준비 중")
+async def trigger_p2(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p2", "holyclaude 제안 처리 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
     if status == "running":
         asyncio.create_task(_run_p2(run_id, started_at))
         return {"status": "started", "pipeline": "p2", "run_id": run_id}
@@ -111,8 +123,10 @@ async def trigger_p2():
 
 
 @app.post("/trigger/p3")
-async def trigger_p3():
-    run_id, started_at, status = _start_active_job("p3", "holyclaude 온톨로지 저작 파이프라인 실행 준비 중")
+async def trigger_p3(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p3", "holyclaude 온톨로지 저작 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
     if status == "running":
         asyncio.create_task(_run_p3(run_id, started_at))
         return {"status": "started", "pipeline": "p3", "run_id": run_id}
@@ -120,8 +134,10 @@ async def trigger_p3():
 
 
 @app.post("/trigger/p4")
-async def trigger_p4():
-    run_id, started_at, status = _start_active_job("p4", "holyclaude 위키 품질 검사 파이프라인 실행 준비 중")
+async def trigger_p4(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p4", "holyclaude 위키 품질 검사 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
     if status == "running":
         asyncio.create_task(_run_p4(run_id, started_at))
         return {"status": "started", "pipeline": "p4", "run_id": run_id}
@@ -129,8 +145,10 @@ async def trigger_p4():
 
 
 @app.post("/trigger/p5")
-async def trigger_p5():
-    run_id, started_at, status = _start_active_job("p5", "holyclaude 위키 정비 파이프라인 실행 준비 중")
+async def trigger_p5(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p5", "holyclaude 위키 정비 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
     if status == "running":
         asyncio.create_task(_run_p5(run_id, started_at))
         return {"status": "started", "pipeline": "p5", "run_id": run_id}
@@ -138,8 +156,10 @@ async def trigger_p5():
 
 
 @app.post("/trigger/p6")
-async def trigger_p6():
-    run_id, started_at, status = _start_active_job("p6", "holyclaude 수요 기반 작성 파이프라인 실행 준비 중")
+async def trigger_p6(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p6", "holyclaude 수요 기반 작성 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
     if status == "running":
         asyncio.create_task(_run_p6(run_id, started_at))
         return {"status": "started", "pipeline": "p6", "run_id": run_id}
@@ -954,52 +974,60 @@ def _load_status_response() -> dict:
 
 
 async def _run_p1(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
     try:
-        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p1", run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p1", run_id, started_at, user_instruction)
         _save_run(log)
     finally:
         _pop_active_job(run_id)
 
 
 async def _run_p3(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
     try:
-        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p3", run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p3", run_id, started_at, user_instruction)
         _save_run(log)
     finally:
         _pop_active_job(run_id)
 
 
 async def _run_p4(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
     try:
-        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p4", run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p4", run_id, started_at, user_instruction)
         _save_run(log)
     finally:
         _pop_active_job(run_id)
 
 
 async def _run_p5(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
     try:
-        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p5", run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p5", run_id, started_at, user_instruction)
         _save_run(log)
     finally:
         _pop_active_job(run_id)
 
 
 async def _run_p6(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
     try:
-        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p6", run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p6", run_id, started_at, user_instruction)
         _save_run(log)
     finally:
         _pop_active_job(run_id)
 
 
-def _start_active_job(pipeline: str, last_line: str) -> tuple[str, str, str]:
+def _start_active_job(pipeline: str, last_line: str, user_instruction: str | None = None) -> tuple[str, str, str]:
     """Register a job. Returns (run_id, started_at, status).
 
     When running slots are available the job is immediately 'running' and a task
     should be scheduled by the caller. Otherwise it is enqueued ('queued').
     Per-pipeline dedup is intentionally removed; the team-lead agent owns that.
+    user_instruction is stored on the job so both immediate-run and queued→running
+    dispatch paths can forward it to the pipeline (see _get_job_instruction).
     """
+    instruction = user_instruction or ""
     now = datetime.now().isoformat()
     run_id = str(uuid.uuid4())[:8]
     with active_jobs_lock:
@@ -1013,6 +1041,7 @@ def _start_active_job(pipeline: str, last_line: str) -> tuple[str, str, str]:
                 "started_at": started_at,
                 "status": "running",
                 "last_line": last_line,
+                "user_instruction": instruction,
                 "updated_at": started_at,
             }
         else:
@@ -1025,10 +1054,17 @@ def _start_active_job(pipeline: str, last_line: str) -> tuple[str, str, str]:
                 "queued_at": now,
                 "status": "queued",
                 "last_line": last_line,
+                "user_instruction": instruction,
                 "updated_at": now,
             }
             run_queue.append(run_id)
         return run_id, started_at, status
+
+
+def _get_job_instruction(run_id: str) -> str:
+    """Return the user_instruction stored on the job (may survive a queue wait)."""
+    with active_jobs_lock:
+        return (active_jobs.get(run_id) or {}).get("user_instruction") or ""
 
 
 def _queue_position(run_id: str):
@@ -1094,7 +1130,16 @@ def _dispatch_next_job() -> None:
             asyncio.create_task(_run_p6(rid, started_at))
 
 
-def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dict:
+def _sanitize_instruction(value: str, limit: int = 4000) -> str:
+    """Strip control chars (keep tabs/newlines) and cap length so the instruction is
+    safe for both the shell (shlex.quote handles the rest) and the team-lead prompt.
+    Returns "" when empty — callers omit --instruction in that case."""
+    text = "".join(ch for ch in (value or "") if ch >= " " or ch in "\t\n")
+    return text.strip()[:limit]
+
+
+def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_instruction: str = "") -> dict:
+    instruction = _sanitize_instruction(user_instruction)
     before_decisions = _automated_decision_snapshot() if pipeline == "p2" else {}
     try:
         import docker as docker_sdk
@@ -1113,6 +1158,8 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dic
         )
 
     inner = f"cd /workspace && node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
+    if instruction:
+        inner += f" --instruction {shlex.quote(instruction)}"
     command = [
         "bash",
         "-lc",
@@ -1158,6 +1205,7 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str) -> dic
         "completed_at": completed_at,
         "status": "completed" if ok else "failed",
         "message": _pipeline_message(pipeline, ok),
+        "user_instruction": instruction,
         "container": HOLYCLAUDE_CONTAINER,
         "exit_code": exit_code,
         "processed": 1 if ok else 0,
@@ -1201,8 +1249,9 @@ def _tail_text(value: str, limit: int) -> str:
 
 
 async def _run_p2(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
     try:
-        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p2", run_id, started_at)
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p2", run_id, started_at, user_instruction)
         _save_run(log)
     finally:
         _pop_active_job(run_id)

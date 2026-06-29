@@ -48,6 +48,7 @@ node --check scripts/run_holyclaude_pipeline.mjs
 node --check scripts/wiki_work_registry.mjs
 node --check scripts/p6_demand_queue.mjs
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
+node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --instruction "..." --dry-run   # 선택 사용자 지시(--instruction) 주입
 ```
 
 세계선 맵 SPA 점검:
@@ -160,6 +161,7 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 
 - **볼륨 마운트 vs 베이크**: `scripts/`, `docker/holyclaude/data/claude/`(에이전트 정의·CLAUDE.md·settings.json)는 컨테이너에 마운트되어 **재빌드 없이 즉시 반영**. 반면 `docker/holyclaude/Dockerfile`이나 `docker/holyclaude/admin/`(admin 서버 코드)은 이미지에 베이크되어 **재빌드 + 컨테이너 재생성 필요**.
 - **admin 서버**(FastAPI, `docker/holyclaude/admin/app/main.py`): 동시성/큐 로직은 `active_jobs_lock`(threading.RLock)로 보호. `_pop_active_job` 완료 시 `_dispatch_next_job`가 FIFO에서 다음 job 승격.
+- **사용자 지시(user instruction)**: 관리 UI 수동 트리거의 `(선택) 사용자 지시` 칸은 `POST /trigger/pN` 본문 `user_instruction` → `active_jobs[run_id]`에 저장(큐 대기→승격 경로도 보존, `_get_job_instruction`으로 회수) → `run_holyclaude_pipeline.mjs --instruction` → 팀장 프롬프트에 "추가 사용자 지시"로 주입. `_sanitize_instruction`(제어문자 제거·4000자 제한)과 `shlex.quote`로 안전 처리. **코드 강제 게이트(MCP 커버리지·source-sanitizer·검증)는 사용자 지시보다 우선**하며 프롬프트 텍스트로는 우회 불가.
 - **테스트**: FastAPI TestClient는 요청 사이에 `asyncio.create_task`로 만든 백그라운드 작업을 취소하므로, 동시성 로직 테스트 시 실제 실행 대신 task를 기록하는 방식으로 격리해야 함.
 - **동시 commit 경합**: cap 10 병렬 실행 시 `.git/index.lock` 충돌 가능. 드물게 발생하면 registry `committing` 상태 기반 직렬화 추가를 고려.
 - **세계선 맵 SPA**: `sg-worldline-map/src/data/*.json`은 tracked 배포 입력이고 `dist/`, `node_modules/`, `*.tsbuildinfo`는 로컬 산출물이다. 맵 경로는 `/maps/` 전제이므로 `vite.config.ts`의 `base`, `index.html`의 favicon 경로, SPA fallback route를 함께 확인한다.

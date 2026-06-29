@@ -144,6 +144,20 @@
     }
     input[type="text"]:focus { border-color: #58a6ff; }
 
+    textarea {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      min-width: 0;
+    }
+    textarea:focus { border-color: #58a6ff; }
+
     .status-badge {
       display: inline-block;
       padding: 2px 8px;
@@ -428,6 +442,13 @@
         <button class="btn btn-demand" onclick="triggerPipeline(6)">수요 기반 작성 팀 실행</button>
       </span>
     </div>
+    <div class="row" style="align-items:flex-start;margin-top:14px">
+      <label for="user-instruction" style="margin-top:6px;white-space:nowrap">
+        사용자 지시<br><span style="color:#484f58;font-size:10px">(선택)</span>
+      </label>
+      <textarea id="user-instruction" rows="2" style="flex:1"
+        placeholder="팀장 에이전트에 전달할 추가 지시(예: 특정 시리즈 우선, 제외할 주제). 비워도 됨. 보안·게이트 규칙은 지시보다 우선합니다."></textarea>
+    </div>
     <div id="trigger-msg" class="msg"></div>
   </div>
 
@@ -560,9 +581,14 @@
   // ── Trigger ──────────────────────────────────────────────────────────────
   async function triggerPipeline(n) {
     const msg = document.getElementById('trigger-msg');
+    const instruction = document.getElementById('user-instruction').value.trim();
     showMsg(msg, 'info', '<span class="spinner"></span>' + pipelineName(n) + ' 실행 중...');
     try {
-      const res = await fetch('/trigger/p' + n, { method: 'POST' });
+      const res = await fetch('/trigger/p' + n, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(instruction ? { user_instruction: instruction } : {}),
+      });
       const data = await res.json();
       if (res.ok) {
         if (data.status === 'queued') {
