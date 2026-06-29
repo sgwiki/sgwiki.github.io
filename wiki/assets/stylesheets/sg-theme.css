@@ -1,0 +1,246 @@
+/*
+  Steins;Gate 한국어 위키 — 커스텀 테마 (절제된 무드)
+  ------------------------------------------------------------------
+  설계 원칙
+  - 본문 가독성 최우선. 분위기는 헤더/악센트/데이터에만 절제해서 입힌다.
+  - 작품 아이덴티티 = 빛바랜 앰버 + 따뜻한 다크 + 다이버전스 미터(닉시 숫자).
+  - MkDocs Material(slate)의 변수를 덮어쓰는 방식 — 테마 동작은 그대로 둔다.
+*/
+
+/* ── 폰트 로드 ───────────────────────────────────────────────── */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Share+Tech+Mono&display=swap");
+
+:root {
+  --md-text-font: "Pretendard Variable", Pretendard;
+  --md-code-font: "JetBrains Mono";
+  /* S;G 팔레트 — 채도는 모두 80% 이하로 억제 */
+  --sg-amber:        #e07b3c;  /* 메인 악센트(빛바랜 오렌지) */
+  --sg-amber-soft:   #e9954f;
+  --sg-amber-bright: #f1b277;  /* hover / glow */
+  --sg-nixie:        #ff8d3a;  /* 다이버전스 미터 발광색 */
+}
+
+/* ── 다크(slate) 스킴: 따뜻한 톤으로 재정의 ──────────────────── */
+[data-md-color-scheme="slate"] {
+  --md-hue: 30;                         /* 차가운 회색 → 따뜻한 회갈색 */
+  --md-default-bg-color:        #16130f;
+  --md-default-bg-color--light: #1d1915;
+  --md-default-fg-color:        #ece6dc;
+  --md-default-fg-color--light: #c8bfb1;
+  --md-default-fg-color--lighter: #8c8275;
+  --md-typeset-color:           #e6ded2;
+  --md-typeset-a-color:         var(--sg-amber-soft);
+
+  --md-primary-fg-color:        #c8602b;
+  --md-primary-fg-color--light: #d8743b;
+  --md-primary-fg-color--dark:  #16130f;
+  --md-primary-bg-color:        #f4ede2;
+  --md-accent-fg-color:         var(--sg-amber-bright);
+
+  --md-code-bg-color:           #100d0a;
+  --md-code-fg-color:           #e3d8c7;
+  --md-typeset-table-color:     #3a3128;
+}
+
+/* 헤더 — 작품 로고처럼 차분한 다크 바 + 앰버 하단선 */
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #110e0b;
+  border-bottom: 1px solid #2c2620;
+}
+[data-md-color-scheme="slate"] .md-header[data-md-state="shadow"] {
+  box-shadow: 0 0 .4rem #0008, 0 .25rem .8rem #0006;
+}
+.md-header__title {
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+/* ── 본문 타이포그래피 ───────────────────────────────────────── */
+.md-typeset {
+  font-size: .78rem;
+  line-height: 1.85;
+  letter-spacing: -0.003em;
+}
+.md-typeset p,
+.md-typeset li {
+  text-wrap: pretty;          /* 끝줄 외톨이 단어 방지 */
+}
+
+/* 제목: 무게감 + 앰버 왼쪽 마커 */
+.md-typeset h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--md-default-fg-color);
+  margin-bottom: .9em;
+}
+.md-typeset h2 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  padding-left: .6rem;
+  border-left: 3px solid var(--sg-amber);
+  margin-top: 2.2em;
+}
+.md-typeset h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--md-default-fg-color--light);
+}
+/* 헤더 앵커(#) — 앰버로 통일 */
+.md-typeset .headerlink { color: var(--md-default-fg-color--lighter); }
+.md-typeset :hover > .headerlink { color: var(--sg-amber); }
+
+/* 본문 폭 제한: 장문 한국어 가독성(약 70자) */
+.md-grid { max-width: 64rem; }
+
+/* 링크: 밑줄은 hover 시에만, 색은 앰버 */
+.md-typeset a {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+.md-typeset a:hover {
+  color: var(--sg-amber-bright);
+  border-bottom-color: currentColor;
+}
+
+/* ── 인용구(blockquote): 캐릭터 대사/리드문 강조 ─────────────── */
+.md-typeset blockquote {
+  border-left: .2rem solid var(--sg-amber);
+  background: #ffffff06;
+  color: var(--md-default-fg-color--light);
+  border-radius: 0 .15rem .15rem 0;
+  padding-top: .4rem;
+  padding-bottom: .4rem;
+}
+
+/* ── 표: 다이버전스 미터 감성(닉시 숫자) ─────────────────────── */
+.md-typeset table:not([class]) {
+  border: 1px solid #2f2922;
+  border-radius: .2rem;
+  overflow: hidden;
+  font-size: .76rem;
+}
+.md-typeset table:not([class]) th {
+  background: #221c16;
+  color: var(--sg-amber-soft);
+  font-weight: 600;
+  letter-spacing: .01em;
+  border-bottom: 1px solid #3a3128;
+}
+.md-typeset table:not([class]) td {
+  border-top: 1px solid #261f19;
+}
+.md-typeset table:not([class]) tr:hover td {
+  background: #ffffff05;
+}
+/* 셀 안의 숫자는 등폭 + 균등정렬(닉시관 느낌) */
+.md-typeset table:not([class]) td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 인라인 코드 / 코드블록 ─────────────────────────────────── */
+.md-typeset code {
+  font-variant-numeric: tabular-nums;
+  border-radius: .15rem;
+}
+.md-typeset pre > code {
+  border: 1px solid #241d17;
+  border-radius: .2rem;
+}
+
+/* ── 인용 태그 칩: [공식] / [팬 분석] / [심층] (sg-enhance.js가 래핑) ── */
+.sg-tag {
+  display: inline-block;
+  font-size: .82em;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: .05em .5em;
+  margin: 0 .1em;
+  border-radius: .2rem;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+.sg-tag--official {      /* 공식 — 작중 확정 설정 */
+  color: #16130f;
+  background: var(--sg-amber);
+}
+.sg-tag--fan {           /* 팬 분석 — 보조 자료 */
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border: 1px solid #5a5147;
+}
+.sg-tag--deep {          /* 심층 — 별도 해석 문서 */
+  color: var(--sg-amber-soft);
+  background: transparent;
+  border: 1px dashed var(--sg-amber);
+}
+
+/* ── 스포일러 경고(admonition.warning): 작품 경고창 무드 ─────── */
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-color: var(--sg-amber);
+  background: #2a1d10;
+}
+.md-typeset .warning > .admonition-title,
+.md-typeset .warning > summary {
+  background: #3a2614;
+  color: var(--sg-amber-bright);
+}
+.md-typeset .warning > .admonition-title::before,
+.md-typeset .warning > summary::before {
+  background-color: var(--sg-amber);
+}
+
+/* ── 네비게이션: 현재 위치 강조 ─────────────────────────────── */
+.md-nav__link--active,
+.md-nav__item .md-nav__link--active {
+  color: var(--sg-amber-soft);
+  font-weight: 600;
+}
+.md-tabs__link--active {
+  color: var(--md-primary-bg-color);
+  font-weight: 700;
+}
+/* 목차(TOC) 현재 섹션 */
+.md-nav--secondary .md-nav__link--active {
+  border-left: 2px solid var(--sg-amber);
+  padding-left: .5rem;
+  margin-left: -2px;
+}
+
+/* ── Worldline Map 헤더 버튼 hover(인라인 스타일 보완) ───────── */
+.worldline-map-btn { transition: opacity .15s ease, background-color .15s ease; }
+.worldline-map-btn:hover {
+  opacity: 1 !important;
+  background-color: #ffffff14;
+}
+
+/* ── 다이버전스 미터: 홈 등에서 .sg-divergence 로 사용 가능 ──── */
+.sg-divergence {
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .12em;
+  color: var(--sg-nixie);
+  text-shadow: 0 0 .35rem #ff8d3a66, 0 0 .9rem #ff8d3a33;
+}
+
+/* ── 접근성: 키보드 포커스 링 ───────────────────────────────── */
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-header__button:focus-visible {
+  outline: 2px solid var(--sg-amber);
+  outline-offset: 2px;
+  border-radius: .1rem;
+}
+
+/* 부드러운 앵커 스크롤 */
+html { scroll-behavior: smooth; }
+
+/* 모션 민감 사용자 배려 */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}

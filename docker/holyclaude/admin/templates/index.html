@@ -100,6 +100,13 @@
     }
     .btn-maint:hover { background: #14a9ad; }
 
+    .btn-demand {
+      background: #be185d;
+      border-color: #ec4899;
+      color: #fff;
+    }
+    .btn-demand:hover { background: #ec4899; }
+
     .btn-small {
       padding: 4px 9px;
       font-size: 11px;
@@ -417,6 +424,9 @@
       <span class="tip" data-tip="위키 정비 파이프라인&#10;① wiki/*.md 전체 스캔 → 정비 대상 선정&#10;② wiki-restructurer: 섹션 구조·헤더·링크 재정비&#10;③ wiki-rewriter: 문체·표현 개선 및 일관성 교정&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
         <button class="btn btn-maint" onclick="triggerPipeline(5)">위키 정비 팀 실행</button>
       </span>
+      <span class="tip" data-tip="수요 기반 작성 파이프라인&#10;① 후보 큐 정규화 → 유저 수요 후보 선점 (DCinside 세그먼트 분석 기반)&#10;② wiki-demand-analyst: 유저 실제 발화·오해·토론 분석 + 생성/업데이트 권고&#10;③ 생성=wiki-planner→writer / 업데이트=wiki-rewriter 타깃 보강&#10;④ source-sanitizer·wiki-linker·quality-lead 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
+        <button class="btn btn-demand" onclick="triggerPipeline(6)">수요 기반 작성 팀 실행</button>
+      </span>
     </div>
     <div id="trigger-msg" class="msg"></div>
   </div>
@@ -544,7 +554,7 @@
 
 <script>
   // ── Pipeline name map ─────────────────────────────────────────────────────
-  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀' };
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '수요 기반 작성 팀' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
   // ── Trigger ──────────────────────────────────────────────────────────────

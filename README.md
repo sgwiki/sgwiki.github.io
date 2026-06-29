@@ -38,14 +38,16 @@ wiki/
 ├── docs/                 설계 문서 · 저작권 검토 · 계획
 ├── mkdocs.yml            MkDocs Material 설정
 ├── scripts/
-│   ├── run_holyclaude_pipeline.mjs   P1~P5 파이프라인 실행 래퍼
+│   ├── run_holyclaude_pipeline.mjs   P1~P6 파이프라인 실행 래퍼
 │   ├── wiki_work_registry.mjs        병렬 실행 중복 주제 방지용 작업 현황 registry
+│   ├── p6_demand_queue.mjs           P6 유저 수요 후보 소비 큐
 │   └── poll_suggestions.py           R2에서 제안 수신 → suggestions/inbox/
 ├── sg-worldline-map/    세계선 인터랙티브 맵 React/Vite SPA (`/maps/`)
 ├── worker/               "제안하기" 폼을 받는 Cloudflare Worker (R2 + KV)
 ├── docker/holyclaude/    Claude Code 에이전트 팀 + 관리 UI 컨테이너
 ├── data/
 │   ├── qaset_with_rag/   P1 근거용 RAG 소스 (gitignored)
+│   ├── dc_gallery/       P6 유저 수요 분석 입력 (gitignored)
 │   ├── 공식 자료집/      공식 자료 (gitignored)
 │   └── mock-r2/          로컬 개발용 R2 모의 제안 데이터
 ├── suggestions/          수신 제안 + 처리 상태 (gitignored)
@@ -63,6 +65,10 @@ make wiki-deploy       # 빌드 후 Cloudflare Pages 배포
 ```
 
 > 배포는 GitHub Pages(현재 기본 경로)로도 연동됩니다. MkDocs 설정은 `mkdocs.yml`을 참고하세요.
+
+### 위키 테마
+
+MkDocs Material 기본 구조 위에 `wiki/assets/stylesheets/sg-theme.css`와 `wiki/javascripts/sg-enhance.js`를 로드합니다. 커스텀 CSS는 Pretendard/JetBrains Mono 폰트, 어두운 슈타인즈 게이트 톤, 표·인용·내비게이션 강조를 담당하고, JS는 본문 안의 `**[공식]**`, `**[팬 분석]**`, `**[심층]**` 태그를 칩 스타일로 변환합니다. 테마 변경 후에는 `make wiki-build`로 정적 빌드를 확인하세요.
 
 ## 세계선 인터랙티브 맵
 
@@ -105,7 +111,7 @@ make shell           # 컨테이너 bash 접속
 
 ### 관리 UI (`http://localhost:3002`)
 
-- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) 수동 실행
+- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) / 파이프라인 6 (수요 기반 작성) 수동 실행
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 - **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 대기 작업 순번·취소
@@ -114,7 +120,7 @@ make shell           # 컨테이너 bash 접속
 
 ## 파이프라인
 
-파이프라인 1과 파이프라인 2는 `sg-wiki-admin`이 Docker socket을 통해 `sg-wiki-holyclaude` 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다. 실행 중 상태는 관리 UI와 `sg-wiki-holyclaude` 로그 스트림에서, 결과 요약은 `.admin/runs/*.json`에서 확인합니다.
+각 파이프라인은 `sg-wiki-admin`이 Docker socket을 통해 `sg-wiki-holyclaude` 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다. 실행 중 상태는 관리 UI와 `sg-wiki-holyclaude` 로그 스트림에서, 결과 요약은 `.admin/runs/*.json`에서 확인합니다.
 
 ### 동시 실행과 중복 주제 방지
 
@@ -133,6 +139,18 @@ make shell           # 컨테이너 bash 접속
 ### 파이프라인 2 — 제안 처리
 
 P2 실행 래퍼는 R2/mock R2 폴링 후 제안을 자동 분류·판정합니다. `approved` 판정은 위키 작성 에이전트와 sanitizer로 전달되어 통과한 위키 변경만 commit/push하고, `rejected`/`partial` 판정은 위키 파일을 수정하지 않습니다. `suggestions/decisions/` 파일은 `automated=true` 상태 표시용 런타임 산출물이며 git에 포함하지 않습니다.
+
+### 파이프라인 6 — 수요 기반 작성
+
+P6는 `data/dc_gallery/wiki_candidates/all_wiki_candidates.csv`에서 정규화한 후보 큐를 소비해, DCinside 슈타게 갤러리 유저 수요를 바탕으로 위키 문서를 새로 만들거나 기존 문서를 보강합니다. 후보 소비 상태는 `.admin/p6-demand-queue.json`에 저장되고, 실제 파일 충돌 방지는 기존 `scripts/wiki_work_registry.mjs` 파일 단위 락을 함께 사용합니다.
+
+```bash
+node scripts/p6_demand_queue.mjs normalize
+node scripts/p6_demand_queue.mjs next --run-id <id> --priority high
+node scripts/run_holyclaude_pipeline.mjs p6 --run-id <id> --dry-run
+```
+
+P6 팀장(`wiki-demand-lead`)은 `wiki-demand-analyst` 보고서를 근거로 `create` 또는 `update`를 판정합니다. `create`는 기존 P1 planner/writer 경로를, `update`는 단일 파일 타깃 보강 경로를 사용하며, sanitizer/linker/quality gate와 구조화 리포트(`.admin/runs/p6-<run_id>-report.json`)를 통과한 `wiki/*.md`만 commit/push합니다. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 git에 포함하지 않습니다.
 
 ### 위키 페이지 검토
 

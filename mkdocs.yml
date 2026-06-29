@@ -6,6 +6,7 @@ theme:
   name: material
   custom_dir: overrides
   language: ko
+  font: false  # Roboto 자동 로드 비활성화 — Pretendard를 sg-theme.css에서 직접 로드
   features:
     - content.code.copy
     - navigation.tabs
@@ -50,5 +51,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/sgwiki/sgwiki.github.io
 
+extra_css:
+  - assets/stylesheets/sg-theme.css
+
 extra_javascript:
   - javascripts/worldline-map-btn.js
+  - javascripts/sg-enhance.js

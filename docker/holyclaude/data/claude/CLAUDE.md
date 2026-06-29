@@ -253,6 +253,27 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 ⑦ sanitizer·linker pass인 wiki 변경만 git add/commit/push. suggestions/는 commit 금지
 ```
 
+### 파이프라인 6 — 유저 수요 기반 생성/업데이트
+
+DCinside 슈타게 갤러리 유저 게시글 세그먼트 분석으로 도출된 위키 후보 큐를 소비해, 유저가 실제로 나누는 대화를 바탕으로 페이지를 **생성하거나 업데이트**한다. 팀장(`wiki-demand-lead`)은 자율 라우팅하며 사용자에게 묻지 않는다.
+
+```
+① node /workspace/scripts/p6_demand_queue.mjs normalize → next --run-id <id> --priority high (후보 선점)
+② Agent(wiki-demand-analyst) → 유저 수요 분석 + 타입 판정 + 생성/업데이트 권고
+③ 팀장 판정(APPROVED/REJECTED/REVISION) + 2계층 예약
+   - p6_demand_queue.mjs reserve --mode create(파일 부재)|update(파일 존재)  ← 큐 소비
+   - wiki_work_registry.mjs reserve                                          ← 파일 단위 락
+④ create=Agent(wiki-planner→wiki-writer) / update=Agent(wiki-rewriter 타깃 보강, 사실·스포일러 등급 불변)
+⑤ source-sanitizer → wiki-linker → wiki-quality-lead(gate)
+⑥ 팀장 검토 + 구조화 리포트 저장 (.admin/runs/p6-<run_id>-report.json)
+⑦ 통과한 wiki/*.md만 git add/commit/push. data/dc_gallery/·.admin/·큐/리포트는 commit 금지
+⑧ p6_demand_queue.mjs complete + wiki_work_registry.mjs complete
+```
+
+- **공통 하드 커버리지(러너 강제)**: `qaset_with_rag`·`namuwiki`·`dc_gallery`(유저 수요). lore/mechanics 타입은 `sg_paper`·`sg-ontology`·`sg_game_sg0_en` 추가(팀장 보고 확인).
+- 1회 실행 최대 3개 후보 순차. 큐(소비 추적)와 registry(파일 락)를 **모두** 사용한다.
+- `dc_gallery`(dcinside) 근거는 산문 전용·각주 금지·식별자(gall_num·chunk ID·source 이름·내부 경로) 노출 금지.
+
 ### MCP 연결 및 소스 정책
 
 | MCP | 방식 | 용도 |
@@ -268,6 +289,12 @@ mcp__dataforge__search_with_filters(query="<주제>", source_names=["qaset_with_
 mcp__dataforge__search_with_filters(query="<주제>", source_names=["sg_game_sg0_en"], top_k=30)
 mcp__dataforge__search_with_filters(query="<주제>", source_names=["sg_paper"],        top_k=30)
 mcp__dataforge__search_with_filters(query="<주제>", source_names=["sg_game_sge"],     top_k=30)
+```
+
+**dataforge `dc_gallery`** — DCinside 유저 게시글(post/query/answer) 소스. 파이프라인 6 유저 수요 근거 전용 (산문 가공·각주 금지·식별자 노출 금지):
+
+```
+mcp__dataforge__search_with_filters(query="<주제>", source_names=["dc_gallery"], top_k=30)
 ```
 
 **namuwiki** — 검색 후 본문 조회 (모든 도구에 `page`, `page_size` 지원):

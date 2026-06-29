@@ -12,14 +12,15 @@
 |---|---|---|
 | `wiki/` | 위키 마크다운 본문 (배포 대상) | tracked |
 | `docs/` | 설계·계획·저작권 검토 문서 | tracked |
-| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5 파이프라인 실행 래퍼 | tracked |
+| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
+| `scripts/p6_demand_queue.mjs` | P6 유저 수요 후보 소비 큐 | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
 | `sg-worldline-map/` | `/maps/`로 배포되는 세계선 인터랙티브 맵 React/Vite SPA | tracked |
 | `worker/` | "제안하기" 폼 Cloudflare Worker | tracked |
 | `docker/holyclaude/` | 에이전트 팀 + 관리 UI 컨테이너 정의 | tracked |
 | `mkdocs.yml` / `Makefile` | 위키 빌드 설정 · 명령 래퍼 | tracked |
-| `data/qaset_with_rag/`, `data/공식 자료집/` | RAG 소스·공식 자료 (대용량/민감) | **gitignored** |
+| `data/qaset_with_rag/`, `data/공식 자료집/`, `data/dc_gallery/` | RAG 소스·공식 자료·P6 유저 수요 입력 (대용량/민감) | **gitignored** |
 | `suggestions/` | 수신 제안 + 처리 상태 (런타임) | **gitignored** |
 | `.admin/` | 실행 로그 · 위키 검토 · registry · locks (런타임) | **gitignored** |
 | `docker/holyclaude/data/cloudcli/` | GitHub 토큰 DB (`auth.db`) — **절대 커밋 금지** | **gitignored** |
@@ -43,6 +44,7 @@ make worker-dev          # 제안 폼 Worker 로컬 개발
 ```bash
 node --check scripts/run_holyclaude_pipeline.mjs
 node --check scripts/wiki_work_registry.mjs
+node --check scripts/p6_demand_queue.mjs
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
 ```
 
@@ -69,6 +71,12 @@ python scripts/generate-data.py --out sg-worldline-map/src/data
 - 현재 로더는 `anime` 데이터셋만 활성화한다. 새 시리즈를 추가할 때는 JSON import, `SERIES_ORDER`, `datasets`, 필요 시 `scripts/create-spa-route-fallbacks.mjs`의 route 목록을 함께 갱신한다.
 - `/maps/anime/` 같은 SPA 하위 경로는 빌드 후 `scripts/create-spa-route-fallbacks.mjs`가 `dist/<route>/index.html`을 복사해 처리한다.
 - GitHub Actions는 SPA 빌드를 먼저 시도하고 성공한 artifact만 MkDocs 결과물의 `site/maps/`로 병합한다. SPA 실패는 위키 배포를 막지 않는다.
+
+### 위키 테마
+
+- MkDocs Material 기본 테마 위에 `wiki/assets/stylesheets/sg-theme.css`를 `extra_css`로 로드한다. `mkdocs.yml`의 `theme.font: false`는 Material의 Roboto 자동 로드를 끄고, CSS에서 Pretendard/JetBrains Mono를 직접 로드하기 위한 설정이다.
+- `wiki/javascripts/sg-enhance.js`는 본문 렌더 후 `**[공식]**`, `**[팬 분석]**`, `**[심층]**` 강조 텍스트를 `.sg-tag` 칩으로 장식한다. Material instant navigation 대응을 위해 `document$` 구독 경로를 유지한다.
+- 테마나 JS를 바꾸면 `make wiki-build`로 MkDocs 빌드와 asset 경로를 확인한다.
 
 ### 파이프라인 1 (콘텐츠 생성)
 
@@ -108,6 +116,23 @@ wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-r
 
 - **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
 
+### 파이프라인 6 (수요 기반 작성)
+
+DCinside 슈타게 갤러리 유저 게시글 세그먼트 분석으로 만든 후보 큐를 소비해 위키 문서를 생성하거나 기존 문서를 보강한다. admin UI의 `/trigger/p6`가 `run_holyclaude_pipeline.mjs p6`를 실행하고, 팀장(`wiki-demand-lead`)은 `wiki-demand-analyst` 보고서를 근거로 `create`/`update`를 판정한다.
+
+```
+all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analyst
+→ 팀장 APPROVED 판정 → p6_demand_queue reserve + wiki_work_registry reserve
+→ create: wiki-planner→wiki-writer / update: wiki-rewriter 타깃 보강
+→ source-sanitizer → wiki-linker → wiki-quality-lead(gate)
+→ .admin/runs/p6-{run_id}-report.json 검증 → wiki/*.md commit/push
+```
+
+- **2계층 동시성**: `scripts/p6_demand_queue.mjs`는 후보 소비 상태(`.admin/p6-demand-queue.json`)를, `scripts/wiki_work_registry.mjs`는 대상 wiki 파일 락을 담당한다. 둘 중 하나라도 예약 실패하면 writer/rewriter를 호출하지 않는다.
+- **러너 강제 게이트**: P6 공통 MCP 커버리지는 `qaset_with_rag`, `namuwiki`, `dc_gallery`이며, 러너가 구조화 리포트의 `supporting_count>0`, `sanitizer=pass`, `quality!=fail`을 검증한다.
+- **commit 범위**: 통과한 `wiki/*.md`만 commit한다. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 절대 commit하지 않는다.
+- **dc_gallery 위생 규칙**: 유저 게시글 근거는 산문 가공 전용이다. 각주, 원문 직접 인용, gall_num, chunk ID, source 이름, 내부 경로를 위키 본문에 노출하지 않는다.
+
 ### 동시 실행과 중복 주제 방지
 
 - **전역 풀 동시 실행 cap 10** (`ADMIN_MAX_CONCURRENT_RUNS`). p1/p2 혼합 가능. 초과분은 단일 전역 FIFO 대기열에 적재, 슬롯 해제 시 자동 시작.
@@ -117,6 +142,7 @@ wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-r
   - 완료/거부 시 `complete`/`release`로 `active`에서 프로그램적 제거
   - 12시간 미갱신 엔트리는 stale 자동 정리
 - **결론**: 파이프라인 동시성을 다룰 때 `acquirePipelineLock` 같은 전체 직렬화 락을 다시 넣지 말 것. 중복 방지는 registry 계층에서만.
+- P6는 registry 외에 별도 후보 소비 큐를 사용한다. `p6_demand_queue.mjs`는 후보 중복 소비를 막고, registry는 파일 충돌만 막는다.
 
 ## 위키 집필 규칙 (변경 시 주의)
 

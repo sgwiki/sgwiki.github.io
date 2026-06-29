@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 const SDK_PATH =
   '/usr/local/lib/node_modules/@siteboon/claude-code-ui/node_modules/@anthropic-ai/claude-agent-sdk/sdk.mjs';
@@ -37,6 +38,24 @@ const REQUIRED_MCP_COVERAGE = [
   { key: 'sg_ontology', label: 'sg-ontology MCP', type: 'mcp-server' },
 ];
 
+// 파이프라인 6 공통 하드 커버리지(타입별 추가 항목은 lead가 보고로 확인).
+// 수요 신호(dc_gallery)·요지 검증(qaset)·외부 교차(namuwiki)만 코드로 강제한다.
+const P6_REQUIRED_COVERAGE = [
+  {
+    key: 'qaset_with_rag',
+    label: 'dataforge:qaset_with_rag',
+    type: 'dataforge-source',
+    source: 'qaset_with_rag',
+  },
+  { key: 'namuwiki', label: 'namuwiki MCP', type: 'mcp-server' },
+  {
+    key: 'dc_gallery',
+    label: 'dataforge:dc_gallery',
+    type: 'dataforge-source',
+    source: 'dc_gallery',
+  },
+];
+
 function parseArgs(argv) {
   const args = {
     command: null,
@@ -59,9 +78,9 @@ function parseArgs(argv) {
   }
 
   if (!args.command) {
-    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5> --run-id <id> [--dry-run]');
+    throw new Error('Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5|p6> --run-id <id> [--dry-run]');
   }
-  if (!['p1', 'p2', 'p3', 'p4', 'p5'].includes(args.command)) {
+  if (!['p1', 'p2', 'p3', 'p4', 'p5', 'p6'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
@@ -363,6 +382,53 @@ function buildP5Prompt(runId) {
 - 완료 시 처리 파일 목록, 각 파일의 변경 요약, commit hash 또는 미커밋 사유를 보고하세요.`;
 }
 
+function buildP6Prompt(runId) {
+  return `파이프라인 6 - 유저 수요 기반 위키 생성/업데이트를 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-demand-lead.md, wiki-demand-analyst.md 규칙을 준수하세요.
+
+당신은 파이프라인 6의 wiki-demand-lead(수요 기반 작성 팀장)입니다.
+
+파이프라인 6은 DCinside 슈타게 갤러리 유저 게시글을 세그먼트 분석해 도출한 위키 후보 큐를 소비해, 유저가 실제로 나누는 대화를 바탕으로 위키 페이지를 새로 생성하거나 기존 페이지를 업데이트합니다. P1(생성 전용)·P5(정비 전용)와 달리 두 경로를 자율 라우팅합니다.
+
+목표:
+1. 후보 큐를 정규화하고 최우선 pending 후보를 선점하세요.
+   node /workspace/scripts/p6_demand_queue.mjs normalize
+   node /workspace/scripts/p6_demand_queue.mjs next --run-id ${runId} --priority high
+2. 선점한 후보로 wiki-demand-analyst를 스폰해 수요 분석 보고서(타입·생성/업데이트 권고)를 받으세요.
+3. 팀장이 APPROVED / REJECTED / REVISION REQUESTED 중 하나를 명시적으로 판정하세요.
+4. APPROVED면 큐와 파일 락을 모두 예약하세요. create는 mode=create(파일 부재), update는 mode=update(파일 존재)입니다.
+   node /workspace/scripts/p6_demand_queue.mjs reserve --candidate-id <id> --run-id ${runId} --mode <create|update> --file wiki/{category}/{slug}.md
+   node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file wiki/{category}/{slug}.md --topic "p6:<id>:{slug}"
+5. 라우팅: create는 wiki-planner→wiki-writer, update는 wiki-rewriter로 대상 파일을 수요 기반 타깃 보강하세요(전체 재정비 아님). 업데이트 시 사실 관계·스포일러 등급을 임의로 바꾸지 마세요.
+6. source-sanitizer → wiki-linker → wiki-quality-lead(gate) 순으로 검증하세요. sanitizer fail은 최대 2회, linker/quality fail은 최대 1회 재작성 요청.
+7. commit 전에 구조화 리포트를 누적 저장하세요: /workspace/.admin/runs/p6-${runId}-report.json
+   각 후보 항목에 candidate_id, type, cluster_ids, supporting_count(>0), decision, target_file, sanitizer("pass"), linker, quality("pass"|"warn"), commit_hash 를 포함하세요. 러너가 이 리포트를 검증합니다.
+8. 통과한 wiki 파일만 git add/commit/push 하세요. 완료 후 큐와 락을 정리하세요(complete/release).
+9. 1회 실행에서 최대 3개 후보를 순차 처리하세요. pending이 없으면 "처리할 후보 없음"을 보고하고 종료하세요.
+
+MCP 커버리지 게이트 (공통 하드 + 타입별):
+- 공통(전 타입, 러너가 코드로 강제): dataforge qaset_with_rag(가능 시), namuwiki MCP, dataforge dc_gallery(유저 수요 근거).
+- lore/mechanics 타입 추가(팀장이 보고로 확인): dataforge sg_paper, sg-ontology MCP, dataforge sg_game_sg0_en.
+- dataforge dc_gallery는 dcinside 유저 게시글 소스입니다. source_names=["dc_gallery"], top_k는 반드시 30 이하로 조회하세요.
+- sg_game_sge는 배제 감사 전용입니다. 위키 본문·요약에 반영 금지.
+
+위생 규칙 (절대 준수):
+- dc_gallery(dcinside) 근거는 산문 가공 전용. 원문 직접 인용 블록·각주([^N]) 금지, gall_num/chunk ID/source 이름·내부 경로(data/dc_gallery/...)를 위키 본문에 노출 금지.
+- sg_game_sge·sg_game_sg0_en은 파라프레이즈만, 소스명·chunk ID 노출 금지.
+- data/dc_gallery/, .admin/, 큐/리포트 파일은 절대 git add 금지. 대상 wiki/*.md만 commit.
+
+운영 제약:
+- 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- 동일 파일을 동시에 수정하지 마세요(두 계층 락 사용).
+- sanitizer fail 또는 quality-lead FAIL 상태에서 commit하지 마세요.
+- 하위 에이전트에게 git commit/push를 위임하지 마세요.
+- 완료 시 처리/스킵/거부 후보 ID, 각 decision(create/update), commit hash 또는 미커밋 사유, 리포트 경로를 요약하세요.`;
+}
+
 function buildPrompt(command, runId) {
   if (command === 'p1') {
     return buildP1Prompt(runId);
@@ -375,6 +441,9 @@ function buildPrompt(command, runId) {
   }
   if (command === 'p5') {
     return buildP5Prompt(runId);
+  }
+  if (command === 'p6') {
+    return buildP6Prompt(runId);
   }
   return buildP2Prompt(runId);
 }
@@ -395,10 +464,11 @@ function stringifyToolInput(input) {
   }
 }
 
-function createMcpCoverageTracker() {
+function createMcpCoverageTracker(required = REQUIRED_MCP_COVERAGE) {
   return {
+    required,
     items: Object.fromEntries(
-      REQUIRED_MCP_COVERAGE.map((item) => [
+      required.map((item) => [
         item.key,
         {
           ...item,
@@ -413,24 +483,26 @@ function createMcpCoverageTracker() {
   };
 }
 
-function labelsForToolUse(block) {
+function labelsForToolUse(block, required) {
   const name = String(block.name ?? '').toLowerCase();
   const inputText = stringifyToolInput(block.input);
+  const requiredKeys = new Set(required.map((item) => item.key));
   const labels = [];
 
   if (name.startsWith('mcp__dataforge__')) {
-    for (const item of REQUIRED_MCP_COVERAGE) {
+    for (const item of required) {
       if (item.type === 'dataforge-source' && inputText.includes(item.source)) {
         labels.push(item.key);
       }
     }
   }
 
-  if (name.startsWith('mcp__namuwiki__')) {
+  if (name.startsWith('mcp__namuwiki__') && requiredKeys.has('namuwiki')) {
     labels.push('namuwiki');
   }
 
   if (
+    requiredKeys.has('sg_ontology') &&
     name.startsWith('mcp__') &&
     (name.includes('sg-ontology') || name.includes('sg_ontology') || name.includes('sgontology'))
   ) {
@@ -445,7 +517,7 @@ function recordToolUse(block, coverage) {
     return;
   }
 
-  const labels = labelsForToolUse(block);
+  const labels = labelsForToolUse(block, coverage.required);
   if (labels.length === 0) {
     return;
   }
@@ -479,12 +551,12 @@ function recordToolResult(block, coverage) {
 }
 
 function missingMcpCoverage(coverage) {
-  return REQUIRED_MCP_COVERAGE.filter((item) => coverage.items[item.key].succeeded < 1);
+  return coverage.required.filter((item) => coverage.items[item.key].succeeded < 1);
 }
 
 function emitMcpCoverage(runId, coverage) {
-  console.log(`[p1:${runId}] mcp coverage:`);
-  for (const item of REQUIRED_MCP_COVERAGE) {
+  console.log(`[${runId}] mcp coverage:`);
+  for (const item of coverage.required) {
     const state = coverage.items[item.key];
     const status = state.succeeded > 0 ? 'ok' : state.attempted > 0 ? 'attempted' : 'missing';
     console.log(
@@ -496,6 +568,52 @@ function emitMcpCoverage(runId, coverage) {
 
 function missingConfiguredMcpServers(mcpServers) {
   return REQUIRED_MCP_SERVERS.filter((name) => !Object.hasOwn(mcpServers, name));
+}
+
+// 파이프라인 6 구조화 리포트 검증. 팀장이 commit 전 산출한 후보별 리포트의
+// 필수 필드·게이트 결과를 확인한다. 리포트가 없으면(처리 후보 0건 등) 경고만 하고
+// 실패시키지 않는다. 리포트가 있으면 각 후보가 게이트를 통과했는지 강제한다.
+// 반환: 실패 사유 문자열(있으면) 또는 null(통과).
+async function verifyP6Report(runId) {
+  const reportPath = path.join(DEFAULT_CWD, '.admin', 'runs', `p6-${runId}-report.json`);
+  let report;
+  try {
+    report = JSON.parse(await readFile(reportPath, 'utf8'));
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log(`[p6:${runId}] no report file (no candidates committed?): ${reportPath}`);
+      return null;
+    }
+    return `report unreadable: ${error.message}`;
+  }
+
+  const candidates = Array.isArray(report.candidates) ? report.candidates : null;
+  if (!candidates) {
+    return 'report missing candidates array';
+  }
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  for (const cand of candidates) {
+    const id = cand.candidate_id || '(unknown)';
+    if (!cand.candidate_id || !cand.decision || !cand.target_file) {
+      return `candidate ${id} missing required fields (candidate_id/decision/target_file)`;
+    }
+    if (!['create', 'update'].includes(cand.decision)) {
+      return `candidate ${id} invalid decision: ${cand.decision}`;
+    }
+    if (!(Number(cand.supporting_count) > 0)) {
+      return `candidate ${id} supporting_count not > 0`;
+    }
+    if (cand.sanitizer !== 'pass') {
+      return `candidate ${id} sanitizer != pass (${cand.sanitizer})`;
+    }
+    if (cand.quality === 'fail') {
+      return `candidate ${id} quality == fail`;
+    }
+  }
+  return null;
 }
 
 function emitMessage(message, coverage) {
@@ -587,7 +705,13 @@ async function main() {
   }
 
   let exitCode = 0;
-  const coverage = args.command === 'p1' ? createMcpCoverageTracker() : null;
+  const coverageRequired =
+    args.command === 'p1'
+      ? REQUIRED_MCP_COVERAGE
+      : args.command === 'p6'
+        ? P6_REQUIRED_COVERAGE
+        : null;
+  const coverage = coverageRequired ? createMcpCoverageTracker(coverageRequired) : null;
   const stream = query({ prompt, options });
   for await (const message of stream) {
     emitMessage(message, coverage);
@@ -596,23 +720,31 @@ async function main() {
     }
   }
 
-  if (args.command === 'p1') {
+  if (coverage) {
     emitMcpCoverage(args.runId, coverage);
 
     const missingCoverage = missingMcpCoverage(coverage);
     if (missingCoverage.length > 0) {
       console.log(
-        `[p1:${args.runId}] missing required MCP coverage: ${missingCoverage
+        `[${args.command}:${args.runId}] missing required MCP coverage: ${missingCoverage
           .map((item) => item.label)
           .join(', ')}`,
       );
       exitCode = 1;
     }
 
-    if (coverage.successfulCoverageToolIds.size < REQUIRED_MCP_COVERAGE.length) {
+    if (coverage.successfulCoverageToolIds.size < coverage.required.length) {
       console.log(
-        `[p1:${args.runId}] insufficient distinct MCP coverage calls: ${coverage.successfulCoverageToolIds.size}/${REQUIRED_MCP_COVERAGE.length}`,
+        `[${args.command}:${args.runId}] insufficient distinct MCP coverage calls: ${coverage.successfulCoverageToolIds.size}/${coverage.required.length}`,
       );
+      exitCode = 1;
+    }
+  }
+
+  if (args.command === 'p6') {
+    const reportFailure = await verifyP6Report(args.runId);
+    if (reportFailure) {
+      console.log(`[p6:${args.runId}] report verification failed: ${reportFailure}`);
       exitCode = 1;
     }
   }
