@@ -22,6 +22,30 @@ SENTINEL="${CMEM_DIR}/.holyclaude-cmem-installed"
 mkdir -p "${CMEM_DIR}"
 chown -R "${PUID}:${PGID}" "${CMEM_DIR}"
 
+# 1b. Materialize claude-mem LLM auth (~/.claude-mem/.env).
+# The worker resolves Claude SDK auth from THIS file (Uy()/zy() in
+# worker-service.cjs), NOT from the container process env — so ANTHROPIC_* in
+# docker-compose are invisible to it. Without this file it falls back to
+# "OAuth from system keychain", which is empty under ZAI token auth, so every
+# observation/summary generation returns "Not logged in · Please run /login"
+# and claude-mem stores nothing (0 observations, 0 summaries).
+# Regenerate every boot (NOT sentinel-gated) so host .env key rotation propagates.
+CMEM_ENV="${CMEM_DIR}/.env"
+if [ -n "${ZAI_API_KEY}" ]; then
+  (
+    umask 077
+    cat > "${CMEM_ENV}" <<EOF
+ANTHROPIC_API_KEY=${ZAI_API_KEY}
+ANTHROPIC_AUTH_TOKEN=${ZAI_API_KEY}
+ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-https://api.z.ai/api/anthropic}
+EOF
+  )
+  chown "${PUID}:${PGID}" "${CMEM_ENV}" 2>/dev/null || true
+  chmod 600 "${CMEM_ENV}"
+else
+  echo "[claude-mem] ZAI_API_KEY unset — cannot write ~/.claude-mem/.env; worker auth will fail" >&2
+fi
+
 # 2. Idempotent install — skip if already provisioned on this volume.
 if [ -f "${SENTINEL}" ]; then
   echo "[claude-mem] already provisioned (sentinel present), skipping install."

@@ -74,6 +74,9 @@ services:
       - QA_WIKI_MAX_CONCURRENCY=8
 
       # Claude Code → Z.AI 라우팅 (docs.z.ai/devpack/quick-start#claude-code)
+      # NOTE: claude-mem 워커는 process.env 가 아닌 ~/.claude-mem/.env 에서 LLM auth를
+      # 읽습니다(Uy()/zy()). 이 파일은 claude-mem-bootstrap.sh 가 $ZAI_API_KEY 로 매
+      # 기동마다 생성합니다. 아래 토큰은 대화형 Claude Code 세션용(Bearer).
       - ANTHROPIC_AUTH_TOKEN=${ZAI_API_KEY}
       - ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
       - API_TIMEOUT_MS=3000000

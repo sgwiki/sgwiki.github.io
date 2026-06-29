@@ -126,7 +126,7 @@ make shell           # 컨테이너 bash 접속
 - **뷰어**: `http://localhost:37700` — 메모리 스트림·검색 (`mem-search`).
 - **데이터**: named volume `sg-wiki-claude-mem` → `/home/claude/.claude-mem` (SQLite + Chroma). drvfs bind mount가 아닌 Docker 로컬 볼륨이라 SQLite 락이 안전하고 컨테이너 재빌드에도 보존됩니다.
 - **격리**: sg-wiki 전용 단일 볼륨·단일 worker — 다른 프로젝트 데이터는 섞이지 않습니다.
-- **요약 LLM**: Z.AI `glm-5.2` 재사용 (`CLAUDE_MEM_MODEL`), 별도 키 불필요.
+- **요약 LLM·인증**: Z.AI `glm-5.2` 재사용 (`CLAUDE_MEM_MODEL`). claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로, `claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성합니다(별도 키 불필요). 파일이 없으면 OAuth 키체인으로 폴백 → "Not logged in" 루프로 observation/summary가 0건이 됩니다.
 - **동작**: 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로, `enabledPlugins`에 등록된 claude-mem 훅이 **모든 에이전트 세션에서 자동으로 캡처·주입**합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
 
 > 변경(`Dockerfile`·`docker-compose.yaml`·`scripts/claude-mem-*`·s6 서비스)은 이미지에 베이크되므로 `make up`(재빌드)으로 반영합니다.
