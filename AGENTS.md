@@ -16,11 +16,13 @@
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
 | `scripts/p6_demand_queue.mjs` | P6 유저 수요 후보 소비 큐 | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
+| `scripts/fetch_fandom_episodes.mjs` | Fandom `Category:Episodes` → `data/fandom_episodes/` 마크다운 수집·변환 (영문 원문+한국어 번역용 원문) | tracked |
+| `scripts/gen_episodes_readme.mjs` | `data/fandom_episodes/README.md` 인덱스 자동 생성 | tracked |
 | `sg-worldline-map/` | `/maps/`로 배포되는 세계선 인터랙티브 맵 React/Vite SPA | tracked |
 | `worker/` | "제안하기" 폼 Cloudflare Worker | tracked |
 | `docker/holyclaude/` | 에이전트 팀 + 관리 UI 컨테이너 정의 | tracked |
 | `mkdocs.yml` / `Makefile` | 위키 빌드 설정 · 명령 래퍼 | tracked |
-| `data/qaset_with_rag/`, `data/공식 자료집/`, `data/dc_gallery/` | RAG 소스·공식 자료·P6 유저 수요 입력 (대용량/민감) | **gitignored** |
+| `data/qaset_with_rag/`, `data/공식 자료집/`, `data/dc_gallery/`, `data/fandom_episodes/` | RAG 소스·공식 자료·P6 유저 수요 입력·Fandom 에피소드 데이터 (대용량) | **gitignored** |
 | `suggestions/` | 수신 제안 + 처리 상태 (런타임) | **gitignored** |
 | `.admin/` | 실행 로그 · 위키 검토 · registry · locks (런타임) | **gitignored** |
 | `docker/holyclaude/data/cloudcli/` | GitHub 토큰 DB (`auth.db`) — **절대 커밋 금지** | **gitignored** |
