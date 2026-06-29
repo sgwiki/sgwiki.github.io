@@ -214,5 +214,13 @@
     "branchCondition": "2025년 오카베가 영상 D메일을 녹화하고 2010년 오카베가 이를 확인한다.",
     "worldLineId": "WL_1_130209",
     "macroEventId": "ME_NostalgiaDrive"
+  },
+  {
+    "id": "EV_SG0_Alpha_Excursion",
+    "uri": "EV_SG0_Alpha_Excursion",
+    "variationIdentity": "S;G0 α 세계선 일시 방문 시나리오",
+    "branchCondition": "베타 분기 도중 크리스의 구원 요청으로 리딩 슈타이너가 발동해 α로 일시 이동한다(Ep.08~09).",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_SG0_Beta_Branches"
   }
 ]

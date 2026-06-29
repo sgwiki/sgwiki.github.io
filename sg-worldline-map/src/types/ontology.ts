@@ -50,6 +50,7 @@ export type MechanismType =
   | 'timeleap'
   | 'physicaltravel'
   | 'videodmail'
+  | 'drine'
   | 'none'
   | (string & {})
 

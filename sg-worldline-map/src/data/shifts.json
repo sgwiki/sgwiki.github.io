@@ -190,5 +190,29 @@
     "fromY": 857,
     "toY": 530,
     "triggeredByEventId": "Event_OperationSkuldTravel"
+  },
+  {
+    "id": "Shift_SG0_Beta_to_Alpha",
+    "uri": "Shift_SG0_Beta_to_Alpha",
+    "shiftType": "readingsteiner",
+    "shiftMoment": "2011-01-06 00:00",
+    "summary": "크리스의 구원 요청으로 β→α 일시 이동(Ep.08).",
+    "fromWorldLineId": "WL_1_064750",
+    "toWorldLineId": "WL_0_571024",
+    "fromY": 686,
+    "toY": 434,
+    "triggeredByEventId": "Event_SG0_AlphaShift"
+  },
+  {
+    "id": "Shift_SG0_Alpha_to_Beta",
+    "uri": "Shift_SG0_Alpha_to_Beta",
+    "shiftType": "readingsteiner",
+    "shiftMoment": "2011-01-09 00:00",
+    "summary": "α 밀회 종료 후 β로 복귀(Ep.09).",
+    "fromWorldLineId": "WL_0_571024",
+    "toWorldLineId": "WL_1_064750",
+    "fromY": 434,
+    "toY": 686,
+    "triggeredByEventId": "Event_SG0_AlphaShift"
   }
 ]

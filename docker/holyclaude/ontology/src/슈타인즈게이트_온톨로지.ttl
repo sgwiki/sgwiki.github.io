@@ -1432,7 +1432,7 @@ sg:Event_NostalgiaDrive_View a sg:Event ;
     sg:mechanismType "videodmail" ;
     sg:localDateTime "2010-08-21 17:30" ;
     sg:timePrecision "approximate" ;
-    sg:actor "Char_Okabe_2025" ;
+    sg:actor "Char_Okabe" ;
     sg:target "Char_Okabe" ;
     sg:place "미래 가제트 연구소" ;
     sg:partOfVariation sg:EV_NostalgiaDrive_Preparation .
@@ -2532,8 +2532,8 @@ sgsh:EventShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:datatype xsd:string ;
-        sh:in ( "dmail" "timeleap" "physicaltravel" "videodmail" "none" ) ;
-        sh:message "mechanismType은 dmail/timeleap/physicaltravel/videodmail/none 중 하나여야 한다."@ko
+        sh:in ( "dmail" "timeleap" "physicaltravel" "videodmail" "drine" "none" ) ;
+        sh:message "mechanismType은 dmail/timeleap/physicaltravel/videodmail/drine/none 중 하나여야 한다."@ko
     ] ;
     sh:property [
         sh:path sg:localDateTime ;
@@ -2720,3 +2720,545 @@ sgsh:MacroEventShape a sh:NodeShape ;
         sh:class sg:EventVariation ;
         sh:message "MacroEvent는 반드시 하나 이상의 EventVariation을 가져야 한다."@ko
     ] .
+# 슈타인즈게이트 온톨로지 — 위키 에피소드 정본 보강 patch (Phase 07)
+# =====================================================================
+# 상태: PENDING APPROVAL — 승인 + 3중 게이트(SHACL/카운트/build) 전 본체 미반영.
+# 규칙: 추가만(additive). 기존 id 덮어쓰기/삭제 금지. worldlines=20 불변.
+# 근거: wiki/애니메이션-에피소드/* (51화 정본) + wiki/lore/2010년-사건-연표.md
+# 선행: mechanismType sh:in 에 drine 추가(01_schema/mechanism-drine.ttl) → 본 patch보다 먼저 머지.
+# 머지 시: 이 파일의 트리플을 슈타인즈게이트_온톨로지.ttl 의 해당 섹션에 추가.
+# 파라프레이즈: 모든 sg:summary/sg:note 텍스트는 위키 산문을 온톨로지 서술문으로 재작성.
+
+# =====================================================================
+# §1. 신규 MediaSource — 본편 anime +22 (기존 Ep01/22/23/24에 추가)
+# =====================================================================
+sg:MS_SG_Anime_Ep02 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep02" ;
+    sg:labelKo "슈타인즈 게이트 애니 2화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "2화" .
+sg:MS_SG_Anime_Ep03 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep03" ;
+    sg:labelKo "슈타인즈 게이트 애니 3화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "3화" .
+sg:MS_SG_Anime_Ep04 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep04" ;
+    sg:labelKo "슈타인즈 게이트 애니 4화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "4화" .
+sg:MS_SG_Anime_Ep05 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep05" ;
+    sg:labelKo "슈타인즈 게이트 애니 5화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "5화" .
+sg:MS_SG_Anime_Ep06 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep06" ;
+    sg:labelKo "슈타인즈 게이트 애니 6화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "6화" .
+sg:MS_SG_Anime_Ep07 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep07" ;
+    sg:labelKo "슈타인즈 게이트 애니 7화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "7화" .
+sg:MS_SG_Anime_Ep08 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep08" ;
+    sg:labelKo "슈타인즈 게이트 애니 8화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "8화" .
+sg:MS_SG_Anime_Ep09 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep09" ;
+    sg:labelKo "슈타인즈 게이트 애니 9화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "9화" .
+sg:MS_SG_Anime_Ep10 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep10" ;
+    sg:labelKo "슈타인즈 게이트 애니 10화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "10화" .
+sg:MS_SG_Anime_Ep11 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep11" ;
+    sg:labelKo "슈타인즈 게이트 애니 11화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "11화" .
+sg:MS_SG_Anime_Ep12 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep12" ;
+    sg:labelKo "슈타인즈 게이트 애니 12화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "12화" .
+sg:MS_SG_Anime_Ep13 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep13" ;
+    sg:labelKo "슈타인즈 게이트 애니 13화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "13화" .
+sg:MS_SG_Anime_Ep14 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep14" ;
+    sg:labelKo "슈타인즈 게이트 애니 14화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "14화" .
+sg:MS_SG_Anime_Ep15 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep15" ;
+    sg:labelKo "슈타인즈 게이트 애니 15화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "15화" .
+sg:MS_SG_Anime_Ep16 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep16" ;
+    sg:labelKo "슈타인즈 게이트 애니 16화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "16화" .
+sg:MS_SG_Anime_Ep17 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep17" ;
+    sg:labelKo "슈타인즈 게이트 애니 17화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "17화" .
+sg:MS_SG_Anime_Ep18 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep18" ;
+    sg:labelKo "슈타인즈 게이트 애니 18화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "18화" .
+sg:MS_SG_Anime_Ep19 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep19" ;
+    sg:labelKo "슈타인즈 게이트 애니 19화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "19화" .
+sg:MS_SG_Anime_Ep20 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep20" ;
+    sg:labelKo "슈타인즈 게이트 애니 20화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "20화" .
+sg:MS_SG_Anime_Ep21 a sg:MediaSource ; sg:id "MS_SG_Anime_Ep21" ;
+    sg:labelKo "슈타인즈 게이트 애니 21화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "21화" .
+sg:MS_SG_Anime_Ep23Beta a sg:MediaSource ; sg:id "MS_SG_Anime_Ep23Beta" ;
+    sg:labelKo "슈타인즈 게이트 애니 23화 β(미싱 링크)"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "23화 β" .
+sg:MS_SG_Anime_Ep25SP a sg:MediaSource ; sg:id "MS_SG_Anime_Ep25SP" ;
+    sg:labelKo "슈타인즈 게이트 애니 25화 SP(이기적 방황병)"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate" ; sg:mediaUnit "25화 SP" .
+
+# =====================================================================
+# §2. 신규 MediaSource — SG0 anime +24 (기존 0개)
+# =====================================================================
+sg:MS_SG0_Anime_Ep01 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep01" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 1화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "1화" .
+sg:MS_SG0_Anime_Ep02 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep02" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 2화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "2화" .
+sg:MS_SG0_Anime_Ep03 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep03" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 3화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "3화" .
+sg:MS_SG0_Anime_Ep04 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep04" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 4화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "4화" .
+sg:MS_SG0_Anime_Ep05 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep05" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 5화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "5화" .
+sg:MS_SG0_Anime_Ep06 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep06" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 6화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "6화" .
+sg:MS_SG0_Anime_Ep07 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep07" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 7화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "7화" .
+sg:MS_SG0_Anime_Ep08 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep08" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 8화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "8화" .
+sg:MS_SG0_Anime_Ep09 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep09" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 9화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "9화" .
+sg:MS_SG0_Anime_Ep10 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep10" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 10화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "10화" .
+sg:MS_SG0_Anime_Ep11 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep11" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 11화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "11화" .
+sg:MS_SG0_Anime_Ep12 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep12" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 12화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "12화" .
+sg:MS_SG0_Anime_Ep13 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep13" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 13화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "13화" .
+sg:MS_SG0_Anime_Ep14 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep14" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 14화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "14화" .
+sg:MS_SG0_Anime_Ep15 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep15" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 15화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "15화" .
+sg:MS_SG0_Anime_Ep16 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep16" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 16화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "16화" .
+sg:MS_SG0_Anime_Ep17 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep17" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 17화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "17화" .
+sg:MS_SG0_Anime_Ep18 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep18" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 18화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "18화" .
+sg:MS_SG0_Anime_Ep19 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep19" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 19화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "19화" .
+sg:MS_SG0_Anime_Ep20 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep20" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 20화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "20화" .
+sg:MS_SG0_Anime_Ep21 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep21" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 21화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "21화" .
+sg:MS_SG0_Anime_Ep22 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep22" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 22화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "22화" .
+sg:MS_SG0_Anime_Ep23 a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep23" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 23화"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "23화" .
+sg:MS_SG0_Anime_Ep24SP a sg:MediaSource ; sg:id "MS_SG0_Anime_Ep24SP" ;
+    sg:labelKo "슈타인즈 게이트 0 애니 24화 SP(발렌티누스)"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate 0" ; sg:mediaUnit "24화 SP" .
+
+# =====================================================================
+# §3. 신규 MediaSource — 극장판 +1
+# =====================================================================
+sg:MS_Movie_Debu a sg:MediaSource ; sg:id "MS_Movie_Debu" ;
+    sg:labelKo "극장판 부하영역의 데자뷰"@ko ; sg:mediaType "anime" ;
+    sg:mediaTitle "Steins;Gate: The Movie - Load Region of Déjà Vu" ; sg:mediaUnit "극장판" .
+
+# =====================================================================
+# §4. 신규 EventVariation 1 — SG0 α 일시 교차 (06 §3)
+# =====================================================================
+sg:EV_SG0_Alpha_Excursion a sg:EventVariation ;
+    sg:id "EV_SG0_Alpha_Excursion" ;
+    sg:variationIdentity "S;G0 α 세계선 일시 방문 시나리오" ;
+    sg:belongsToWorldLine sg:WL_0_571024 ;        # α 어트랙터 재사용(신규 WL 생성 안 함)
+    sg:partOfMacroEvent sg:ME_SG0_Beta_Branches ;
+    sg:branchCondition "베타 분기 도중 크리스의 구원 요청으로 리딩 슈타이너가 발동해 α로 일시 이동한다(Ep.08~09)."@ko ;
+    sg:note "애니 Ep.08~09 명시. α 어트랙터는 본편 WL_0_571024 재사용."@ko .
+
+# =====================================================================
+# §5. 신규 WorldLineShift 2 — SG0 α 교차 (06 §3)
+# =====================================================================
+sg:Shift_SG0_Beta_to_Alpha a sg:WorldLineShift ;
+    sg:id "Shift_SG0_Beta_to_Alpha" ;
+    sg:fromWorldLine sg:WL_1_064750 ;
+    sg:toWorldLine sg:WL_0_571024 ;
+    sg:triggeredByEvent sg:Event_SG0_AlphaShift ;
+    sg:shiftType "readingsteiner" ;
+    sg:shiftMoment "2011-01-06 00:00" ;
+    sg:summary "크리스의 구원 요청으로 β→α 일시 이동(Ep.08)."@ko .
+sg:Shift_SG0_Alpha_to_Beta a sg:WorldLineShift ;
+    sg:id "Shift_SG0_Alpha_to_Beta" ;
+    sg:fromWorldLine sg:WL_0_571024 ;
+    sg:toWorldLine sg:WL_1_064750 ;
+    sg:triggeredByEvent sg:Event_SG0_AlphaShift ;
+    sg:shiftType "readingsteiner" ;
+    sg:shiftMoment "2011-01-09 00:00" ;
+    sg:summary "α 밀회 종료 후 β로 복귀(Ep.09)."@ko .
+
+# =====================================================================
+# §6. 신규 Event — 본편 (위키 정본 기반, Tier B-1)
+# 규칙: partOfVariation/eventType/mechanismType/localDateTime/timePrecision 필수.
+# =====================================================================
+sg:Event_SatelliteCrash a sg:Event ;
+    sg:id "Event_SatelliteCrash" ;
+    sg:labelKo "위성 추락(스즈하 타임머신)"@ko ;
+    sg:summary "라디오 회관 옥상에 추락한 위성은 사실 2036년에서 온 스즈하의 타임머신이다."@ko ;
+    sg:partOfVariation sg:EV_Prologue_Beta_Discovery ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-28 12:00" ; sg:timePrecision "approximate" ;
+    sg:place "라디오 회관 옥상" ; sg:actor "Char_Suzuha" ; sg:target "C204 타임머신" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep01 ; sg:note "정체는 Ep.14에서 공개."@ko .
+
+sg:Event_SERN_Hacked a sg:Event ;
+    sg:id "Event_SERN_Hacked" ;
+    sg:labelKo "SERN 데이터 침입 및 인체실험 발견"@ko ;
+    sg:summary "다루가 SERN 메일박스를 해킹해 인체실험 기록을 발견한다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_IBN_Search ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-07-31 23:00" ; sg:timePrecision "day" ;
+    sg:place "다루 방" ; sg:actor "Char_Daru" ; sg:target "SERN DB" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep05 ;
+    sg:note "에셸론 포착과 Z-프로그램의 인과 출발점. Ep.03/05."@ko .
+
+sg:Event_ReadingSteiner_Named a sg:Event ;
+    sg:id "Event_ReadingSteiner_Named" ;
+    sg:labelKo "리딩 슈타이너 명명"@ko ;
+    sg:summary "오카베가 세계선 이동 시 기억을 유지하는 능력을 리딩 슈타이너라 명명한다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Loto6_Send ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-03 16:25" ; sg:timePrecision "approximate" ;
+    sg:place "미래 가젯 연구소" ; sg:actor "Char_Okabe" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep08 ; sg:note "Ep.08에서 명명."@ko .
+
+sg:Event_Lifter_Discovered a sg:Event ;
+    sg:id "Event_Lifter_Discovered" ;
+    sg:labelKo "리프터 정체 발견"@ko ;
+    sg:summary "미스터 브라운의 대형 브라운관 TV가 D메일 전송의 리프터였음이 밝혀진다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_DMail_SuzuhaChase_Send ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-10 15:00" ; sg:timePrecision "approximate" ;
+    sg:place "브라운관 공방" ; sg:actor "Char_Okabe" ; sg:target "42형 CRT TV" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep11 .
+
+sg:Event_TimeLeapMachine_Complete a sg:Event ;
+    sg:id "Event_TimeLeapMachine_Complete" ;
+    sg:labelKo "타임리프 머신 완성"@ko ;
+    sg:summary "크리스가 기억을 과거로 보내는 타임리프 머신을 완성하고 공개를 선언한다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_TimeLeap_FirstUse ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 14:00" ; sg:timePrecision "approximate" ;
+    sg:place "미래 가젯 연구소" ; sg:actor "Char_Kurisu" ; sg:target "타임리프 머신" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep12 .
+
+sg:Event_DivergenceMeter_Introduced a sg:Event ;
+    sg:id "Event_DivergenceMeter_Introduced" ;
+    sg:labelKo "분기계(다이버전스 미터) 도입"@ko ;
+    sg:summary "미래 오카베가 만든 분기계가 현재 세계선 수치를 시각화한다."@ko ;
+    sg:partOfVariation sg:EV_Rescue_LabShot ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 00:00" ; sg:timePrecision "day" ;
+    sg:place "라디오 회관 앞" ; sg:actor "Char_Suzuha" ; sg:target "분기계" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep14 .
+
+sg:Event_Suzuha_Identity_Titor a sg:Event ;
+    sg:id "Event_Suzuha_Identity_Titor" ;
+    sg:labelKo "스즈하 정체(존 티토) 공개"@ko ;
+    sg:summary "스즈하가 자신이 2036년에서 온 시간여행자 존 티토 본인임을 밝힌다."@ko ;
+    sg:partOfVariation sg:EV_Rescue_LabShot ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 00:00" ; sg:timePrecision "day" ;
+    sg:place "라디오 회관" ; sg:actor "Char_Suzuha" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep14 .
+
+sg:Event_Suzuha_Departure_1975 a sg:Event ;
+    sg:id "Event_Suzuha_Departure_1975" ;
+    sg:labelKo "스즈하 1975년 출발"@ko ;
+    sg:summary "스즈하가 IBN 5100을 회수하기 위해 1975년으로 출발한다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_DMail_SuzuhaChase_Cancel ;
+    sg:eventType "travel" ; sg:mechanismType "physicaltravel" ;
+    sg:localDateTime "2010-08-13 15:07" ; sg:timePrecision "exact" ;
+    sg:place "라디오 회관" ; sg:actor "Char_Suzuha" ; sg:target "1975년" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep16 .
+
+sg:Event_Daru_Is_Suzuha_Father a sg:Event ;
+    sg:id "Event_Daru_Is_Suzuha_Father" ;
+    sg:labelKo "다루=스즈하 아버지 공개"@ko ;
+    sg:summary "스즈하의 친아버지가 하시다 이타루(다루)임이 밝혀진다."@ko ;
+    sg:partOfVariation sg:EV_Rescue_LabShot ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 15:07" ; sg:timePrecision "exact" ;
+    sg:place "라디오 회관" ; sg:actor "Char_Mayuri" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep16 .
+
+sg:Event_FB_Is_MrBraun a sg:Event ;
+    sg:id "Event_FB_Is_MrBraun" ;
+    sg:labelKo "FB 정체(미스터 브라운) 공개"@ko ;
+    sg:summary "라운더의 지휘자 FB가 텐노지 유고(미스터 브라운)임이 드러난다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Moeka_Cancel ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 00:00" ; sg:timePrecision "day" ;
+    sg:place "미스터 브라운 집" ; sg:actor "Char_MrBraun" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep20 .
+
+sg:Event_Moeka_Death a sg:Event ;
+    sg:id "Event_Moeka_Death" ;
+    sg:labelKo "모에카 사망(미스터 브라운 사살)"@ko ;
+    sg:summary "미스터 브라운이 모에카를 사살한 뒤 자살한다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_DMail_Moeka_Cancel ;
+    sg:eventType "death" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-13 00:00" ; sg:timePrecision "day" ;
+    sg:place "미스터 브라운 집" ; sg:actor "Char_MrBraun" ; sg:target "Char_Moeka" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep20 .
+
+sg:Event_NakabachiPaper_Russia a sg:Event ;
+    sg:id "Event_NakabachiPaper_Russia" ;
+    sg:labelKo "나카바치 논문 러시아 유출"@ko ;
+    sg:summary "나카바치가 타임머신 논문을 들고 러시아로 망명해 3차대전 위험이 현실화한다."@ko ;
+    sg:partOfVariation sg:EV_Skuld_Fail ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-21 00:00" ; sg:timePrecision "day" ;
+    sg:place "러시아" ; sg:actor "Char_Nakabachi" ; sg:target "타임머신 논문" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep23 .
+
+sg:Event_Moeka_FB_FirstMessage a sg:Event ;
+    sg:id "Event_Moeka_FB_FirstMessage" ;
+    sg:labelKo "모에카 FB 첫 문자 수신"@ko ;
+    sg:summary "모에카가 FB로부터 첫 지령 문자를 수신한다."@ko ;
+    sg:partOfVariation sg:EV_Alpha_IBN_Search ;
+    sg:eventType "communication" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-08-02 11:52" ; sg:timePrecision "approximate" ;
+    sg:place "라디오 회관 앞" ; sg:actor "Char_FB" ; sg:target "Char_Moeka" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep06 ; sg:note "위키 Ep.06 명시(06 B-1에는 Ep.06 미포함이나 위키 정본 근거로 추가)."@ko .
+
+# =====================================================================
+# §7. 신규 Event — SG0 (위키 정본, Tier B-2)
+# =====================================================================
+sg:Event_SG0_LeskinenSeminar a sg:Event ;
+    sg:id "Event_SG0_LeskinenSeminar" ;
+    sg:labelKo "레스키넨 세미나 및 아마데우스 발표"@ko ;
+    sg:summary "레스키넨과 마호가 크리스 연구를 기반으로 한 기억 디지털화 AI 아마데우스를 발표한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Contact ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-11-15 00:00" ; sg:timePrecision "unknown" ;
+    sg:place "빅토르 콘도리아 대학 세미나" ; sg:actor "Char_Leskinen" ; sg:target "Amadeus" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep01 .
+
+sg:Event_SG0_ChristmasParty a sg:Event ;
+    sg:id "Event_SG0_ChristmasParty" ;
+    sg:labelKo "크리스마스 이브 연구소 파티"@ko ;
+    sg:summary "크리스마스 이브에 미래 가젯 연구소에서 파티가 열린다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Contact ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-12-24 00:00" ; sg:timePrecision "day" ;
+    sg:place "미래 가젯 연구소" ; sg:actor "Char_Okabe" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep03 ; sg:note "날짜 확정(12/24)."@ko .
+
+sg:Event_SG0_ReadingSteinerReactivates a sg:Event ;
+    sg:id "Event_SG0_ReadingSteinerReactivates" ;
+    sg:labelKo "리딩 슈타이너 비정상 재발동"@ko ;
+    sg:summary "리딩 슈타이너가 비정상적으로 발동하며 1.382733β 세계선의 비전을 체험한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Contact ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2010-12-28 00:00" ; sg:timePrecision "unknown" ;
+    sg:actor "Char_Okabe" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep04 ; sg:note "1.382733β 명시(Ep.04)."@ko .
+
+sg:Event_SG0_KagariTimeTravel a sg:Event ;
+    sg:id "Event_SG0_KagariTimeTravel" ;
+    sg:labelKo "카가리 시간 이동(1975→1998→2010)"@ko ;
+    sg:summary "스즈하와 카가리가 1975년을 거쳐 1998년, 2010년으로 이동한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Solitude ;
+    sg:eventType "travel" ; sg:mechanismType "physicaltravel" ;
+    sg:localDateTime "1975-08-01 00:00" ; sg:timePrecision "unknown" ;
+    sg:place "아키하바라" ; sg:actor "Char_Kagari" ; sg:target "2010년" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep04 .
+
+sg:Event_SG0_AlphaShift a sg:Event ;
+    sg:id "Event_SG0_AlphaShift" ;
+    sg:labelKo "SG0 α 세계선 일시 이동"@ko ;
+    sg:summary "크리스의 구원 요청으로 리딩 슈타이너가 발동해 α 세계선으로 일시 이동한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Alpha_Excursion ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2011-01-06 00:00" ; sg:timePrecision "unknown" ;
+    sg:actor "Char_Okabe" ; sg:target "α 어트랙터" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep08 .
+
+sg:Event_SG0_KurisuLaptop a sg:Event ;
+    sg:id "Event_SG0_KurisuLaptop" ;
+    sg:labelKo "크리스 노트북 발견"@ko ;
+    sg:summary "마호가 보존 중이던 크리스의 노트북(타임머신 이론)을 공개한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Twin_Automata ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2011-01-10 00:00" ; sg:timePrecision "unknown" ;
+    sg:place "마호 연구실" ; sg:actor "Char_Maho" ; sg:target "크리스 노트북" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep10 ; sg:note "판도라의 상자. 살리에리 콤플렉스."@ko .
+
+sg:Event_SG0_LeskinenStratfoReveal a sg:Event ;
+    sg:id "Event_SG0_LeskinenStratfoReveal" ;
+    sg:labelKo "레스키넌 Stratfo 배후 폭로"@ko ;
+    sg:summary "레스키넌이 민간 정보기관 Stratfo의 일원임을 드러낸다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Solitude ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2011-08-15 00:00" ; sg:timePrecision "unknown" ;
+    sg:place "아키하바라" ; sg:actor "Char_Leskinen" ; sg:target "Stratfo" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep18 .
+
+sg:Event_SG0_Okabe2036 a sg:Event ;
+    sg:id "Event_SG0_Okabe2036" ;
+    sg:labelKo "오카베 2036년 각성"@ko ;
+    sg:summary "오카베가 2036년 시설에서 눈을 뜬다(2011년 기억을 덮어쓴 상태)."@ko ;
+    sg:partOfVariation sg:EV_SG0_Promised_Rinascimento ;
+    sg:eventType "travel" ; sg:mechanismType "timeleap" ;
+    sg:localDateTime "2036-07-07 00:00" ; sg:timePrecision "unknown" ;
+    sg:place "미래 시설" ; sg:actor "Char_Okabe" ; sg:target "2011년" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep20 ; sg:note "절대연도(C1 비교불가)."@ko .
+
+sg:Event_SG0_3000TimeLeaps a sg:Event ;
+    sg:id "Event_SG0_3000TimeLeaps" ;
+    sg:labelKo "2036→2011 3000회 타임리프"@ko ;
+    sg:summary "오카베가 2036년에서 2011년까지 2주 단위로 약 3000회 타임리프를 반복한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Promised_Rinascimento ;
+    sg:eventType "travel" ; sg:mechanismType "timeleap" ;
+    sg:localDateTime "2036-08-01 00:00" ; sg:timePrecision "unknown" ;
+    sg:actor "Char_Okabe" ; sg:target "2011년" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep21 .
+
+sg:Event_SG0_AmadeusPatch_Maho a sg:Event ;
+    sg:id "Event_SG0_AmadeusPatch_Maho" ;
+    sg:labelKo "마호 아마데우스 제어코드·자폭"@ko ;
+    sg:summary "마호가 최고 관리 권한으로 제어 코드를 입력해 이머전시 모드로 전환 후 자폭 처리를 지시한다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Deleted ;
+    sg:eventType "intervention" ; sg:mechanismType "none" ;
+    sg:localDateTime "2011-08-20 00:00" ; sg:timePrecision "unknown" ;
+    sg:actor "Char_Maho" ; sg:target "Amadeus" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep22 ; sg:note "§5′-C2(사용자 정정)."@ko .
+
+sg:Event_SG0_DRine a sg:Event ;
+    sg:id "Event_SG0_DRine" ;
+    sg:labelKo "다루 D-RINE 송신"@ko ;
+    sg:summary "다루가 에셜론 회피 목적의 D-RINE으로 크리스 기억 보호 지령을 과거의 자신에게 보낸다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Amadeus_Deleted ;
+    sg:eventType "communication" ; sg:mechanismType "drine" ;
+    sg:localDateTime "2011-08-20 00:00" ; sg:timePrecision "unknown" ;
+    sg:actor "Char_Daru" ; sg:target "과거" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep22 ;
+    sg:note "mechanismType=drine(허용목록 확장 선행 필수). §5′-C2."@ko .
+
+sg:Event_SG0_TimeMachineDestroyed a sg:Event ;
+    sg:id "Event_SG0_TimeMachineDestroyed" ;
+    sg:labelKo "타임머신 파괴(수속점)"@ko ;
+    sg:summary "특수부대 공격으로 마유리·스즈하 타임머신이 반복적으로 파괴된다."@ko ;
+    sg:partOfVariation sg:EV_SG0_Solitude ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2011-08-17 00:00" ; sg:timePrecision "unknown" ;
+    sg:place "아키하바라" ; sg:actor "Char_Rounder" ; sg:target "타임머신" ;
+    sg:appearsIn sg:MS_SG0_Anime_Ep18 ; sg:note "위키 고유(수속점 파괴, Ep.18/19)."@ko .
+
+# =====================================================================
+# §8. 신규 Event — 영화/기원 (Tier B-3, C6)
+# =====================================================================
+sg:Event_Kurisu_HououinKyouma_2005 a sg:Event ;
+    sg:id "Event_Kurisu_HououinKyouma_2005" ;
+    sg:labelKo "크리스 2005년 황오인 쿄우마 관념 심음(영화, SG 한정)"@ko ;
+    sg:summary "극장판에서 크리스가 타임머신으로 2005년으로 돌아가 어린 오카베에게 황오인 쿄우마 관념을 심는다."@ko ;
+    sg:partOfVariation sg:EV_NostalgiaDrive_Preparation ;
+    sg:eventType "intervention" ; sg:mechanismType "physicaltravel" ;
+    sg:localDateTime "2005-06-30 00:00" ; sg:timePrecision "day" ;
+    sg:actor "Char_Kurisu" ; sg:target "Char_Okabe" ;
+    sg:appearsIn sg:MS_Movie_Debu ;
+    sg:note "영화 고유·SG 세계선 한정(캐논 분리). C6."@ko .
+
+sg:Event_ReadingSteiner_Manifestation a sg:Event ;
+    sg:id "Event_ReadingSteiner_Manifestation" ;
+    sg:labelKo "리딩 슈타이너 발현(본편, Y2K 무렵)"@ko ;
+    sg:summary "오카베가 Y2K 소동 무렵 중병 중 리딩 슈타이너 능력을 얻은 것으로 회상된다."@ko ;
+    sg:partOfVariation sg:EV_Prologue_Beta_Discovery ;
+    sg:eventType "actual" ; sg:mechanismType "none" ;
+    sg:localDateTime "2000-07-01 00:00" ; sg:timePrecision "unknown" ;
+    sg:actor "Char_Okabe" ;
+    sg:appearsIn sg:MS_SG_Anime_Ep10 ;
+    sg:note "본편 Ep.10 회상(~Y2K 2000). C6 본편 기원."@ko .
+
+# =====================================================================
+# §9. Tier A — 기존 Event additive 필드 추가 (SHACL 안전·카운트 불변)
+# 기존 id에 트리플을 [추가만]. enum 필수 필드 변경 없음.
+# =====================================================================
+
+# A-1. 사망 Event actor 채우기 (기존 actor 없음 → 추가)
+sg:Event_KurisuDies_Beta_Actual sg:actor "Char_Nakabachi" ;
+    sg:note "베타 수속 원사건 가해. Ep.23 스쿨드 맥락 진범=오카베는 별건(Event_Skuld_Fail_KurisuDeath)."@ko .
+sg:Event_Rescue_LabShot_MayuriDeath sg:actor "Char_Moeka" .
+sg:Event_Rescue_CarAccident_MayuriDeath sg:actor "Char_Rounder" .
+sg:Event_Rescue_TaxiStab_MayuriDeath sg:actor "Char_Rounder" .
+sg:Event_Rescue_YodobashiShot_MayuriDeath sg:actor "Char_Rounder" ;
+    sg:note "VN 고유(위키 미등장) — VN 기반."@ko .
+
+# A-2. appearsIn 전수 연결 (기존 Event 29건 미연결 → 추가)
+sg:Event_Prologue_MetalUpa sg:appearsIn sg:MS_SG_Anime_Ep01 .
+sg:Event_KurisuDies_Beta_Actual sg:appearsIn sg:MS_SG_Anime_Ep01 .
+sg:Event_FirstDMail sg:appearsIn sg:MS_SG_Anime_Ep01 .
+sg:Event_IBN_Discovery sg:appearsIn sg:MS_SG_Anime_Ep04 .
+sg:Event_DMail_Loto6 sg:appearsIn sg:MS_SG_Anime_Ep07 .
+sg:Event_DMail_Moeka sg:appearsIn sg:MS_SG_Anime_Ep08 .
+sg:Event_DMail_Luka sg:appearsIn sg:MS_SG_Anime_Ep08 .
+sg:Event_DMail_Faris sg:appearsIn sg:MS_SG_Anime_Ep09 .
+sg:Event_Rescue_LabShot_Attack sg:appearsIn sg:MS_SG_Anime_Ep12 .
+sg:Event_Rescue_LabShot_MayuriDeath sg:appearsIn sg:MS_SG_Anime_Ep12 .
+sg:Event_TimeLeap_FirstUse sg:appearsIn sg:MS_SG_Anime_Ep12 .
+sg:Event_Rescue_CarAccident_Escape sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_CarAccident_MayuriDeath sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_NaePush_Wait sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_NaePush_MayuriDeath sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_TaxiStab_Escape sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_TaxiStab_MayuriDeath sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_YodobashiShot_Hide sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_Rescue_YodobashiShot_MayuriDeath sg:appearsIn sg:MS_SG_Anime_Ep13 .
+sg:Event_DMail_Cancel_SuzuhaChase sg:appearsIn sg:MS_SG_Anime_Ep16 .
+sg:Event_DMail_Cancel_Faris sg:appearsIn sg:MS_SG_Anime_Ep17 .
+sg:Event_DMail_Cancel_Luka sg:appearsIn sg:MS_SG_Anime_Ep18 .
+sg:Event_DMail_Cancel_Moeka sg:appearsIn sg:MS_SG_Anime_Ep20 .
+sg:Event_DMail_Cancel_Loto6 sg:appearsIn sg:MS_SG_Anime_Ep22 .
+sg:Event_Skuld_Fail_Travel sg:appearsIn sg:MS_SG_Anime_Ep23 .
+sg:Event_Skuld_Fail_KurisuDeath sg:appearsIn sg:MS_SG_Anime_Ep23 .
+sg:Event_NostalgiaDrive_View sg:appearsIn sg:MS_SG_Anime_Ep23 .
+sg:Event_Skuld_Success_UpaSwap sg:appearsIn sg:MS_SG_Anime_Ep24 .
+sg:Event_OperationSkuldTravel sg:appearsIn sg:MS_SG_Anime_Ep24 .
+sg:Event_Skuld_Success_SelfStab sg:appearsIn sg:MS_SG_Anime_Ep24 .
+sg:Event_KurisuAppearsDeadToPastOkabe sg:appearsIn sg:MS_SG_Anime_Ep24 .
+sg:Event_KurisuSurvives_SG sg:appearsIn sg:MS_SG_Anime_Ep24 .
+# SG0 기존 Event → 신규 SG0 MS appearsIn 해금
+sg:Event_SG0_AmadeusCall sg:appearsIn sg:MS_SG0_Anime_Ep02 .
+sg:Event_SG0_RemoveKurisuMemory sg:appearsIn sg:MS_SG0_Anime_Ep22 .
+sg:Event_SG0_PhonePowerOff sg:appearsIn sg:MS_SG0_Anime_Ep04 .
+sg:Event_SG0_IgnoreAmadeusCall sg:appearsIn sg:MS_SG0_Anime_Ep11 .
+sg:Event_SG0_SelfDMail sg:appearsIn sg:MS_SG0_Anime_Ep23 .
+sg:Event_SG0_AmadeusDeleted sg:appearsIn sg:MS_SG0_Anime_Ep23 .
+
+# A-3. 진짜 버그 정정 — Event_NostalgiaDrive_View actor
+# [정정] 기존 actor "Char_Okabe_2025" → "Char_Okabe"(2010년 오카베 열람).
+#   머지 시: 기존 sg:Event_NostalgiaDrive_View sg:actor "Char_Okabe_2025" 트리플을 [삭제]하고
+#   아래 트리플로 [대체]. actor는 SHACL 미검사 선택 속성 → 정정 안전.
+sg:Event_NostalgiaDrive_View sg:actor "Char_Okabe" ;
+    sg:note "정정(Phase 07): 2010년 오카베가 영상메일 열람(Ep.23). 기존 Char_Okabe_2025는 Record에 해당."@ko .
+
+# =====================================================================
+# END. 머지 후 게이트 순차: validate_ontology.py(0) → generate-data.py(expected 갱신, exit 0) → npm run build
+# =====================================================================

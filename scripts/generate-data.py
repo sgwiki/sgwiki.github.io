@@ -393,9 +393,9 @@ def main() -> int:
     # 카운트 검증 (계획서 기준)
     expected = {
         "worldlines.json": 20,
-        "events.json": 41,
-        "shifts.json": 16,
-        "variations.json": 27,
+        "events.json": 68,
+        "shifts.json": 18,
+        "variations.json": 28,
         "macro_events.json": 8,
         "convergence.json": 5,
     }
