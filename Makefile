@@ -2,12 +2,12 @@ COMPOSE_FILE := docker/holyclaude/docker-compose.yaml
 COMPOSE      := docker compose --env-file .env -f $(COMPOSE_FILE)
 MKDOCS       := uv run mkdocs
 
-.PHONY: up down restart logs shell \
+.PHONY: up down restart logs shell build \
         wiki-serve wiki-build wiki-deploy \
         suggestions-poll worker-dev worker-deploy \
         help
 
-# ── sg-wiki-holyclaude 컨테이너 ─────────────────────────────────────────────
+# ── holyclaude 서비스 ───────────────────────────────────────────────────────
 
 up:
 	$(COMPOSE) up -d --build
@@ -21,13 +21,18 @@ down:
 	$(COMPOSE) down
 
 restart:
-	$(COMPOSE) restart sg-wiki-holyclaude
+	$(COMPOSE) restart holyclaude
 
 logs:
-	$(COMPOSE) logs -f sg-wiki-holyclaude
+	$(COMPOSE) logs -f holyclaude
 
 shell:
-	$(COMPOSE) exec sg-wiki-holyclaude bash
+	$(COMPOSE) exec holyclaude bash
+
+# ── Docker 빌드 / 관리 ────────────────────────────────────────────────────────
+
+build:
+	$(COMPOSE) build
 
 # ── 위키 빌드 / 로컬 미리보기 ───────────────────────────────────────────────
 
@@ -63,6 +68,8 @@ help:
 	@echo "  restart   컨테이너 재시작 (재빌드 없음)"
 	@echo "  logs      컨테이너 로그 스트리밍"
 	@echo "  shell     컨테이너 bash 접속"
+	@echo ""
+	@echo "  build     Docker 이미지만 빌드 (컨테이너 시작 안 함)"
 	@echo ""
 	@echo "  wiki-serve           로컬 미리보기 (localhost:8000)"
 	@echo "  wiki-build           정적 사이트 빌드 (site/, strict 검사)"

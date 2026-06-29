@@ -35,6 +35,7 @@
 
 ```bash
 make up       # 에이전트 팀 + 관리 UI 빌드 & 시작
+make build    # Docker 이미지만 빌드 (컨테이너 시작 안 함)
 make wiki-serve          # 위키 로컬 미리보기 (localhost:8000)
 make wiki-build          # 정적 사이트 빌드 (site/)
 make wiki-deploy         # 빌드 후 Cloudflare Pages 배포
@@ -160,6 +161,7 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 ## 코드 변경 시 주의
 
 - **볼륨 마운트 vs 베이크**: `scripts/`, `docker/holyclaude/data/claude/`(에이전트 정의·CLAUDE.md·settings.json)는 컨테이너에 마운트되어 **재빌드 없이 즉시 반영**. 반면 `docker/holyclaude/Dockerfile`이나 `docker/holyclaude/admin/`(admin 서버 코드)은 이미지에 베이크되어 **재빌드 + 컨테이너 재생성 필요**.
+- **Makefile Docker 타깃**: `restart`/`logs`/`shell`은 Compose 서비스명 `holyclaude`를 대상으로 한다. Docker API, `HOLYCLAUDE_CONTAINER`, 직접 `docker logs` 명령은 컨테이너명 `sg-wiki-holyclaude`를 사용한다.
 - **admin 서버**(FastAPI, `docker/holyclaude/admin/app/main.py`): 동시성/큐 로직은 `active_jobs_lock`(threading.RLock)로 보호. `_pop_active_job` 완료 시 `_dispatch_next_job`가 FIFO에서 다음 job 승격.
 - **사용자 지시(user instruction)**: 관리 UI 수동 트리거의 `(선택) 사용자 지시` 칸은 `POST /trigger/pN` 본문 `user_instruction` → `active_jobs[run_id]`에 저장(큐 대기→승격 경로도 보존, `_get_job_instruction`으로 회수) → `run_holyclaude_pipeline.mjs --instruction` → 팀장 프롬프트에 "추가 사용자 지시"로 주입. `_sanitize_instruction`(제어문자 제거·4000자 제한)과 `shlex.quote`로 안전 처리. **코드 강제 게이트(MCP 커버리지·source-sanitizer·검증)는 사용자 지시보다 우선**하며 프롬프트 텍스트로는 우회 불가.
 - **테스트**: FastAPI TestClient는 요청 사이에 `asyncio.create_task`로 만든 백그라운드 작업을 취소하므로, 동시성 로직 테스트 시 실제 실행 대신 task를 기록하는 방식으로 격리해야 함.

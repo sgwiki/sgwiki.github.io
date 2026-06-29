@@ -96,18 +96,21 @@ Claude Code 에이전트 팀과 관리 UI를 Docker로 실행합니다.
 
 ```bash
 make up              # 빌드 & 시작
+make build           # Docker 이미지만 빌드 (컨테이너 시작 안 함)
 make down            # 중지
+make restart         # holyclaude 서비스 재시작 (재빌드 없음)
 make logs            # 로그 스트리밍
 make shell           # 컨테이너 bash 접속
 ```
 
 > `docker compose`는 `--env-file .env`로 `.env`의 환경변수를 컨테이너에 전달합니다.
+> Makefile의 `restart`/`logs`/`shell` 타깃은 Compose 서비스명 `holyclaude`를 대상으로 하며, Docker API와 환경 변수에서는 컨테이너명 `sg-wiki-holyclaude`를 사용합니다.
 
-| 서비스 | 포트 | 역할 |
-|---|---|---|
-| `sg-wiki-holyclaude` | 3001 · 37700 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) · [claude-mem 메모리 뷰어](#에이전트-메모리-claude-mem) |
-| `sg-wiki-admin` | 3002 | 관리 UI — cron 스케줄 · 수동 트리거 · 실행 현황 · 검토 |
-| `sg-wiki-ontology-http` | 8093 | P1 커버리지용 sg-ontology HTTP MCP bridge |
+| Compose 서비스 | 컨테이너 | 포트 | 역할 |
+|---|---|---|---|
+| `holyclaude` | `sg-wiki-holyclaude` | 3001 · 37700 | Claude Code 에이전트 팀 (위키 집필 · 제안 처리) · [claude-mem 메모리 뷰어](#에이전트-메모리-claude-mem) |
+| `admin` | `sg-wiki-admin` | 3002 | 관리 UI — cron 스케줄 · 수동 트리거 · 실행 현황 · 검토 |
+| `ontology` | `sg-wiki-ontology-http` | 8093 | P1 커버리지용 sg-ontology HTTP MCP bridge |
 
 ### 관리 UI (`http://localhost:3002`)
 
