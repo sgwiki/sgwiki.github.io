@@ -3177,8 +3177,8 @@ sg:Event_SG0_TimeMachineDestroyed a sg:Event ;
 # =====================================================================
 sg:Event_Kurisu_HououinKyouma_2005 a sg:Event ;
     sg:id "Event_Kurisu_HououinKyouma_2005" ;
-    sg:labelKo "크리스 2005년 황오인 쿄우마 관념 심음(영화, SG 한정)"@ko ;
-    sg:summary "극장판에서 크리스가 타임머신으로 2005년으로 돌아가 어린 오카베에게 황오인 쿄우마 관념을 심는다."@ko ;
+    sg:labelKo "크리스 2005년 호오인 쿄우마 관념 심음(영화, SG 한정)"@ko ;
+    sg:summary "극장판에서 크리스가 타임머신으로 2005년으로 돌아가 어린 오카베에게 호오인 쿄우마 관념을 심는다."@ko ;
     sg:partOfVariation sg:EV_NostalgiaDrive_Preparation ;
     sg:eventType "intervention" ; sg:mechanismType "physicaltravel" ;
     sg:localDateTime "2005-06-30 00:00" ; sg:timePrecision "day" ;
