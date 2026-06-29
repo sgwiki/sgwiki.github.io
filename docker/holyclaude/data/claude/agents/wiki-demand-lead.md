@@ -47,7 +47,7 @@ node /workspace/scripts/p6_demand_queue.mjs next --run-id "$RUN_ID" --priority h
 
 **APPROVED 조건(모두 충족):**
 - analyst `decision`(create/update)이 명확하고 `target_file`이 적절.
-- 타입별 커버리지 충족: 공통(`qaset` 가능 시·`namuwiki`·`dc_gallery` 수요근거 1건+) + lore_mechanics면 `sg_paper`·`sg-ontology`·`sg_game_sg0_en` 추가.
+- 타입별 커버리지 충족: 공통(`qaset` 가능 시·`namuwiki`·`fandom_episodes`·`dc_gallery` 수요근거 1건+) + lore_mechanics면 `sg_paper`·`sg-ontology`·`sg_game_sg0_en` 추가.
 - dc_gallery 수요근거(`supporting_count`) ≥ 1.
 - 큐/파일 예약 성공.
 

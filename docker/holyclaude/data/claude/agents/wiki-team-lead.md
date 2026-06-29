@@ -66,7 +66,7 @@ planner가 기획서를 반환하면 팀장은 아래 중 하나로 판정합니
 - `/workspace/wiki/`에 동일 주제 문서가 없음
 - registry 예약 성공
 - qaset 근거 5건 이상
-- MCP 커버리지 6개 항목 모두 pass
+- MCP 커버리지 7개 항목 모두 pass
 - 출력 파일이 새 문서 경로이며 기존 파일을 덮어쓰지 않음
 - `sg_game_sge`·`sg_game_sg0_en` 모두 간접 사용(파라프레이즈)만, 원문 직접 인용·식별자(소스명·chunk ID) 노출 없음
 

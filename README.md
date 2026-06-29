@@ -144,7 +144,7 @@ make shell           # 컨테이너 bash 접속
 
 위키작성 팀장(wiki-team-lead)이 planner → writer → source-sanitizer → commit/push 흐름을 총괄합니다. 팀장은 기획서를 `APPROVED PLAN` / `REJECTED PLAN` / `REVISION REQUESTED`로 판정하고, 승인된 경우에만 writer를 호출합니다.
 
-커밋 전에 아래 6개 항목이 각각 별도 성공 MCP 호출로 확인되어야 하며, 하나라도 빠지면 P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`, `namuwiki`, `sg-ontology`.
+커밋 전에 아래 7개 항목이 각각 별도 성공 MCP 호출로 확인되어야 하며, 하나라도 빠지면 P1은 실패 처리되고 commit/push하지 않습니다: dataforge `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`, `fandom_episodes`, `namuwiki`, `sg-ontology`.
 
 > 자율 push 경로: `sg-wiki-holyclaude` 컨테이너는 `data/cloudcli/auth.db`에서 GitHub 토큰을 읽는 git credential helper(`docker/holyclaude/scripts/git-credential-cloudcli-github`)로 P1이 생성한 위키 변경을 직접 commit/push합니다.
 

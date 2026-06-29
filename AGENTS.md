@@ -88,10 +88,11 @@ python scripts/generate-data.py --out sg-worldline-map/src/data
 팀장: 주제 선정 → wiki-planner(기획서) → APPROVED 판정 → wiki-writer(초안) → source-sanitizer → wiki-linker → wiki-quality-lead(gate) → commit/push
 ```
 
-- **MCP 커버리지 게이트**: 커밋 전 6개 항목이 각각 별도 성공 호출로 확인되어야 함. 하나라도 빠지면 실패 처리, commit/push 금지.
-  - dataforge `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`, `namuwiki`, `sg-ontology`
+- **MCP 커버리지 게이트**: 커밋 전 7개 항목이 각각 별도 성공 호출로 확인되어야 함. 하나라도 빠지면 실패 처리, commit/push 금지.
+  - dataforge `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`, `namuwiki`, `sg-ontology`, `fandom_episodes`
 - **자율 push**: `holyclaude` 컨테이너가 `data/cloudcli/auth.db`의 GitHub 토큰을 읽는 credential helper(`docker/holyclaude/scripts/git-credential-cloudcli-github`)로 P1 결과를 직접 commit/push.
 - **위키 집필 규칙** (모든 에이전트 필수 준수): `sg_game_sge`·`sg_game_sg0_en` 원문 직접 인용 금지(파라프레이즈·풀어쓰기·내용 재료로 간접 사용만) / 소스명·파일명·chunk ID·source_filter 이름 공개 위키 노출 금지.
+- **fandom_episodes (dataforge 소스, P1·P6 필수)**: Fandom 위키 애니메이션 에피소드(본편·0·극장판) 줄거리. P1 커버리지 7번째 항목·P6 공통 커버리지에 **포함**. 메타데이터 필터는 `series`만 유효(`Steins;Gate`·`Steins;Gate 0`·`Steins;Gate: The Movie - Load Region of Déjà Vu`), `lang`(전부 bilingual)·`ep`(사후 필터)은 무효. qaset·namuwiki 동일 취급 — 산문 가공·출처 미표시, 직접 인용/Fandom URL/식별자(`doc_id`·`source_type=fandom_wiki`) 노출 금지.
 
 ### 파이프라인 2 (제안 처리)
 
@@ -131,7 +132,7 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 ```
 
 - **2계층 동시성**: `scripts/p6_demand_queue.mjs`는 후보 소비 상태(`.admin/p6-demand-queue.json`)를, `scripts/wiki_work_registry.mjs`는 대상 wiki 파일 락을 담당한다. 둘 중 하나라도 예약 실패하면 writer/rewriter를 호출하지 않는다.
-- **러너 강제 게이트**: P6 공통 MCP 커버리지는 `qaset_with_rag`, `namuwiki`, `dc_gallery`이며, 러너가 구조화 리포트의 `supporting_count>0`, `sanitizer=pass`, `quality!=fail`을 검증한다.
+- **러너 강제 게이트**: P6 공통 MCP 커버리지는 `qaset_with_rag`, `namuwiki`, `fandom_episodes`, `dc_gallery`이며, 러너가 구조화 리포트의 `supporting_count>0`, `sanitizer=pass`, `quality!=fail`을 검증한다.
 - **commit 범위**: 통과한 `wiki/*.md`만 commit한다. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 절대 commit하지 않는다.
 - **dc_gallery 위생 규칙**: 유저 게시글 근거는 산문 가공 전용이다. 각주, 원문 직접 인용, gall_num, chunk ID, source 이름, 내부 경로를 위키 본문에 노출하지 않는다.
 

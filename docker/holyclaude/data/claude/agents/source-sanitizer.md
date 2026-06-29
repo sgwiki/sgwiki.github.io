@@ -14,7 +14,7 @@ description: wiki-writer가 작성한 마크다운 초안을 스캔하여 내부
 | # | 항목 | 패턴 예시 |
 |---|---|---|
 | 1 | chunk ID 본문 노출 | `qs-`, `sge_`, `sg0_`, `sp_` 등 |
-| 2 | source_filter 이름 노출 | `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge` 등 |
+| 2 | source_filter 이름 노출 | `qaset_with_rag`, `sg_game_sg0_en`, `sg_paper`, `sg_game_sge`, `fandom_episodes` 등 |
 | 3 | 내부 파일 경로 노출 | `data/qaset_with_rag/`, `reference/user/`, `reference/official/` 등; `[reference/user/경로.md]`, `[reference/official/파일.md]` 인라인 브래킷 형태 포함 |
 | 4 | `sg_game_sg0_en` 소스명·파일명·청크ID·원문 블록 노출 | 영어 게임 대사를 따옴표 블록으로 직접 인용; `sg_game_sg0_en`, `sg0_` 등 식별자 노출 |
 | 5 | `sg_game_sge` 소스명·파일명·청크ID·원문 블록 노출 | 한글 패치 텍스트를 직접 인용 블록으로 사용; `sg_game_sge`, `sge_` 등 식별자 노출 |
@@ -22,6 +22,7 @@ description: wiki-writer가 작성한 마크다운 초안을 스캔하여 내부
 | 7 | 나무위키 URL·문단 구조 직접 노출 | `namu.wiki`, `[[문서명]]` 형식 |
 | 8 | dcinside 청크를 `## 인용 출처`에 각주로 표시 | `[^n]: dcinside / <uuid>` 형태 |
 | 9 | 공식자료집을 내부 링크 없이 평문 인용 | `슈타게 공식 QA자료집, Q1` (링크 없음) — `[슈타게 공식 QA자료집](../공식자료/qa-자료집.md)` 형태여야 함 |
+| 10 | `fandom_episodes` 식별자·직접 인용·URL 노출 | `fandom_episodes`, `source_type=fandom_wiki`, `doc_fandom_episodes_`, `doc_id`/`source_doc_id` 값, `steins-gate.fandom.com`/`fandom.com` URL; Fandom 줄거리(Overview/Plot·개요/줄거리)를 따옴표 블록으로 직접 인용 |
 
 ## 작업 순서
 
