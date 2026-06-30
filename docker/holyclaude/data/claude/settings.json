@@ -8,7 +8,7 @@
   "permissions": {
     "defaultMode": "acceptEdits"
   },
-  "model": "glm-5.2",
+  "model": "haiku",
   "hooks": {
     "Stop": [
       {

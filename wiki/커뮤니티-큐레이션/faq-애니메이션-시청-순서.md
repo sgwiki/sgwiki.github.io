@@ -41,7 +41,7 @@ last_verified: 2026-06-30
 
 두 흐름의 핵심 차이는 **본편 결말(23~24화)을 먼저 볼 것인가, 23-β에서 분기해 제로를 먼저 볼 것인가**입니다. 방영순은 본편 결말의 전율을 온전히 느끼도록 설계됐고, 감정선순은 오카베가 겪는 절망과 극복의 연속선을 시간순으로 따라가도록 구성됩니다. 다만 감정선순은 본편 결말이 중간에 끊기고 제로로 넘어가기 때문에, 처음부터 이 순서를 따르면 지치거나 전개 이해가 어려워질 수 있습니다.
 
-> **[팬 분석]** "출시 순서대로 감상하는 것이 작품이 해당 순서로 기획된 의도를 이해하는 데 도움이 되며, 내용 파악도 더 수월하다. 시간순 시청은 2회차에 시도하는 것이 좋다." — [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.6.1 시리즈 연대기[^1]
+> **[팬 분석]** "출시 순서대로 감상하는 것이 작품이 해당 순서로 기획된 의도를 이해하는 데 도움이 되며, 내용 파악도 더 수월하다. 시간순 시청은 2회차에 시도하는 것이 좋다." — [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md), §2.6.1 시리즈 연대기[^1]
 
 ---
 
@@ -171,4 +171,4 @@ last_verified: 2026-06-30
 
 ## 인용 출처
 
-[^1]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf) — §2.6.1 Series Chronology 요약
+[^1]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md) — §2.6.1 Series Chronology 요약

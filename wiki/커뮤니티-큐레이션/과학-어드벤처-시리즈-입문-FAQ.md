@@ -169,5 +169,5 @@ description: "과학 어드벤처 시리즈에 처음 입문하는 분들을 위
 
 [^1]: [슈타인즈 게이트 공식 QA자료집](../근거자료/공식/qa-자료집.md) — 시리즈 분류 및 감상 순서 요약
 [^2]: 시쿠라 치요마루 인터뷰 (패미통, 2022.07.07) — 어나니머스 코드와 과학 어드벤처 시리즈 연결, 세계층 구조, 트리거 시스템 관련 발언
-[^3]: [The Mechanics of Steins;Gate v1.0.3](https://github.com/Votuko/steins-gate-mechanics/blob/main/The%20Mechanics%20of%20Steins%20Gate%20v1.0.3.pdf), §2.1 World Lines — 세계선 구조 및 어트랙터 필드 수속 메커니즘
+[^3]: [The Mechanics of Steins;Gate v1.0.3](../근거자료/비공식/mechanics-of-steins-gate/ch2.md#21-어트랙터-필드-이론), §2.1 World Lines — 세계선 구조 및 어트랙터 필드 수속 메커니즘
 [^4]: 『카오스 헤드 & 슈타인즈 게이트 과학 어드벤처 게임 매니악스』 p.162 — 트리거 시스템 도입 배경 및 시리즈 제작 의도
