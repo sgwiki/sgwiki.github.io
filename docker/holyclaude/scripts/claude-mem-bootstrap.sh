@@ -39,7 +39,7 @@ if [ -n "${ZAI_API_KEY}" ]; then
     cat > "${CMEM_ENV}" <<EOF
 ANTHROPIC_API_KEY=${ZAI_API_KEY}
 ANTHROPIC_AUTH_TOKEN=${ZAI_API_KEY}
-ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-https://api.z.ai/api/anthropic}
+ANTHROPIC_BASE_URL=http://127.0.0.1:37701
 EOF
   )
   chown "${PUID}:${PGID}" "${CMEM_ENV}" 2>/dev/null || true

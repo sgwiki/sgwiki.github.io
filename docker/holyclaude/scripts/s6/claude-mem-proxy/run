@@ -1,0 +1,6 @@
+#!/command/with-contenv sh
+# ==============================================================================
+# s6-overlay longrun: claude-mem LLM proxy worker
+# ==============================================================================
+export HOME=/home/claude
+exec s6-setuidgid claude node /app/scripts/claude-mem-llm-proxy.js

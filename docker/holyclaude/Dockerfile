@@ -36,4 +36,11 @@ RUN chmod +x /etc/s6-overlay/s6-rc.d/claude-mem-worker/run
 # starts it at boot (the user bundle uses a contents.d/ dir, not a contents file).
 RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/claude-mem-worker
 
+# --- proxy ---
+COPY scripts/claude-mem-llm-proxy.js /app/scripts/claude-mem-llm-proxy.js
+COPY scripts/s6/claude-mem-proxy/run  /etc/s6-overlay/s6-rc.d/claude-mem-proxy/run
+COPY scripts/s6/claude-mem-proxy/type /etc/s6-overlay/s6-rc.d/claude-mem-proxy/type
+RUN chmod +x /etc/s6-overlay/s6-rc.d/claude-mem-proxy/run
+RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/claude-mem-proxy
+
 ENTRYPOINT ["/usr/local/bin/entrypoint-cmem.sh"]

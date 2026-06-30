@@ -1,26 +1,12 @@
 {
-  "mcpServers": {
-    "dataforge": {
-      "type": "http",
-      "url": "http://host.docker.internal:8081/mcp/"
-    },
-    "sg-ontology": {
-      "type": "http",
-      "url": "http://host.docker.internal:8093/mcp"
-    },
-    "namuwiki": {
-      "type": "http",
-      "url": "http://host.docker.internal:8091/mcp/"
-    }
-  },
-  "permissions": {
-    "defaultMode": "acceptEdits"
-  },
   "env": {
     "DISABLE_AUTOUPDATER": "1",
     "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
     "API_TIMEOUT_MS": "3000000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits"
   },
   "model": "glm-5.2",
   "hooks": {
@@ -47,5 +33,19 @@
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": true
+  },
+  "mcpServers": {
+    "dataforge": {
+      "type": "http",
+      "url": "http://host.docker.internal:8081/mcp/"
+    },
+    "sg-ontology": {
+      "type": "http",
+      "url": "http://host.docker.internal:8093/mcp"
+    },
+    "namuwiki": {
+      "type": "http",
+      "url": "http://host.docker.internal:8091/mcp/"
+    }
   }
 }
