@@ -337,7 +337,7 @@ function buildP5Prompt(runId) {
 실행 ID: ${runId}
 작업 디렉토리: /workspace
 
-반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-maintenance-lead.md, wiki-restructurer.md, wiki-rewriter.md, source-sanitizer.md 규칙을 준수하세요.
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-maintenance-lead.md, wiki-restructurer.md, wiki-rewriter.md, source-sanitizer.md, wiki-linker.md 규칙을 준수하세요.
 
 당신은 파이프라인 5의 wiki-maintenance-lead(위키 정비 팀장)입니다.
 
@@ -354,7 +354,7 @@ function buildP5Prompt(runId) {
    node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file wiki/{category}/{slug}.md --topic "p5:maintenance:{slug}"
    실패 시 해당 파일 건너뜀.
 
-2. wiki-restructurer 에이전트 스폰 → 섹션 구조·헤더·frontmatter 정비.
+2. wiki-restructurer 에이전트 스폰 → 섹션 구조·헤더·frontmatter 정비 (링크는 다루지 않음).
    보고가 \`changed: false\`이면 restructurer 단계 완료로 간주.
 
 3. wiki-rewriter 에이전트 스폰 → 문체·표현·용어 일관성 교정.
@@ -363,18 +363,22 @@ function buildP5Prompt(runId) {
 4. source-sanitizer 에이전트 스폰 → 내부 식별자 누출 검사.
    fail이면 rewriter에게 최대 1회 재작성 요청. 재작성 후에도 fail이면 git checkout으로 되돌리고 registry release.
 
-5. 팀장 diff 검토:
+5. wiki-linker 에이전트 스폰(file 모드) → 내부·외부 링크를 직접 검사·교정.
+   wiki-linker가 자동 교정 가능한 깨진 링크(유일 일치 내부 경로, 200대로 해결되는 외부 리다이렉트)를 직접 수정하고 fixed로 보고. 팀장은 수정 요청 없이 결과(diff)만 검토.
+   result: fail(자동 교정 불가 broken_links 잔존)이면 git checkout으로 되돌리고 registry release. orphan_warning·외부 URL warn은 fail이 아니며 팀장이 판단.
+
+6. 팀장 diff 검토:
    - 사실 관계 변경 없음 확인
    - 스포일러 등급 변경 없음 확인
    - source 식별자 미노출 확인
 
-6. 통과 시 commit/push:
+7. 통과 시 commit/push:
    node /workspace/scripts/wiki_work_registry.mjs status --run-id ${runId} --file wiki/{category}/{slug}.md --status committing
    git add wiki/{category}/{slug}.md
    git commit -m "chore(wiki): {slug} 정비 — {변경 요약}"
    git push
 
-7. registry 정리:
+8. registry 정리:
    완료: node /workspace/scripts/wiki_work_registry.mjs complete --run-id ${runId} --file wiki/{category}/{slug}.md
    실패: node /workspace/scripts/wiki_work_registry.mjs release --run-id ${runId} --file wiki/{category}/{slug}.md --status rejected
 
@@ -384,6 +388,7 @@ function buildP5Prompt(runId) {
 - 신규 페이지 생성 금지.
 - 사실 관계·스포일러 등급 변경 금지.
 - sanitizer fail 상태에서 commit 금지.
+- wiki-linker fail(broken_links) 상태에서 commit 금지.
 - 팀장 diff 검토 없이 commit 금지.
 - 하위 에이전트에게 git commit/push 위임 금지.
 - 내부 경로, chunk ID, source_filter 이름은 공개 위키에 노출하지 마세요.
@@ -428,7 +433,7 @@ function buildP6Prompt(runId) {
    - create(editorial): wiki-writer에 사설 브리프("커뮤니티 견해" 배지 + 사실 단정 금지).
    - 내용 업데이트(근거 기반 보강): wiki-writer 섹션 병합 브리프로 대상 파일을 타깃 보강(전체 재정비 아님). 문체 전용인 wiki-rewriter에 내용 보강을 위임하지 마세요(레거시 라우팅 버그 교정).
    - 문체 교정만 필요하면 wiki-rewriter. 어느 경우든 사실 관계·스포일러 등급을 임의로 바꾸지 마세요.
-6. source-sanitizer → wiki-linker → wiki-quality-lead(gate) 순으로 검증하세요. sanitizer fail은 최대 2회, linker/quality fail은 최대 1회 재작성 요청.
+6. source-sanitizer → wiki-linker → wiki-quality-lead(gate) 순으로 검증하세요. sanitizer fail은 최대 2회, quality fail은 최대 1회 재작성 요청. wiki-linker는 내부·외부 링크를 직접 교정하고 결과만 보고하므로 재작성 요청 대신 결과(diff)를 검토하고, 자동 교정 불가 broken_links가 남으면 commit하지 마세요.
 7. commit 전에 구조화 리포트를 누적 저장하세요: /workspace/.admin/runs/p6-${runId}-report.json
    각 후보 항목에 candidate_id, type, genre, evidence_grade, cluster_ids, supporting_count(>0), decision, target_file, sanitizer("pass"), linker, quality("pass"|"warn"), commit_hash 를 포함하세요. genre·evidence_grade는 관측용 선택 필드로 러너 게이트는 이를 검증하지 않으며, 강제 필드(decision∈{create,update}, supporting_count>0, sanitizer=pass, quality!=fail)는 그대로입니다. editorial은 decision=create로 처리해 게이트를 통과합니다.
 8. 통과한 wiki 파일만 git add/commit/push 하세요. 완료 후 큐와 락을 정리하세요(complete/release).

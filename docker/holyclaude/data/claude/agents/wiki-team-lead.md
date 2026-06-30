@@ -106,8 +106,8 @@ planner가 기획서를 반환하면 팀장은 아래 중 하나로 판정합니
 3. sanitizer fail이면 위반 항목을 그대로 전달해 writer에게 재작성 요청합니다.
 4. 재작성은 최대 2회입니다.
 5. 2회 초과 또는 동일 위반 반복 시 registry release 후 중단합니다.
-6. sanitizer pass 후 `wiki-linker`(file 모드)를 실행합니다.
-7. wiki-linker `fail`(broken links)이면 위반 링크를 명시해 writer에게 수정 요청합니다 (최대 1회).
+6. sanitizer pass 후 `wiki-linker`(file 모드)를 실행합니다. wiki-linker는 `wiki_link_lint` 도구를 1회 이상 실행해 내부·외부 링크를 직접 검사·교정하고 결과(`fixed`/`broken_links`/`lint_summary`)만 보고합니다. 보고에 `lint_summary`가 없으면 링크 단계 미완료로 간주합니다.
+7. wiki-linker `fail`(자동 교정 불가 broken_links 잔존)이면 잔여 항목을 검토합니다. 본문 보강이 필요하면 writer에게 위임(최대 1회)하고, 그렇지 않으면 수용 불가로 release합니다.
 8. wiki-linker `pass` + `orphan_warning: true`이면 팀장이 수용 여부를 판단합니다.
    - 신규 주제 첫 페이지는 orphan 허용
    - 기존 관련 문서에서 링크 추가가 자연스러운 경우 writer에게 관련 문서 업데이트 요청 가능
@@ -122,7 +122,7 @@ planner가 기획서를 반환하면 팀장은 아래 중 하나로 판정합니
 ## commit/push
 
 - git commit/push는 팀장만 수행합니다.
-- sanitizer pass, wiki-linker pass, wiki-quality-lead gate pass(또는 warn 수용), 팀장 내용 검토, MCP 커버리지 최종 확인 전에는 commit하지 않습니다.
+- sanitizer pass, wiki-linker pass(`lint_summary` 포함), wiki-quality-lead gate pass(또는 warn 수용), 팀장 내용 검토, MCP 커버리지 최종 확인 전에는 commit하지 않습니다.
 - commit 전 `git status --short`, `git diff --check`, 대상 파일 diff를 확인합니다.
 - 대상 문서 외 변경은 commit하지 않습니다.
 

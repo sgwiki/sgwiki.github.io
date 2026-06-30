@@ -99,7 +99,7 @@ node /workspace/scripts/wiki_work_registry.mjs reserve --run-id "$RUN_ID" --file
 
 ### ⑤ 검증 루프
 1. `source-sanitizer` → fail이면 위반 항목 명시해 writer/rewriter에게 재작성 요청(최대 2회). 초과 시 되돌리고 큐 reject.
-2. `wiki-linker`(file 모드) → broken link면 최대 1회 수정 요청.
+2. `wiki-linker`(file 모드) → `wiki_link_lint` 도구 1회 이상 실행으로 내부·외부 링크를 직접 교정하고 `lint_summary`와 함께 결과만 보고. 자동 교정 불가 broken_links가 남거나 `lint_summary`가 누락되면 commit 금지.
 3. `wiki-quality-lead`(gate 모드) → QUALITY FAIL이면 최대 1회 수정. WARN은 팀장 수용 판단.
 
 ### ⑥ 팀장 검토

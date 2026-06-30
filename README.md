@@ -29,6 +29,7 @@ wiki/
 - `SERN`, `D-RINE`, `D메일`, `IBN 5100`처럼 한국어 팬덤에서 원문·약어 표기가 통용되는 항목은 파일명에도 해당 표기를 유지합니다.
 - 문서 이름을 바꿀 때는 변경 전에 기존 내부 링크를 확인하고, 파일 이동과 함께 모든 Markdown 상대 링크를 새 경로로 갱신해야 합니다.
 - `The Mechanics of Steins;Gate v1.0.3` 인용은 GitHub PDF 원문 대신 로컬 번역본 `wiki/근거자료/비공식/mechanics-of-steins-gate/`의 구체적인 장 파일로 연결합니다. 절 번호가 `§3.1`이면 `ch3.md`, `§2.6.1`이면 `ch2.md`처럼 첫 자리 장 번호를 기준으로 매핑하고, 로컬 번역본에 대응 장이 없는 부록성 인용만 `index.md`를 사용합니다.
+- 내부 링크 점검은 `scripts/wiki_link_lint.py`(결정적 정규식 funnel)로 자동화합니다. `make wiki-lint`로 전체를 스캔하면 깨진 링크 중 동일 파일명이 유일하게 존재하는 경우는 `--apply`로 자동 교정되고, 애매한 케이스(`[[wikilink]]`·링크 잔해 등)는 `suspicious` 목록으로 추려집니다. P1/P2/P5/P6의 `wiki-linker` 에이전트는 이 도구를 **강제로 1회 이상** 실행합니다.
 - 링크 정리 후에는 `make wiki-build`로 MkDocs strict 빌드를 통과시켜야 합니다.
 
 ## 디렉터리 구조
@@ -42,6 +43,7 @@ wiki/
 │   ├── run_holyclaude_pipeline.mjs   P1~P7 파이프라인 실행 래퍼
 │   ├── wiki_work_registry.mjs        병렬 실행 중복 주제 방지용 작업 현황 registry
 │   ├── p6_demand_queue.mjs           P6 커뮤니티 큐레이션 후보 소비 큐
+│   ├── wiki_link_lint.py             내부 링크 결정적 검사·자동 교정 funnel (+ test)
 │   └── poll_suggestions.py           R2에서 제안 수신 → suggestions/inbox/
 ├── sg-worldline-map/    세계선 인터랙티브 맵 React/Vite SPA (`/maps/`)
 ├── worker/               "제안하기" 폼을 받는 Cloudflare Worker (R2 + KV)
@@ -63,6 +65,8 @@ wiki/
 make wiki-serve        # 로컬 미리보기 (localhost:8000)
 make wiki-build        # 정적 사이트 빌드 → site/
 make wiki-deploy       # 빌드 후 Cloudflare Pages 배포
+make wiki-lint         # 내부 링크 결정적 스캔 (scripts/wiki_link_lint.py)
+make test              # scripts 단위 테스트 (wiki_link_lint)
 ```
 
 > 배포는 GitHub Pages(현재 기본 경로)로도 연동됩니다. MkDocs 설정은 `mkdocs.yml`을 참고하세요.

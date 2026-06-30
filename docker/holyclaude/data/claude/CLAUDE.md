@@ -226,7 +226,7 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 - 공식/팬 논문 인용 블록에 출처 표시
 - 문서 상단 스포일러 배지 (`!!! warning "스포일러"`)
 - source-sanitizer 통과 (chunk ID·source_filter·내부 경로 미노출)
-- wiki-linker 통과 (내부 링크 정합성·외부 URL 유효성 확인)
+- wiki-linker 통과 (`wiki_link_lint` 도구 1회 이상 실행·`lint_summary` 보고 포함, 내부 링크 정합성·외부 URL 유효성 확인 및 자동 교정, 잔여 broken_links 없음)
 
 ### 파이프라인 1 — 콘텐츠 생성
 
@@ -236,7 +236,7 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 ③ 팀장 기획서 검토 → APPROVED PLAN / REJECTED PLAN / REVISION REQUESTED 판정
 ④ APPROVED PLAN인 경우에만 registry reserve 성공 후 Agent(wiki-writer, 기획서) 스폰
 ⑤ Agent(source-sanitizer, 초안) → 위반 시 팀장이 writer에게 피드백 재작성 요청 최대 2회, 초과 시 release 후 폐기
-⑤-b Agent(wiki-linker, 초안) → broken link fail 시 writer에게 링크 수정 요청 최대 1회
+⑤-b Agent(wiki-linker, 초안) → 내부·외부 링크 직접 교정 후 결과 보고. 자동 교정 불가 broken_links 잔존 시에만 팀장이 writer에게 보강 위임(최대 1회) 또는 release
 ⑥ 팀장 내용 검토 + orphan_warning 검토 + MCP 커버리지 최종 확인 + registry status committing
 ⑦ git add <file> && git commit -m "wiki: <제목>" && git push
 ⑧ registry complete 또는 release

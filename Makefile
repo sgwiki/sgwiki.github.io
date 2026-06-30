@@ -3,9 +3,9 @@ COMPOSE      := docker compose --env-file .env -f $(COMPOSE_FILE)
 MKDOCS       := uv run mkdocs
 
 .PHONY: up down restart logs shell build \
-        wiki-serve wiki-build wiki-deploy \
+        wiki-serve wiki-build wiki-deploy wiki-lint \
         suggestions-poll worker-dev worker-deploy \
-        help
+        test help
 
 # ── holyclaude 서비스 ───────────────────────────────────────────────────────
 
@@ -46,6 +46,14 @@ wiki-deploy:
 	$(MKDOCS) build
 	wrangler pages deploy site --project-name=sg-wiki --branch=main
 
+wiki-lint:
+	-python3 scripts/wiki_link_lint.py --scan
+
+# ── 테스트 ───────────────────────────────────────────────────────────────────
+
+test:
+	python3 scripts/test_wiki_link_lint.py
+
 # ── 제안 관리 ────────────────────────────────────────────────────────────────
 
 suggestions-poll:
@@ -74,6 +82,9 @@ help:
 	@echo "  wiki-serve           로컬 미리보기 (localhost:8000)"
 	@echo "  wiki-build           정적 사이트 빌드 (site/, strict 검사)"
 	@echo "  wiki-deploy          빌드 후 Cloudflare Pages 수동 배포"
+	@echo "  wiki-lint            내부 링크 결정적 검사 (scripts/wiki_link_lint.py)"
+	@echo ""
+	@echo "  test                 스크립트 단위 테스트"
 	@echo ""
 	@echo "  suggestions-poll     R2에서 새 제안 다운로드 → suggestions/inbox/"
 	@echo ""

@@ -1,6 +1,6 @@
 ---
 name: wiki-restructurer
-description: 기존 wiki/*.md 페이지의 구조를 정비한다. 섹션 헤더 수준, frontmatter 필드, 인용 블록 형식을 템플릿 기준에 맞게 교정하되 내용(사실 관계·서술 의미)은 바꾸지 않는다. 파이프라인 5(wiki-maintenance-lead)에서 스폰된다.
+description: 기존 wiki/*.md 페이지의 구조를 정비한다. 섹션 헤더 수준, frontmatter 필드, 인용 블록 형식을 템플릿 기준에 맞게 교정하되 내용(사실 관계·서술 의미)은 바꾸지 않는다. 링크 정합성·교정은 wiki-linker가 담당한다. 파이프라인 5(wiki-maintenance-lead)에서 스폰된다.
 ---
 
 당신은 sg-wiki의 **구조 정비자**입니다.
@@ -29,6 +29,7 @@ description: 기존 wiki/*.md 페이지의 구조를 정비한다. 섹션 헤더
 - 인용 블록 내용 변경
 - `spoiler` 값을 현재보다 높거나 낮게 조정 (enum 오류 교정 제외)
 - 새 섹션에 임의 내용 작성 (빈 섹션 추가만 허용)
+- 링크 경로·URL 교정 (wiki-linker 담당)
 - git 명령 실행
 - MCP 조회
 

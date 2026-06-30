@@ -14,6 +14,7 @@
 | `docs/` | 설계·계획·저작권 검토 문서 | tracked |
 | `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
+| `scripts/wiki_link_lint.py` | 내부 링크 결정적 검사·자동 교정 funnel(wiki-linker 강제 사용). `--file`/`--scan`, `--apply`, `--json`. ok/autofix/broken/suspicious/external 분류 | tracked |
 | `scripts/p6_demand_queue.mjs` | P6 커뮤니티 큐레이션 후보 소비 큐 | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
 | `scripts/fetch_fandom_episodes.mjs` | Fandom `Category:Episodes` → `data/fandom_episodes/` 마크다운 수집·변환 (영문 원문+한국어 번역용 원문) | tracked |
@@ -52,6 +53,9 @@ node --check scripts/p6_demand_queue.mjs
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --instruction "..." --dry-run   # 선택 사용자 지시(--instruction) 주입
 node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run   # claude-mem 규칙 승격 제안 dry-run
+make test                                             # scripts 단위 테스트 (wiki_link_lint)
+make wiki-lint                                        # 내부 링크 결정적 스캔 (전체 wiki/)
+python3 scripts/wiki_link_lint.py --file wiki/<cat>/<slug>.md --json   # 단일 파일 분류(교정 제안)
 ```
 
 세계선 맵 SPA 점검:
@@ -121,7 +125,7 @@ wiki/*.md 전체 → wiki-format-inspector(형식) → wiki-completeness-checker
 전체 `wiki/*.md` 대상 구조·문체 일관성 개선 전용. wiki-maintenance-lead가 조율:
 
 ```
-wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-rewriter(문체·표현) → source-sanitizer → commit/push
+wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더) → wiki-rewriter(문체·표현) → source-sanitizer → wiki-linker(내부·외부 링크 검사·자동 교정·게이트) → commit/push
 ```
 
 - **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
