@@ -24,6 +24,8 @@ from app.scheduler import add_p2_job, get_jobs, remove_p2_job, scheduler
 RUNS_DIR = Path(os.getenv("ADMIN_RUNS_DIR", ".admin/runs"))
 WORKSPACE = Path(os.getenv("WORKSPACE", "/workspace"))
 WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
+SUGGESTION_ACK_STATE = Path(os.getenv("ADMIN_SUGGESTION_ACK_STATE", WORKSPACE / ".admin/suggestion_ack.json"))
+HOLYCLAUDE_GIT_WORKDIR = "/workspace"
 RULE_PROMOTION_ROOT = Path(os.getenv("ADMIN_RULE_PROMOTION_ROOT", WORKSPACE / ".admin/rule-promotions"))
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "sg-wiki-holyclaude")
@@ -77,11 +79,37 @@ def _invalidate_cache(*prefixes: str) -> None:
                 response_cache.pop(key, None)
 
 
+def _warn_if_push_hook_missing() -> None:
+    """p2 push-approval 게이트용 pre-push 훅 설치 여부 self-check.
+
+    훅이 없으면 p2 push 게이트의 결정론적 보장이 무효화된다(프롬프트만 남음).
+    시작 시 경고만 출력하고 동작은 막지 않는다.
+    """
+    try:
+        configured = subprocess.run(
+            ["git", "config", "--get", "core.hooksPath"],
+            cwd=WORKSPACE,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        candidate = (WORKSPACE / configured / "pre-push").resolve() if configured else (WORKSPACE / ".git" / "hooks" / "pre-push").resolve()
+        if not candidate.exists():
+            print(
+                f"[admin] WARNING: pre-push 훅 미설치({candidate}) — p2 push 게이트 무효. "
+                "'make install-hooks' 로 설치 필요.",
+                flush=True,
+            )
+    except Exception as exc:
+        print(f"[admin] WARNING: pre-push 훅 검증 실패: {exc}", flush=True)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
     WIKI_REVIEW_STATE.parent.mkdir(parents=True, exist_ok=True)
+    SUGGESTION_ACK_STATE.parent.mkdir(parents=True, exist_ok=True)
     RULE_PROMOTION_ROOT.mkdir(parents=True, exist_ok=True)
+    _warn_if_push_hook_missing()
     scheduler.start()
     yield
     scheduler.shutdown(wait=False)
@@ -750,6 +778,25 @@ def _save_review_state(state: dict) -> None:
     WIKI_REVIEW_STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _load_ack_state() -> dict:
+    """제안 '확인(과거 제한 사항)' 보관 상태. sid -> {acknowledged_at, ...}.
+
+    suggestions/decisions(에이전트가 재작성)과 분리된 admin 전용 런타임 상태로,
+    위키 검토 상태(.admin/wiki_reviews.json)와 동일한 패턴을 따른다.
+    """
+    if not SUGGESTION_ACK_STATE.exists():
+        return {}
+    try:
+        return json.loads(SUGGESTION_ACK_STATE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_ack_state(state: dict) -> None:
+    SUGGESTION_ACK_STATE.parent.mkdir(parents=True, exist_ok=True)
+    SUGGESTION_ACK_STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def _review_key(rel: str, digest: str) -> str:
     return f"{rel}:{digest}"
 
@@ -1141,6 +1188,7 @@ def _load_suggestions_response() -> dict:
         ADMIN_SUGGESTION_CACHE_TTL_SECONDS,
         _suggestion_pipeline_logs,
     )
+    ack_state = _load_ack_state()
     items = []
     if inbox_dir.exists():
         for f in sorted(inbox_dir.glob("*.json"), reverse=True):
@@ -1149,10 +1197,51 @@ def _load_suggestions_response() -> dict:
                 sid = item.get("id", f.stem)
                 item["decision"] = _load_decision(sid)
                 item["pipeline_logs"] = logs_by_sid.get(sid, [])
+                ack = ack_state.get(sid) or {}
+                item["acknowledged"] = bool(ack)
+                item["acknowledged_at"] = ack.get("acknowledged_at")
                 items.append(item)
             except Exception:
                 pass
     return {"items": items}
+
+
+@app.post("/suggestions/{sid}/acknowledge")
+async def acknowledge_suggestion(sid: str):
+    return await asyncio.to_thread(_acknowledge_suggestion, sid)
+
+
+def _acknowledge_suggestion(sid: str) -> dict:
+    """제안을 '확인' 처리해 과거 제한 사항 섹션으로 이동.
+
+    inbox 원본은 그대로 두고 .admin/suggestion_ack.json에 보관 표식만 기록한다.
+    """
+    inbox_path = WORKSPACE / "suggestions" / "inbox" / f"{sid}.json"
+    if not inbox_path.exists():
+        raise HTTPException(status_code=404, detail={"status": "not_found", "sid": sid})
+    state = _load_ack_state()
+    state[sid] = {
+        "acknowledged_at": datetime.now().isoformat(),
+        "sid": sid,
+    }
+    _save_ack_state(state)
+    _invalidate_cache("suggestions")
+    return {"status": "acknowledged", "sid": sid}
+
+
+@app.post("/suggestions/{sid}/unacknowledge")
+async def unacknowledge_suggestion(sid: str):
+    return await asyncio.to_thread(_unacknowledge_suggestion, sid)
+
+
+def _unacknowledge_suggestion(sid: str) -> dict:
+    """'확인'을 취소해 과거 제한 사항 → 활성 섹션으로 복원."""
+    state = _load_ack_state()
+    if sid in state:
+        state.pop(sid, None)
+        _save_ack_state(state)
+    _invalidate_cache("suggestions")
+    return {"status": "restored", "sid": sid}
 
 
 @app.get("/suggestions/{sid}")
@@ -1172,7 +1261,99 @@ def _suggestion_detail_response(sid: str) -> dict:
         _suggestion_pipeline_logs,
     )
     item["pipeline_logs"] = logs_by_sid.get(sid, [])
+    ack = _load_ack_state().get(sid) or {}
+    item["acknowledged"] = bool(ack)
+    item["acknowledged_at"] = ack.get("acknowledged_at")
     return item
+
+
+# ── p2 push 승인 게이트: 미push 커밋 조회 + 승인 push ──────────────────────
+def _docker_exec_git(args: list[str], env: dict[str, str] | None = None) -> tuple[int, str]:
+    """holyclaude 컨테이너 내에서 git 실행. push 자격증명은 컨테이너가 이미 보유.
+
+    p2의 로컬 커밋도 동일 컨테이너/동일 리포에서 수행되므로, 승인 push 역시
+    이 경로로 라우팅한다. 반환: (exit_code, stdout+stderr).
+    """
+    try:
+        import docker as docker_sdk
+        client = docker_sdk.from_env()
+        container = client.containers.get(HOLYCLAUDE_CONTAINER)
+    except Exception as exc:
+        return 127, f"컨테이너 접근 실패: {exc}"
+
+    command = ["git", "-C", HOLYCLAUDE_GIT_WORKDIR, *args]
+    try:
+        result = container.exec_run(
+            command,
+            workdir=HOLYCLAUDE_GIT_WORKDIR,
+            environment=env,
+            demux=False,
+        )
+        raw = result.output
+        output = raw.decode("utf-8", errors="replace") if isinstance(raw, (bytes, bytearray)) else str(raw)
+        return int(result.exit_code if result.exit_code is not None else 0), output
+    except Exception as exc:
+        return 127, f"git 실행 실패: {exc}"
+
+
+def _parse_pending_push(output: str) -> list[dict]:
+    commits: list[dict] = []
+    for line in output.strip().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(" ", 1)
+        commits.append({"hash": parts[0], "subject": parts[1] if len(parts) > 1 else ""})
+    return commits
+
+
+@app.get("/suggestions/pending-push")
+async def pending_push():
+    return await asyncio.to_thread(_pending_push_response)
+
+
+def _pending_push_response() -> dict:
+    """p2가 커밋했지만 아직 push 되지 않은 커밋(upstream..HEAD) 목록.
+
+    upstream이 미추적이거나 컨테이너 접근이 불가하면 has_pending=False.
+    """
+    exit_code, out = _docker_exec_git(["log", "--pretty=format:%h %s", "@{u}..HEAD"])
+    if exit_code != 0:
+        return {"has_pending": False, "ahead_by": 0, "commits": [], "error": out.strip() or None}
+    commits = _parse_pending_push(out)
+    return {"has_pending": len(commits) > 0, "ahead_by": len(commits), "commits": commits}
+
+
+@app.post("/suggestions/push/approve")
+async def approve_push():
+    return await asyncio.to_thread(_approve_push)
+
+
+def _approve_push() -> dict:
+    """관리자 최종 승인 후 미push 커밋을 push.
+
+    SG_PUSH_ALLOWED=1 환경변수로 pre-push 훅을 통과시킨다. push 자체는
+    holyclaude 컨테이너에서 수행(자격/원격 접근 일관성).
+    """
+    ahead_exit, ahead_out = _docker_exec_git(["rev-list", "--count", "@{u}..HEAD"])
+    ahead_by = 0
+    if ahead_exit == 0:
+        try:
+            ahead_by = int((ahead_out or "0").strip() or "0")
+        except ValueError:
+            ahead_by = 0
+    if ahead_by == 0:
+        return {"status": "nothing_to_push", "ahead_by": 0}
+
+    push_exit, push_out = _docker_exec_git(["push"], env={"SG_PUSH_ALLOWED": "1"})
+    _invalidate_cache("status", "suggestions", "suggestion_logs", "wiki_status", "wiki_reviews")
+    if push_exit != 0:
+        raise RuntimeError(push_out.strip() or f"git push 실패 (exit {push_exit})")
+    return {
+        "status": "pushed",
+        "ahead_by": ahead_by,
+        "output": _tail_text(push_out, 2000),
+    }
 
 
 @app.get("/schedule")
@@ -1460,7 +1641,14 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
             f"컨테이너를 찾을 수 없습니다: {HOLYCLAUDE_CONTAINER} ({exc})",
         )
 
-    inner = f"cd /workspace && node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
+    # p2(제안 자동 처리) push 승인 게이트:
+    #   pre-push 훅이 SG_PUSH_ALLOWED=1 일 때만 push를 허용한다. p2 에이전트 실행엔
+    #   이 env를 부여하지 않으므로, 에이전트가 프롬프트를 어기고 git push 해도
+    #   훅이 exit 1 로 물리 차단한다(결정론적 보장). push는 관리자 승인 엔드포인트
+    #   (/suggestions/push/approve) 가 SG_PUSH_ALLOWED=1 로 별도 수행한다.
+    #   p1/3/5/6 은 기존 자동 push 유지를 위해 env를 부여한다.
+    push_allow = "" if pipeline == "p2" else "SG_PUSH_ALLOWED=1 "
+    inner = f"cd /workspace && {push_allow}node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
     if instruction:
         inner += f" --instruction {shlex.quote(instruction)}"
     command = [

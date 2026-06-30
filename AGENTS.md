@@ -101,6 +101,10 @@ python scripts/generate-data.py --out sg-worldline-map/src/data
 
 `suggestions/inbox/` 제안 → wiki-classifier(분류) → suggestion-judge(판정) → `approved`만 writer/sanitizer/wiki-linker 경유 commit. `rejected`/`partial`은 위키 파일 미수정.
 
+- **push 승인 게이트 (P2 전용)**: P2는 **commit까지만** 수행하고 `git push`는 하지 않는다. admin이 P2 실행 시 `SG_PUSH_ALLOWED` 환경변수를 부여하지 않으므로, `pre-push` 훅(`hooks/pre-push`)이 에이전트의 모든 push를 `exit 1`로 차단한다(결정론적 보장). 미push 커밋은 admin UI "제안 자동 처리 → push 대기"에 표시되고, 운영자가 **"승인 후 push"**(`POST /suggestions/push/approve`, `SG_PUSH_ALLOWED=1`로 holyclaude 컨테이너에서 실행)를 눌러야 원격에 반영된다. P1/3/5/6은 admin이 `SG_PUSH_ALLOWED=1`을 부여해 기존 자동 push를 유지한다.
+- **훅 설치**: `.git/hooks`는 비추적이므로 `make install-hooks`(호스트) 1회 필요. 호스트 `.git`이 `holyclaude` 컨테이너 `/workspace`에 마운트되므로 한 번 설치하면 컨테이너의 P2 push에도 적용된다. admin 시작 시 `pre-push` 훅 미설치면 로그에 경고한다.
+- **확인 아카이브**: admin "제안 자동 처리" 항목은 헤더 클릭으로 접고/펼치며(기본 접힘), **"확인"** 버튼으로 "과거 제한 사항" 섹션(`.admin/suggestion_ack.json`)으로 이동, "복원"으로 되돌린다. `suggestions/decisions/`와 분리된 admin 전용 상태다.
+
 ### 파이프라인 4 (위키 품질 검사)
 
 전체 감사(audit) 전용. wiki-quality-lead가 조율:

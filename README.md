@@ -16,7 +16,7 @@ wiki/
 ├── lore/              핵심 설정·사건 해설
 ├── organization/      조직·단체
 ├── setting/           세계관·배경
-├── 세계관/  세계선/  용어/   (한글 분류)
+├── 세계선/  용어/   (한글 분류)
 └── ...
 ```
 
@@ -156,7 +156,9 @@ make shell           # 컨테이너 bash 접속
 
 ### 파이프라인 2 — 제안 처리
 
-P2 실행 래퍼는 R2/mock R2 폴링 후 제안을 자동 분류·판정합니다. `approved` 판정은 위키 작성 에이전트와 sanitizer로 전달되어 통과한 위키 변경만 commit/push하고, `rejected`/`partial` 판정은 위키 파일을 수정하지 않습니다. `suggestions/decisions/` 파일은 `automated=true` 상태 표시용 런타임 산출물이며 git에 포함하지 않습니다.
+P2 실행 래퍼는 R2/mock R2 폴링 후 제안을 자동 분류·판정합니다. `approved` 판정은 위키 작성 에이전트와 sanitizer로 전달되어 통과한 위키 변경만 **commit**하고(아래 push 승인 게이트 참고), `rejected`/`partial` 판정은 위키 파일을 수정하지 않습니다. `suggestions/decisions/` 파일은 `automated=true` 상태 표시용 런타임 산출물이며 git에 포함하지 않습니다.
+
+**push 승인 게이트**: P2는 `git push`를 직접 실행하지 않습니다. admin이 P2 실행에 `SG_PUSH_ALLOWED` 환경변수를 부여하지 않으므로 `pre-push` 훅(`hooks/pre-push`)이 push를 차단합니다. 미push 커밋은 관리 UI "제안 자동 처리 → push 대기"에 표시되며, 운영자가 **"승인 후 push"** 버튼(`POST /suggestions/push/approve`)을 눌러야 원격에 반영됩니다. 훅은 `.git/hooks`에 비추적이므로 최초 1회 `make install-hooks`로 설치해야 합니다(호스트 `.git`이 컨테이너 `/workspace`에 마운트되어 컨테이너 P2 push에도 적용). P1/3/5/6은 admin이 `SG_PUSH_ALLOWED=1`을 부여해 기존 자동 push를 유지합니다. 관리 UI의 제안 항목은 접고/펼칠 수 있고, "확인"하면 "과거 제한 사항" 섹션(`.admin/suggestion_ack.json`)으로 이동합니다.
 
 ### 파이프라인 6 — 수요 기반 작성
 
@@ -195,6 +197,8 @@ node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run
 - `ADMIN_SUGGESTION_CACHE_TTL_SECONDS`: 제안 목록과 파이프라인 로그 API 응답 캐시 TTL, 기본값 `10`
 - `ADMIN_STATUS_CACHE_TTL_SECONDS`: 최근 실행 현황 API 응답 캐시 TTL, 기본값 `2`
 - `ADMIN_RULE_PROMOTION_ROOT`: P7 규칙 승격 제안 manifest/proposed 파일 저장 위치, 기본값 `/workspace/.admin/rule-promotions`
+- `ADMIN_SUGGESTION_ACK_STATE`: 제안 "확인"(과거 제한 사항) 보관 상태 파일, 기본값 `/workspace/.admin/suggestion_ack.json`
+- `SG_PUSH_ALLOWED`: `pre-push` 훅 게이트. `1`일 때만 `git push` 허용. admin이 P1/3/5/6 실행과 "승인 후 push"에 부여하고, P2 실행에는 부여하지 않아 자동 push를 차단합니다.
 - `HOLYCLAUDE_PIPELINE_MODEL`: 파이프라인 실행 모델, 기본값 `glm-5.2`
 - `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
 - `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)

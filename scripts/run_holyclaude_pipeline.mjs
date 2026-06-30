@@ -192,7 +192,7 @@ function buildP2Prompt(runId) {
 7. 판정 결과를 /workspace/suggestions/decisions/{id}.json에 저장하세요.
 8. 판정이 approved이면 즉시 위키 작성 에이전트에게 넘겨 실행하세요. Type A는 필요하면 wiki-planner로 기획서를 먼저 만들고 wiki-writer에 전달하세요. Type B는 관련 기존 문서를 대상으로 반영 기획서를 작성해 wiki-writer에 전달하세요.
 9. wiki-writer가 파일을 만들거나 수정하면 source-sanitizer를 실행하세요. sanitizer fail이면 최대 2회 재작성 요청 후 중단하고 decision의 writer_status를 failed로 갱신하세요.
-10. sanitizer pass인 approved 반영분만 git add/commit/push 하세요. suggestions/ 디렉토리는 로컬 런타임 큐이므로 git add하지 마세요.
+10. sanitizer pass인 approved 반영분만 git add/commit 하세요. **절대 git push를 직접 실행하지 마세요** — push는 관리자 승인 후 별도 프로세스가 수행하며, pre-push 훅이 당신의 push를 차단합니다. suggestions/ 디렉토리는 로컬 런타임 큐이므로 git add하지 마세요. 커밋 후 commit hash와 변경 파일 목록을 반드시 완료 요약에 포함하세요.
 
 decision JSON 필수 형식:
 {
@@ -217,6 +217,7 @@ decision JSON 필수 형식:
 - 동일 파일을 동시에 수정하지 마세요.
 - approved가 아닌 rejected/partial 제안은 위키 파일을 수정하지 마세요.
 - Type B 직접 수정도 wiki-writer/source-sanitizer 경로를 거치세요.
+- **git push는 절대 금지**. 커밋까지만 수행하고 종료하세요. push는 관리자 승인 후 별도로 실행됩니다(pre-push 훅이 차단).
 - decisions 파일은 자동 처리 상태 표시용 런타임 산출물입니다. 반드시 저장하되 commit 대상에는 포함하지 마세요.
 - 내부 경로, chunk ID, source_filter 이름, 배제 소스 내용은 공개 위키와 feedback에 노출하지 마세요.
 - 완료 시 처리/스킵/오류 제안 ID, 각 판정, writer_status, sanitizer 결과, commit hash 또는 미커밋 사유를 요약하세요.`;

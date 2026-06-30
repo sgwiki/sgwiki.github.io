@@ -1,0 +1,18 @@
+#!/bin/sh
+# sg-wiki p2(제안 자동 처리) push-approval gate
+#
+# 모든 git push는 SG_PUSH_ALLOWED=1 환경변수가 있을 때만 허용한다.
+# p2 에이전트 실행에는 이 env가 부여되지 않으므로(see main.py _run_holyclaude_pipeline),
+# 에이전트가 프롬프트를 어기고 git push 를 시도해도 이 훅이 exit 1 로 물리 차단한다.
+# push는 관리자 UI의 '승인 후 push'(/suggestions/push/approve)가 SG_PUSH_ALLOWED=1 로 수행한다.
+# p1/3/5/6 은 main.py 가 실행 시 env를 부여하므로 기존 자동 push가 그대로 통과한다.
+#
+# 설치: `make install-hooks` (.git/hooks/pre-push 로 복사)
+
+if [ "$SG_PUSH_ALLOWED" != "1" ]; then
+  echo "[sg-wiki pre-push] push 차단됨 — 관리자 승인 필요 (SG_PUSH_ALLOWED!=1)." >&2
+  echo "[sg-wiki pre-push] 제안 자동 처리(p2)는 커밋만 하고, push는 admin '승인 후 push' 버튼으로 실행하세요." >&2
+  exit 1
+fi
+
+exit 0

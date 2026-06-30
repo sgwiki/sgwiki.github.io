@@ -347,6 +347,60 @@
       overflow-wrap: anywhere;
     }
 
+    /* Suggestion collapse/expand */
+    .sugg-item { padding: 12px 0; border-bottom: 1px solid #21262d; }
+    .sugg-item:last-child { border-bottom: 0; }
+    .sugg-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      cursor: pointer;
+    }
+    .sugg-caret {
+      display: inline-block;
+      color: #8b949e;
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+    .sugg-item.open .sugg-caret { transform: rotate(90deg); }
+    .sugg-summary {
+      color: #8b949e;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+      flex: 1 1 200px;
+    }
+    .sugg-detail { margin-top: 8px; }
+    .sugg-detail.collapsed { display: none; }
+    .sugg-actions { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+
+    /* Pending push panel */
+    .push-pending {
+      margin: 4px 0 14px;
+      padding: 12px 14px;
+      background: #2a210d;
+      border: 1px solid #9e6a03;
+      border-radius: 6px;
+    }
+    .push-pending-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: #f0883e;
+      font-size: 13px;
+    }
+    .push-pending-list {
+      margin-top: 8px;
+      color: #8b949e;
+      font-size: 11px;
+      font-family: 'Consolas', 'Menlo', monospace;
+      line-height: 1.6;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
@@ -549,8 +603,17 @@
   <!-- 섹션 5.5: 제안 검토 -->
   <div class="card full-card">
     <h2>제안 자동 처리 <span id="sugg-inbox-badge" style="font-size:12px;color:#f0883e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
+    <div id="sugg-push-pending"></div>
+    <div id="sugg-push-msg" class="msg"></div>
     <div id="sugg-body" style="color:#484f58;font-size:12px">확인 중...</div>
-    <p class="refresh-hint">제안 처리 팀이 자동 판정하고, 승인된 제안은 위키 작성 에이전트로 전달합니다. 30초마다 자동 갱신</p>
+    <p class="refresh-hint">제안 처리 팀이 자동 판정하고, 승인된 제안은 위키 작성 에이전트로 전달합니다. 위키 변경은 커밋만 되며, 원격 push는 아래 '승인 후 push'로만 반영됩니다. 항목 헤더를 클릭해 접고 펼칠 수 있습니다. 30초마다 자동 갱신</p>
+  </div>
+
+  <!-- 섹션 5.6: 과거 제한 사항 (확인 완료) -->
+  <div class="card full-card">
+    <h2>과거 제한 사항 <span id="sugg-archive-badge" style="font-size:12px;color:#8b949e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
+    <div id="sugg-archive-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <p class="refresh-hint">'확인'한 제안이 여기에 보관됩니다. '복원'으로 활성 목록으로 되돌릴 수 있습니다.</p>
   </div>
 
   <!-- 섹션 6: 에이전트 로그 -->
@@ -1231,6 +1294,7 @@
     runPoll('wikiReviews', loadWikiReviews);
     runPoll('rulePromotions', loadRulePromotions);
     runPoll('suggestions', loadSuggestions);
+    runPoll('pendingPush', loadPendingPush);
   }
 
   // ── Log stream ────────────────────────────────────────────────────────────
@@ -1399,44 +1463,156 @@
     ].filter(Boolean).join('\n')).join('\n\n');
   }
 
+  // 접기/펼치기 상태를 폴링 리렌더 후에도 보존한다(기본 접힘).
+  const expandedSuggs = new Set();
+
+  function toggleSugg(sid) {
+    const item = document.getElementById('sugg-item-' + sid);
+    if (!item) return;
+    const detail = item.querySelector('.sugg-detail');
+    if (!detail) return;
+    const nowCollapsed = detail.classList.toggle('collapsed');
+    item.classList.toggle('open', !nowCollapsed);
+    if (nowCollapsed) expandedSuggs.delete(sid);
+    else expandedSuggs.add(sid);
+  }
+
+  function firstLine(text, limit = 80) {
+    const line = String(text ?? '').split('\n').find(l => l.trim()) ?? '';
+    return line.length > limit ? line.slice(0, limit) + '…' : line;
+  }
+
+  function renderSuggestionItem(s, archived) {
+    const sid     = s.id ?? '';
+    const date    = (s.created_at ?? '').slice(0, 16).replace('T', ' ');
+    const contact = s.contact ? `<span style="color:#8b949e;font-size:11px"> · ${escapeHtml(s.contact)}</span>` : '';
+    const dec     = s.decision;
+    const statusBadge = decisionBadge(dec);
+    const decBlock = renderDecisionBlock(dec);
+    const logBlock = renderSuggestionLogs(s.pipeline_logs ?? []);
+    const open    = expandedSuggs.has(sid);
+    const ackBtn  = archived
+      ? `<button class="btn btn-small" onclick="restoreSugg('${escapeAttr(sid)}')">복원</button>`
+      : `<button class="btn btn-success btn-small" onclick="acknowledgeSugg('${escapeAttr(sid)}')">확인</button>`;
+    return `<div class="sugg-item${open ? ' open' : ''}" id="sugg-item-${escapeAttr(sid)}">
+      <div class="sugg-head" onclick="toggleSugg('${escapeAttr(sid)}')">
+        <span class="sugg-caret">▸</span>
+        ${statusBadge}
+        <code style="color:#8b949e;font-size:11px">${sid.slice(0,8)}</code>
+        <span style="color:#484f58;font-size:11px">${date}</span>
+        ${contact}
+        <span class="sugg-summary">${escapeHtml(firstLine(s.content))}</span>
+        <span class="sugg-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-small" onclick="viewSugg('${escapeAttr(sid)}')">보기</button>
+          ${ackBtn}
+        </span>
+      </div>
+      <div class="sugg-detail${open ? '' : ' collapsed'}">
+        <div style="color:#c9d1d9;line-height:1.6;white-space:pre-wrap;word-break:break-all">${escapeHtml(s.content ?? '')}</div>
+        ${decBlock}
+        ${logBlock}
+      </div>
+    </div>`;
+  }
+
   async function loadSuggestions() {
     try {
       const res   = await fetch('/suggestions');
       const data  = await res.json();
       const items = data.items ?? [];
       const el    = document.getElementById('sugg-body');
+      const archiveEl = document.getElementById('sugg-archive-body');
       const badge = document.getElementById('sugg-inbox-badge');
-      const pending = items.filter(s => s.decision?.automated !== true).length;
+      const archiveBadge = document.getElementById('sugg-archive-badge');
+
+      const active   = items.filter(s => !s.acknowledged);
+      const archived = items.filter(s => s.acknowledged);
+
+      const pending = active.filter(s => s.decision?.automated !== true).length;
       badge.textContent = pending > 0 ? `(자동 대기 ${pending}건)` : '';
-      if (items.length === 0) {
-        el.innerHTML = '<span style="color:#484f58">대기 중인 제안 없음</span>';
-        return;
+      if (archiveBadge) archiveBadge.textContent = archived.length > 0 ? `(${archived.length}건)` : '';
+
+      el.innerHTML = active.length === 0
+        ? '<span style="color:#484f58">대기 중인 제안 없음</span>'
+        : active.map(s => renderSuggestionItem(s, false)).join('');
+
+      if (archiveEl) {
+        archiveEl.innerHTML = archived.length === 0
+          ? '<span style="color:#484f58">확인된 제한 없음</span>'
+          : archived.map(s => renderSuggestionItem(s, true)).join('');
       }
-      el.innerHTML = items.map(s => {
-        const sid     = s.id ?? '';
-        const date    = (s.created_at ?? '').slice(0, 16).replace('T', ' ');
-        const contact = s.contact ? `<span style="color:#8b949e;font-size:11px"> · ${escapeHtml(s.contact)}</span>` : '';
-        const dec     = s.decision;
-        const statusBadge = decisionBadge(dec);
-        const decBlock = renderDecisionBlock(dec);
-        const logBlock = renderSuggestionLogs(s.pipeline_logs ?? []);
-        return `<div style="padding:14px 0;border-bottom:1px solid #21262d">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-            ${statusBadge}
-            <code style="color:#8b949e;font-size:11px">${sid.slice(0,8)}</code>
-            <span style="color:#484f58;font-size:11px">${date}</span>
-            ${contact}
-            <span style="margin-left:auto;display:flex;gap:6px">
-              <button class="btn btn-small" onclick="viewSugg('${escapeAttr(sid)}')">보기</button>
-            </span>
-          </div>
-          <div style="color:#c9d1d9;line-height:1.6;white-space:pre-wrap;word-break:break-all">${escapeHtml(s.content ?? '')}</div>
-          ${decBlock}
-          ${logBlock}
-        </div>`;
-      }).join('');
     } catch (e) {
       document.getElementById('sugg-body').textContent = '로드 실패: ' + e.message;
+    }
+  }
+
+  async function acknowledgeSugg(sid) {
+    try {
+      const res = await fetch(`/suggestions/${sid}/acknowledge`, { method: 'POST' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      expandedSuggs.delete(sid);
+      await loadSuggestions();
+    } catch (e) {
+      alert('확인 처리 실패: ' + e.message);
+    }
+  }
+
+  async function restoreSugg(sid) {
+    try {
+      const res = await fetch(`/suggestions/${sid}/unacknowledge`, { method: 'POST' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      await loadSuggestions();
+    } catch (e) {
+      alert('복원 실패: ' + e.message);
+    }
+  }
+
+  // ── Pending push (p2 승인 게이트) ──────────────────────────────────────────
+  async function loadPendingPush() {
+    const host = document.getElementById('sugg-push-pending');
+    if (!host) return;
+    try {
+      const res  = await fetch('/suggestions/pending-push');
+      const data = await res.json();
+      if (!data.has_pending) { host.innerHTML = ''; return; }
+      const commits = (data.commits ?? []).map(c =>
+        `${escapeHtml(c.hash)} ${escapeHtml(c.subject)}`).join('<br>');
+      host.innerHTML = `
+        <div class="push-pending">
+          <div class="push-pending-head">
+            <b>push 대기 ${data.ahead_by}건</b>
+            <span style="color:#8b949e;font-size:11px">관리자 승인 후에만 원격에 반영됩니다</span>
+            <span style="margin-left:auto;display:flex;gap:6px">
+              <button class="btn btn-success btn-small" onclick="approvePush()">승인 후 push</button>
+            </span>
+          </div>
+          <div class="push-pending-list">${commits}</div>
+        </div>`;
+    } catch (e) {
+      host.innerHTML = '';
+    }
+  }
+
+  async function approvePush() {
+    const msg = document.getElementById('sugg-push-msg');
+    const res0 = await fetch('/suggestions/pending-push');
+    const info = await res0.json().catch(() => ({ ahead_by: '?' }));
+    if (!confirm(`미push 커밋 ${info.ahead_by ?? '?'}건을 원격에 push 할까요?`)) return;
+    showMsg(msg, 'info', '<span class="spinner"></span>push 승인 중...');
+    try {
+      const res  = await fetch('/suggestions/push/approve', { method: 'POST' });
+      const data = await readResponseJson(res);
+      if (res.ok && data.status === 'pushed') {
+        showMsg(msg, 'ok', `push 완료 (${data.ahead_by}건)`);
+      } else if (res.ok && data.status === 'nothing_to_push') {
+        showMsg(msg, 'info', 'push할 커밋이 없습니다');
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+      await loadPendingPush();
+      await loadWikiReviews();
+    } catch (e) {
+      showMsg(msg, 'err', 'push 실패: ' + e.message);
     }
   }
 
@@ -1468,6 +1644,7 @@
   schedulePoll('wikiReviews',  loadWikiReviews,  10000);
   schedulePoll('rulePromotions', loadRulePromotions, 10000);
   schedulePoll('suggestions',  loadSuggestions,  30000);
+  schedulePoll('pendingPush',  loadPendingPush,  15000);
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) refreshVisibleData();
   });
