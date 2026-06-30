@@ -1,11 +1,11 @@
 ---
 title: 아마데우스 FAQ
 slug: 아마데우스-FAQ
+type: community-curation
 category: 커뮤니티-큐레이션
 last_updated: 2026-06-30
 spoiler: main_story
-source_notes: "커뮤니티 큐레이션 후보 cand-c51caeaed5 기반. 공식·팬 QA, 온톨로지, 외부 백과, 영어 원문 사료, 애니메이션 에피소드 교차 검증"
-pipeline: "p6:7c2b9b6c,+50f6324d"
+source_notes: "커뮤니티 큐레이션 기반. 공식·팬 QA, 온톨로지, 외부 백과, 영어 원문 사료, 애니메이션 에피소드 교차 검증"
 genre: faq
 evidence_grade: corroborated
 ---
