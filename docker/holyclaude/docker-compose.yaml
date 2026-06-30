@@ -84,7 +84,7 @@ services:
       - HOLYCLAUDE_PIPELINE_MODEL=glm-5.2
 
       # claude-mem worker config (worker bind host + port + Z.AI summarization model)
-      - CLAUDE_MEM_MODEL=glm-5.2
+      - CLAUDE_MEM_MODEL=glm-4.7
       - CLAUDE_MEM_PROXY_N=3
       - CLAUDE_MEM_WORKER_HOST=0.0.0.0
       - CLAUDE_MEM_WORKER_PORT=37700
