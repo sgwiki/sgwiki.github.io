@@ -256,22 +256,29 @@ node /workspace/scripts/wiki_work_registry.mjs status --run-id <run_id> --file w
 
 ### 파이프라인 6 — 커뮤니티 큐레이션 생성/업데이트
 
-DCinside 슈타게 갤러리 유저 게시글 세그먼트 분석으로 도출된 위키 후보 큐를 소비해, 커뮤니티에서 실제로 반복되는 질문·오해·토론을 바탕으로 페이지를 **생성하거나 업데이트**한다. FAQ·토론 정리 성격의 새 문서는 `wiki/커뮤니티-큐레이션/`을 우선 대상으로 삼는다. 커뮤니티 큐레이션 팀장(`wiki-demand-lead`)은 자율 라우팅하며 사용자에게 묻지 않는다.
+DCinside 슈타게 갤러리 유저 게시글을 커뮤니티 세그먼테이션으로 분석해 도출된 소제(subtopic) 후보 큐를 소비해, 커뮤니티에서 실제로 반복되는 질문·오해·토론을 바탕으로 페이지를 **생성하거나(근거 합리 시에만) 업데이트**한다. 신규 문서의 기본 대상은 `wiki/커뮤니티-큐레이션/`이며, **양식 제한 없이** 마이닝 결과에 맞는 최적 양식을 자율 선택한다. 커뮤니티 큐레이션 팀장(`wiki-demand-lead`)은 자율 라우팅하며 사용자에게 묻지 않는다.
+
+**장르(genre, 후보당 1개·기존 type과 직교):** `faq`(반복 질문 묶음) · `simple_q`(단발 사실 단답) · `complex_q`(조건부 단계 설명) · `debate`(토론 중개: 쟁점→양측 논거→근거 평가→합리적 결론/가설) · `deep_dive`(특정 유저의 통찰 주장을 연구 가설로 심층 전개) · `editorial`(사설: 사실검증 미충족 주장을 "커뮤니티 견해"로 소개, 사실 단정 금지).
+
+**근거 등급(evidence_grade) 게이트:** `corroborated`(사실검증 소스가 뒷받침)면 fact 페이지 작성 가능. `community_only`(수요만, 사실검증 미충족)면 **반드시 editorial로 강등**하고 사실 단정·기존 정전 페이지 업데이트를 금지한다.
 
 ```
 ① node /workspace/scripts/p6_demand_queue.mjs normalize → next --run-id <id> --priority high (후보 선점)
-② Agent(wiki-demand-analyst) → 커뮤니티 수요 분석 + 타입 판정 + 생성/업데이트 권고
+② Agent(wiki-demand-analyst) → 커뮤니티 수요 분석 + genre·evidence_grade 판정 + 생성/업데이트 권고
 ③ 팀장 판정(APPROVED/REJECTED/REVISION) + 2계층 예약
-   - p6_demand_queue.mjs reserve --mode create(파일 부재)|update(파일 존재)  ← 큐 소비
+   - community_only → editorial 강등. update는 evidence_grade=corroborated이고 새 사실 출처가 합리적일 때만 승인
+   - p6_demand_queue.mjs reserve --mode create(파일 부재, 사설 포함)|update(파일 존재)  ← 큐 소비
    - wiki_work_registry.mjs reserve                                          ← 파일 단위 락
-④ create=Agent(wiki-planner→wiki-writer) / update=Agent(wiki-rewriter 타깃 보강, 사실·스포일러 등급 불변)
+④ 라우팅: create(fact)=wiki-planner→wiki-writer / create(editorial)=wiki-writer 사설 브리프 /
+   내용 업데이트=wiki-writer 섹션 병합 타깃 보강(rewriter 아님) / 문체 교정만=wiki-rewriter. 사실·스포일러 등급 불변
 ⑤ source-sanitizer → wiki-linker → wiki-quality-lead(gate)
-⑥ 팀장 검토 + 구조화 리포트 저장 (.admin/runs/p6-<run_id>-report.json)
+⑥ 팀장 검토 + 구조화 리포트 저장 (.admin/runs/p6-<run_id>-report.json, genre·evidence_grade는 선택 관측 필드)
 ⑦ 통과한 wiki/*.md만 git add/commit/push. data/dc_gallery/·.admin/·큐/리포트는 commit 금지
 ⑧ p6_demand_queue.mjs complete + wiki_work_registry.mjs complete
 ```
 
-- **공통 하드 커버리지(러너 강제)**: `qaset_with_rag`·`namuwiki`·`fandom_episodes`(에피소드 줄거리, 산문 가공·`series` 필터만 유효·**호출 시도만 pass**)·`dc_gallery`(커뮤니티 수요). lore/mechanics 타입은 `sg_paper`·`sg-ontology`·`sg_game_sg0_en` 추가(팀장 보고 확인).
+- **공통 하드 커버리지(러너 강제)**: `qaset_with_rag`·`namuwiki`·`dc_gallery`(커뮤니티 수요) 3개를 러너가 코드로 강제한다(P6_REQUIRED_COVERAGE). `fandom_episodes`(에피소드 줄거리, 산문 가공·`series` 필터만 유효·호출 시도만 pass)는 공통 권장 소스로 analyst가 조회하되 러너 강제 항목은 아니다. lore/mechanics 타입은 `sg_paper`·`sg-ontology`·`sg_game_sg0_en`를 추가 조회한다(팀장 보고로 확인).
+- 내용 보강은 `wiki-writer`(섹션 병합)로 라우팅한다. `wiki-rewriter`는 문체 전용이므로 내용 추가에 사용하지 않는다(레거시 라우팅 버그 교정).
 - 1회 실행 최대 3개 후보 순차. 큐(소비 추적)와 registry(파일 락)를 **모두** 사용한다.
 - `dc_gallery`(dcinside) 근거는 산문 전용·각주 금지·식별자(gall_num·chunk ID·source 이름·내부 경로) 노출 금지.
 
