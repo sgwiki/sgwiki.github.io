@@ -79,37 +79,12 @@ def _invalidate_cache(*prefixes: str) -> None:
                 response_cache.pop(key, None)
 
 
-def _warn_if_push_hook_missing() -> None:
-    """p2 push-approval 게이트용 pre-push 훅 설치 여부 self-check.
-
-    훅이 없으면 p2 push 게이트의 결정론적 보장이 무효화된다(프롬프트만 남음).
-    시작 시 경고만 출력하고 동작은 막지 않는다.
-    """
-    try:
-        configured = subprocess.run(
-            ["git", "config", "--get", "core.hooksPath"],
-            cwd=WORKSPACE,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-        candidate = (WORKSPACE / configured / "pre-push").resolve() if configured else (WORKSPACE / ".git" / "hooks" / "pre-push").resolve()
-        if not candidate.exists():
-            print(
-                f"[admin] WARNING: pre-push 훅 미설치({candidate}) — p2 push 게이트 무효. "
-                "'make install-hooks' 로 설치 필요.",
-                flush=True,
-            )
-    except Exception as exc:
-        print(f"[admin] WARNING: pre-push 훅 검증 실패: {exc}", flush=True)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
     WIKI_REVIEW_STATE.parent.mkdir(parents=True, exist_ok=True)
     SUGGESTION_ACK_STATE.parent.mkdir(parents=True, exist_ok=True)
     RULE_PROMOTION_ROOT.mkdir(parents=True, exist_ok=True)
-    _warn_if_push_hook_missing()
     scheduler.start()
     yield
     scheduler.shutdown(wait=False)
@@ -1332,8 +1307,9 @@ async def approve_push():
 def _approve_push() -> dict:
     """관리자 최종 승인 후 미push 커밋을 push.
 
-    SG_PUSH_ALLOWED=1 환경변수로 pre-push 훅을 통과시킨다. push 자체는
-    holyclaude 컨테이너에서 수행(자격/원격 접근 일관성).
+    p2는 프롬프트 지침에 따라 commit까지만 수행하고 push하지 않는다. 미push 커밋은
+    이 엔드포인트를 통해 관리자 승인 시에만 push된다. push 자체는 holyclaude
+    컨테이너에서 수행(자격/원격 접근 일관성).
     """
     ahead_exit, ahead_out = _docker_exec_git(["rev-list", "--count", "@{u}..HEAD"])
     ahead_by = 0
@@ -1345,7 +1321,7 @@ def _approve_push() -> dict:
     if ahead_by == 0:
         return {"status": "nothing_to_push", "ahead_by": 0}
 
-    push_exit, push_out = _docker_exec_git(["push"], env={"SG_PUSH_ALLOWED": "1"})
+    push_exit, push_out = _docker_exec_git(["push"])
     _invalidate_cache("status", "suggestions", "suggestion_logs", "wiki_status", "wiki_reviews")
     if push_exit != 0:
         raise RuntimeError(push_out.strip() or f"git push 실패 (exit {push_exit})")
@@ -1642,13 +1618,10 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
         )
 
     # p2(제안 자동 처리) push 승인 게이트:
-    #   pre-push 훅이 SG_PUSH_ALLOWED=1 일 때만 push를 허용한다. p2 에이전트 실행엔
-    #   이 env를 부여하지 않으므로, 에이전트가 프롬프트를 어기고 git push 해도
-    #   훅이 exit 1 로 물리 차단한다(결정론적 보장). push는 관리자 승인 엔드포인트
-    #   (/suggestions/push/approve) 가 SG_PUSH_ALLOWED=1 로 별도 수행한다.
-    #   p1/3/5/6 은 기존 자동 push 유지를 위해 env를 부여한다.
-    push_allow = "" if pipeline == "p2" else "SG_PUSH_ALLOWED=1 "
-    inner = f"cd /workspace && {push_allow}node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
+    #   p2는 프롬프트 지침으로 commit까지만 수행하고 push하지 않는다. 미push 커밋은
+    #   관리자 승인 엔드포인트(/suggestions/push/approve)가 별도로 push한다.
+    #   p1/3/5/6 은 기존대로 자동 push 한다.
+    inner = f"cd /workspace && node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
     if instruction:
         inner += f" --instruction {shlex.quote(instruction)}"
     command = [

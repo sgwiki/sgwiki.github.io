@@ -5,7 +5,6 @@ MKDOCS       := uv run mkdocs
 .PHONY: up down restart logs shell build \
         wiki-serve wiki-build wiki-deploy \
         suggestions-poll worker-dev worker-deploy \
-        install-hooks install-hooks-remote \
         help
 
 # ── holyclaude 서비스 ───────────────────────────────────────────────────────
@@ -52,19 +51,6 @@ wiki-deploy:
 suggestions-poll:
 	python3 scripts/poll_suggestions.py
 
-# ── p2 push 승인 게이트 훅 ───────────────────────────────────────────────────
-# pre-push 훅을 설치한다. p2(제안 자동 처리)가 관리자 승인 없이 push 하지 못하게
-# 하는 결정론적 게이트. .git/hooks 는 비추적이므로 clone/컨테이너마다 1회 설치 필요.
-
-install-hooks:
-	install -d -m 755 .git/hooks
-	install -m 755 hooks/pre-push .git/hooks/pre-push
-	@echo "  installed → .git/hooks/pre-push (host)"
-
-# holyclaude 컨테이너의 /workspace 리포에 훅 설치 (.git 이 호스트와 공유되지 않을 때).
-install-hooks-remote:
-	$(COMPOSE) exec holyclaude sh -lc 'install -d -m 755 /workspace/.git/hooks && install -m 755 /workspace/hooks/pre-push /workspace/.git/hooks/pre-push && echo "  installed → container /workspace/.git/hooks/pre-push"'
-
 # ── Cloudflare Worker ────────────────────────────────────────────────────────
 
 worker-dev:
@@ -90,9 +76,6 @@ help:
 	@echo "  wiki-deploy          빌드 후 Cloudflare Pages 수동 배포"
 	@echo ""
 	@echo "  suggestions-poll     R2에서 새 제안 다운로드 → suggestions/inbox/"
-	@echo ""
-	@echo "  install-hooks        pre-push 훅 설치 (p2 push 승인 게이트, 호스트)"
-	@echo "  install-hooks-remote pre-push 훅 설치 (holyclaude 컨테이너 /workspace)"
 	@echo ""
 	@echo "  worker-dev           Cloudflare Worker 로컬 개발 서버"
 	@echo "  worker-deploy        Cloudflare Worker 배포"
