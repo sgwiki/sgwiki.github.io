@@ -2058,13 +2058,12 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
     group_script = (
         f"echo $$ > {shlex.quote(marker)}; "
         f"trap 'rm -f {shlex.quote(marker)}' EXIT; "
-        f"set -o pipefail; "
-        f"su claude -s /bin/sh -c {shlex.quote(inner)} 2>&1 | tee /proc/1/fd/1"
+        f"su claude -s /bin/sh -c {shlex.quote(inner)} 2>&1"
     )
     command = [
         "bash",
         "-lc",
-        f"mkdir -p {shlex.quote(RUN_MARKER_DIR)}; setsid bash -lc {shlex.quote(group_script)}",
+        f"mkdir -p {shlex.quote(RUN_MARKER_DIR)}; bash -lc {shlex.quote(group_script)}",
     ]
 
     _update_active_job(
