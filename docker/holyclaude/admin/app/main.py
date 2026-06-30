@@ -23,6 +23,12 @@ from app.scheduler import add_p2_job, get_jobs, remove_p2_job, scheduler
 
 RUNS_DIR = Path(os.getenv("ADMIN_RUNS_DIR", ".admin/runs"))
 WORKSPACE = Path(os.getenv("WORKSPACE", "/workspace"))
+# 파이프라인별 '사용자 지시' 프리셋. /workspace 마운트본을 우선 읽어 재빌드 없이 수정이
+# 반영되게 하고, 없으면 이미지에 번들된 사본(BUILD 시 COPY)으로 폴백한다.
+PRESETS_FILE = Path(
+    os.getenv("ADMIN_PRESETS_FILE", str(WORKSPACE / "docker/holyclaude/admin/presets.json"))
+)
+PRESETS_FALLBACK = Path(__file__).parent.parent / "presets.json"
 WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
 SUGGESTION_ACK_STATE = Path(os.getenv("ADMIN_SUGGESTION_ACK_STATE", WORKSPACE / ".admin/suggestion_ack.json"))
 HOLYCLAUDE_GIT_WORKDIR = "/workspace"
@@ -105,6 +111,28 @@ async def runtime_error_handler(_request: Request, exc: RuntimeError):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(request, "index.html")
+
+
+def _load_presets() -> dict[str, str]:
+    """파이프라인별 사용자 지시 프리셋을 읽는다. 마운트본 → 번들 사본 순서로 시도하고
+    모두 실패하면 빈 dict를 반환한다(프리셋 없이 빈 칸으로 동작)."""
+    for path in (PRESETS_FILE, PRESETS_FALLBACK):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if isinstance(data, dict):
+            return {
+                key: value
+                for key, value in data.items()
+                if key.isdigit() and isinstance(value, str)
+            }
+    return {}
+
+
+@app.get("/presets")
+async def get_presets():
+    return {"presets": _load_presets()}
 
 
 class TriggerBody(BaseModel):

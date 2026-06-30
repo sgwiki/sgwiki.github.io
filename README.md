@@ -115,7 +115,8 @@ make shell           # 컨테이너 bash 접속
 ### 관리 UI (`http://localhost:3002`)
 
 - 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) / 파이프라인 6 (수요 기반 작성) / 파이프라인 7 (규칙 승격 제안) 수동 실행
-- 수동 트리거 시 **(선택) 사용자 지시** 입력 칸: 텍스트를 넣으면 팀장(team-lead) 에이전트 프롬프트에 추가 지시로 전달 (`POST /trigger/pN` 본문 `user_instruction`). 비워도 되며, 보안·게이트 규칙은 지시보다 우선합니다.
+- 수동 실행은 팀 버튼 선택 → 사용자 지시 확인·수정 → **실행** 버튼 순서로 시작합니다. 팀별 기본 지시 프리셋은 `docker/holyclaude/admin/presets.json`에서 로드되며, 파일을 수정하면 다음 페이지 새로고침부터 반영됩니다.
+- **(선택) 사용자 지시** 입력 칸: 텍스트를 넣으면 팀장(team-lead) 에이전트 프롬프트에 추가 지시로 전달 (`POST /trigger/pN` 본문 `user_instruction`). 비워도 되며, 보안·게이트 규칙은 지시보다 우선합니다.
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 - **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 대기 작업 순번·취소
@@ -198,6 +199,7 @@ node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run
 - `ADMIN_STATUS_CACHE_TTL_SECONDS`: 최근 실행 현황 API 응답 캐시 TTL, 기본값 `2`
 - `ADMIN_RULE_PROMOTION_ROOT`: P7 규칙 승격 제안 manifest/proposed 파일 저장 위치, 기본값 `/workspace/.admin/rule-promotions`
 - `ADMIN_SUGGESTION_ACK_STATE`: 제안 "확인"(과거 제한 사항) 보관 상태 파일, 기본값 `/workspace/.admin/suggestion_ack.json`
+- `ADMIN_PRESETS_FILE`: 관리 UI 수동 실행 팀별 사용자 지시 프리셋 JSON, 기본값 `/workspace/docker/holyclaude/admin/presets.json`
 - `HOLYCLAUDE_PIPELINE_MODEL`: 파이프라인 실행 모델, 기본값 `glm-5.2`
 - `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
 - `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)
@@ -219,6 +221,7 @@ make suggestions-poll   # R2 → suggestions/inbox/ 수동 폴링
 
 - [위키 안내 및 근거 체계](wiki/README.md)
 - [세계선 인터랙티브 맵 개발 안내](sg-worldline-map/README.md)
+- [holyclaude 컨테이너 작업 안내](docker/holyclaude/AGENTS.md)
 - [holyclaude 위키 에이전트 팀 설계](docs/holyclaude-wiki-agent-팀-설계.md)
 - [제안 처리 팀 설계](docs/제안%20처리%20팀%20설계.md)
 - [RAG 소스 저작권 검토](docs/rag-소스-저작권-검토.md)

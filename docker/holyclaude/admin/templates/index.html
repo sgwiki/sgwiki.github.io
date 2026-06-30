@@ -119,6 +119,25 @@
       font-size: 11px;
     }
 
+    .btn-run {
+      background: #1f6feb;
+      border-color: #388bfd;
+      color: #fff;
+      font-weight: 600;
+    }
+    .btn-run:hover { background: #388bfd; }
+
+    .btn:disabled,
+    .btn[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn:disabled:hover { background: #21262d; border-color: #30363d; }
+
+    .pipeline-btn.selected {
+      box-shadow: 0 0 0 2px #f0f6fc, 0 0 0 4px #1f6feb;
+    }
+
     .btn + .btn { margin-left: 8px; }
 
     .msg {
@@ -500,33 +519,40 @@
     <h2>수동 실행</h2>
     <div>
       <span class="tip" data-tip="콘텐츠 생성 파이프라인&#10;① wiki/ 현황 vs qaset 비교 → 미작성 주제 선정&#10;② wiki-planner: 기획서 작성 (병렬)&#10;③ wiki-writer: 페이지 초안 작성 (병렬)&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
-        <button class="btn btn-primary" onclick="triggerPipeline(1)">위키 작성 팀 실행</button>
+        <button class="btn btn-primary pipeline-btn" data-pipeline="1" onclick="selectPipeline(1)">위키 작성 팀</button>
       </span>
-      <span class="tip" data-tip="제안 처리 파이프라인&#10;① R2 폴링 → suggestions/inbox/ 저장 (멱등)&#10;② wiki-classifier: Type A(주제 요청) / B(편집 제안) 분류&#10;③ suggestion-judge: MCP 조회 후 자동 승인·거부·부분 판정&#10;④ approved면 wiki-writer → source-sanitizer 실행&#10;⑤ 통과한 위키 변경만 commit/push">
-        <button class="btn btn-success" onclick="triggerPipeline(2)">제안 처리 팀 실행</button>
+      <span class="tip" data-tip="제안 처리 파이프라인&#10;① R2 폴링 → suggestions/inbox/ 저장 (멱등)&#10;② wiki-classifier: Type A(주제 요청) / B(편집 제안) 분류&#10;③ suggestion-judge: MCP 조회 후 자동 승인·거부·부분 판정&#10;④ approved면 wiki-writer → source-sanitizer 실행&#10;⑤ 통과한 위키 변경은 commit만 수행, push는 운영자 승인 후 별도 실행">
+        <button class="btn btn-success pipeline-btn" data-pipeline="2" onclick="selectPipeline(2)">제안 처리 팀</button>
       </span>
       <span class="tip" data-tip="온톨로지 저작 파이프라인&#10;① 시리즈 선정 (기본 S;G0) + sg-ontology MCP로 누락 인스턴스 식별&#10;② registry 예약 (p3-work, 동일 시리즈/범위 중복 방지)&#10;③ ontology-author: TTL facts 저작 (SHACL 스키마·MCP 6종·정책 준수)&#10;④ ontology-validator: SHACL + 참조 무결성 + 정책 검증 (최대 2회 재시도)&#10;⑤ 팀장 검토 → git commit → 온톨로지 TTL push">
-        <button class="btn btn-warning" onclick="triggerPipeline(3)">온톨로지 저작 팀 실행</button>
+        <button class="btn btn-warning pipeline-btn" data-pipeline="3" onclick="selectPipeline(3)">온톨로지 저작 팀</button>
       </span>
       <span class="tip" data-tip="위키 품질 검사 파이프라인 (전체 감사)&#10;① wiki/*.md 전체 대상 선정 (현재 188개 파일)&#10;② wiki-format-inspector: frontmatter·인용 형식·섹션 구조 검사&#10;③ wiki-completeness-checker: 미치환 placeholder·빈 섹션·완성도 검사&#10;④ wiki-consistency-checker: 세계선 수치·날짜·인물명 교차 검사&#10;⑤ 감사 리포트 생성 (.admin/quality-audit-{날짜}.json)">
-        <button class="btn btn-quality" onclick="triggerPipeline(4)">품질 검사 팀 실행</button>
+        <button class="btn btn-quality pipeline-btn" data-pipeline="4" onclick="selectPipeline(4)">품질 검사 팀</button>
       </span>
       <span class="tip" data-tip="위키 정비 파이프라인&#10;① wiki/*.md 전체 스캔 → 정비 대상 선정&#10;② wiki-restructurer: 섹션 구조·헤더·링크 재정비&#10;③ wiki-rewriter: 문체·표현 개선 및 일관성 교정&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
-        <button class="btn btn-maint" onclick="triggerPipeline(5)">위키 정비 팀 실행</button>
+        <button class="btn btn-maint pipeline-btn" data-pipeline="5" onclick="selectPipeline(5)">위키 정비 팀</button>
       </span>
       <span class="tip" data-tip="수요 기반 작성 파이프라인&#10;① 후보 큐 정규화 → 유저 수요 후보 선점 (DCinside 세그먼트 분석 기반)&#10;② wiki-demand-analyst: 유저 실제 발화·오해·토론 분석 + 생성/업데이트 권고&#10;③ 생성=wiki-planner→writer / 업데이트=wiki-rewriter 타깃 보강&#10;④ source-sanitizer·wiki-linker·quality-lead 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
-        <button class="btn btn-demand" onclick="triggerPipeline(6)">수요 기반 작성 팀 실행</button>
+        <button class="btn btn-demand pipeline-btn" data-pipeline="6" onclick="selectPipeline(6)">수요 기반 작성 팀</button>
       </span>
       <span class="tip" data-tip="claude-mem 규칙 승격 제안 파이프라인&#10;① mem-search로 반복 결정·거절·수정 패턴 조회&#10;② AGENTS/CLAUDE/에이전트 규칙 후보만 산출&#10;③ 실제 규칙 파일은 수정하지 않고 .admin/rule-promotions/에 제안 저장&#10;④ 관리자가 파일별 전후 diff를 보고 수정·승인해야 적용">
-        <button class="btn btn-rule" onclick="triggerPipeline(7)">규칙 승격 제안 생성</button>
+        <button class="btn btn-rule pipeline-btn" data-pipeline="7" onclick="selectPipeline(7)">규칙 승격 제안</button>
       </span>
     </div>
-    <div class="row" style="align-items:flex-start;margin-top:14px">
+    <div style="margin-top:10px;font-size:12px;color:#8b949e">
+      위 팀을 선택하면 기본 지시가 채워집니다. 내용을 수정·삭제한 뒤 <b>실행</b>을 누르세요.
+      <span id="selected-pipeline" style="color:#58a6ff"></span>
+    </div>
+    <div class="row" style="align-items:flex-start;margin-top:10px">
       <label for="user-instruction" style="margin-top:6px;white-space:nowrap">
         사용자 지시<br><span style="color:#484f58;font-size:10px">(선택)</span>
       </label>
-      <textarea id="user-instruction" rows="2" style="flex:1"
+      <textarea id="user-instruction" rows="3" style="flex:1"
         placeholder="팀장 에이전트에 전달할 추가 지시(예: 특정 시리즈 우선, 제외할 주제). 비워도 됨. 보안·게이트 규칙은 지시보다 우선합니다."></textarea>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-run" id="run-btn" onclick="runSelectedPipeline()" disabled>실행</button>
     </div>
     <div id="trigger-msg" class="msg"></div>
   </div>
@@ -702,11 +728,42 @@
   const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '수요 기반 작성 팀', '7': '규칙 승격 제안' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
-  // ── Trigger ──────────────────────────────────────────────────────────────
-  async function triggerPipeline(n) {
+  // 팀별 사용자 지시 기본값(프리셋)은 서버의 presets.json에서 로드합니다.
+  // 파일 경로: docker/holyclaude/admin/presets.json (유저가 직접 수정 가능).
+  let PIPELINE_PRESETS = {};
+  async function loadPresets() {
+    try {
+      const res = await fetch('/presets');
+      const data = await res.json();
+      PIPELINE_PRESETS = data.presets || {};
+    } catch (e) {
+      PIPELINE_PRESETS = {};
+    }
+  }
+
+  let selectedPipeline = null;
+
+  // ── Select preset ──────────────────────────────────────────────────────────
+  // 팀 버튼은 즉시 실행하지 않고 해당 팀을 선택하면서 기본 지시를 채웁니다.
+  function selectPipeline(n) {
+    selectedPipeline = n;
+    document.querySelectorAll('.pipeline-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.pipeline === String(n));
+    });
+    document.getElementById('user-instruction').value = PIPELINE_PRESETS[String(n)] || '';
+    document.getElementById('selected-pipeline').textContent = '선택됨: ' + pipelineName(n);
+    document.getElementById('run-btn').disabled = false;
+  }
+
+  // ── Run selected ─────────────────────────────────────────────────────────
+  async function runSelectedPipeline() {
+    if (selectedPipeline == null) return;
+    const n = selectedPipeline;
     const msg = document.getElementById('trigger-msg');
+    const runBtn = document.getElementById('run-btn');
     const instruction = document.getElementById('user-instruction').value.trim();
     showMsg(msg, 'info', '<span class="spinner"></span>' + pipelineName(n) + ' 실행 중...');
+    runBtn.disabled = true;
     try {
       const res = await fetch('/trigger/p' + n, {
         method: 'POST',
@@ -726,6 +783,8 @@
       loadRunning();
     } catch (e) {
       showMsg(msg, 'err', '요청 실패: ' + e.message);
+    } finally {
+      runBtn.disabled = false;
     }
   }
 
@@ -1634,6 +1693,7 @@
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
+  loadPresets();
   runPoll('schedule', loadSchedule);
   runPoll('config', loadConfig);
   refreshVisibleData();
