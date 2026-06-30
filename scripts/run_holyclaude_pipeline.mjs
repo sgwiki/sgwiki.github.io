@@ -380,6 +380,7 @@ function buildP5Prompt(runId) {
 
 운영 제약:
 - 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- SDK stream 안정성을 위해 도구 호출은 한 응답에 하나씩만 실행하세요. 여러 Bash/Read 호출을 한 번에 병렬로 내지 말고, 각 tool_result를 받은 뒤 다음 도구를 호출하세요.
 - 신규 페이지 생성 금지.
 - 사실 관계·스포일러 등급 변경 금지.
 - sanitizer fail 상태에서 commit 금지.
@@ -831,11 +832,22 @@ async function main() {
         : null;
   const coverage = coverageRequired ? createMcpCoverageTracker(coverageRequired) : null;
   const stream = query({ prompt, options });
+  let sawResult = false;
   for await (const message of stream) {
     emitMessage(message, coverage);
     if (message.type === 'result' && message.subtype && message.subtype !== 'success') {
       exitCode = 1;
     }
+    if (message.type === 'result') {
+      sawResult = true;
+    }
+  }
+
+  if (!sawResult) {
+    console.log(
+      `[${args.command}:${args.runId}] stream ended before result event; treating run as failed`,
+    );
+    exitCode = 1;
   }
 
   if (coverage) {
