@@ -1247,6 +1247,13 @@ def _unacknowledge_suggestion(sid: str) -> dict:
     return {"status": "restored", "sid": sid}
 
 
+# /suggestions/pending-push must be registered BEFORE /suggestions/{sid};
+# otherwise the dynamic route captures "pending-push" as a sid and 404s.
+@app.get("/suggestions/pending-push")
+async def pending_push():
+    return await asyncio.to_thread(_pending_push_response)
+
+
 @app.get("/suggestions/{sid}")
 async def get_suggestion(sid: str):
     return await asyncio.to_thread(_suggestion_detail_response, sid)
@@ -1284,7 +1291,16 @@ def _docker_exec_git(args: list[str], env: dict[str, str] | None = None) -> tupl
     except Exception as exc:
         return 127, f"컨테이너 접근 실패: {exc}"
 
-    command = ["git", "-C", HOLYCLAUDE_GIT_WORKDIR, *args]
+    # safe.directory: holyclaude 컨테이너의 git 사용자와 /workspace 소유자 uid가
+    # 달라 "dubious ownership"으로 실패할 수 있으므로 호출마다 명시한다.
+    command = [
+        "git",
+        "-c",
+        f"safe.directory={HOLYCLAUDE_GIT_WORKDIR}",
+        "-C",
+        HOLYCLAUDE_GIT_WORKDIR,
+        *args,
+    ]
     try:
         result = container.exec_run(
             command,
@@ -1308,11 +1324,6 @@ def _parse_pending_push(output: str) -> list[dict]:
         parts = line.split(" ", 1)
         commits.append({"hash": parts[0], "subject": parts[1] if len(parts) > 1 else ""})
     return commits
-
-
-@app.get("/suggestions/pending-push")
-async def pending_push():
-    return await asyncio.to_thread(_pending_push_response)
 
 
 def _pending_push_response() -> dict:
