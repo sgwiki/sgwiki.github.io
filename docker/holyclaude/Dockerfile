@@ -2,6 +2,7 @@ FROM coderluii/holyclaude:latest
 
 USER root
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN ln -sf /usr/local/bin/uv /usr/local/bin/uvx
 COPY scripts/git-credential-cloudcli-github /usr/local/bin/git-credential-cloudcli-github
 RUN chmod 0755 /usr/local/bin/git-credential-cloudcli-github \
     && git config --system user.name "sgwiki" \

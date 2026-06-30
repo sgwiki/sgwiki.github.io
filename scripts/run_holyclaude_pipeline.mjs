@@ -83,10 +83,10 @@ function parseArgs(argv) {
 
   if (!args.command) {
     throw new Error(
-      'Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5|p6> --run-id <id> [--instruction "text"] [--dry-run]',
+      'Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5|p6|p7> --run-id <id> [--instruction "text"] [--dry-run]',
     );
   }
-  if (!['p1', 'p2', 'p3', 'p4', 'p5', 'p6'].includes(args.command)) {
+  if (!['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
@@ -435,6 +435,81 @@ MCP 커버리지 게이트 (공통 하드 + 타입별):
 - 완료 시 처리/스킵/거부 후보 ID, 각 decision(create/update), commit hash 또는 미커밋 사유, 리포트 경로를 요약하세요.`;
 }
 
+function buildP7Prompt(runId) {
+  return `파이프라인 7 - claude-mem 반복 결정 규칙 승격 제안 생성을 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요.
+
+당신은 claude-mem 관측을 검토해 반복되는 운영 결정을 규칙 파일로 승격할 "제안"만 생성하는 팀장입니다.
+
+핵심 원칙:
+- 이 파이프라인은 규칙 파일을 직접 수정하지 않습니다.
+- git add/commit/push를 절대 실행하지 않습니다.
+- 실제 적용은 admin UI에서 사용자가 파일별 diff를 보고, 필요하면 제안문을 수정한 뒤 승인해야만 가능합니다.
+- 메모리 관측은 규칙보다 우선하지 않습니다. 관측은 규칙 업데이트 후보를 찾는 입력입니다.
+
+작업 목표:
+1. claude-mem \`mem-search\`를 사용해 최근 반복된 \`decision\`, \`gotcha\`, \`problem-solution\`, sanitizer/quality warning, 표기·구조·파이프라인 운영 판단을 검색하세요.
+   - 반드시 \`search -> timeline -> get_observations\` 순서로 좁혀 보세요.
+   - 검색 결과가 없으면 빈 proposals manifest를 생성하고 종료하세요.
+2. 아래 허용 대상 파일만 읽고, 필요한 경우 "제안된 전체 파일 내용"을 생성하세요.
+   - AGENTS.md
+   - README.md
+   - wiki/README.md
+   - docker/holyclaude/data/claude/CLAUDE.md
+   - docker/holyclaude/data/claude/agents/*.md
+3. 반복성이 약하거나 일회성 실행 로그인 관측은 제안하지 마세요.
+4. 제안은 파일별로 분리하세요. 한 파일에 여러 규칙을 넣어도 되지만, 대상 파일마다 proposal 1개를 만드세요.
+5. 각 proposal은 현재 파일의 전체 내용에 필요한 변경만 반영한 "제안 전체본"이어야 합니다.
+
+산출물 위치:
+\`\`\`
+/workspace/.admin/rule-promotions/${runId}/manifest.json
+/workspace/.admin/rule-promotions/${runId}/proposed/{proposal_id}.md
+\`\`\`
+
+manifest 형식:
+\`\`\`json
+{
+  "run_id": "${runId}",
+  "pipeline": "p7",
+  "created_at": "{ISO-8601 timestamp}",
+  "status": "pending_review",
+  "summary": "이번 규칙 승격 제안 요약",
+  "proposals": [
+    {
+      "id": "짧은 kebab-case id",
+      "target_path": "docker/holyclaude/data/claude/agents/wiki-team-lead.md",
+      "title": "제안 제목",
+      "rationale": "왜 반복 규칙으로 승격할 가치가 있는지",
+      "source_observations": ["관측 ID 또는 검색 요약. 원문/비밀/내부 source id 금지"],
+      "before_sha256": "현재 대상 파일 UTF-8 내용 sha256",
+      "proposed_path": "proposed/{proposal_id}.md",
+      "status": "pending"
+    }
+  ]
+}
+\`\`\`
+
+검증:
+- \`manifest.json\`이 JSON으로 파싱되는지 확인하세요.
+- 모든 \`target_path\`가 허용 대상에 속하는지 확인하세요.
+- 모든 \`proposed_path\` 파일이 존재하는지 확인하세요.
+- \`before_sha256\`은 대상 파일 현재 내용 기준이어야 합니다.
+
+금지:
+- 허용 대상 외 파일 제안 금지.
+- 공개 금지 정보(source_filter 이름, chunk ID, 내부 RAG 파일 경로, 원문 직접 인용)를 proposal에 포함 금지.
+- 위키 본문 파일 수정 금지.
+- 규칙 파일 직접 수정 금지.
+- git 명령 금지.
+
+완료 시 manifest 경로, proposal 개수, 대상 파일 목록, 적용은 사용자 승인 후 admin UI에서만 가능하다는 점을 보고하세요.`;
+}
+
 function formatUserInstruction(instruction) {
   const text = String(instruction ?? '').trim();
   if (!text) {
@@ -460,6 +535,8 @@ function buildPrompt(command, runId, instruction = '') {
     prompt = buildP5Prompt(runId);
   } else if (command === 'p6') {
     prompt = buildP6Prompt(runId);
+  } else if (command === 'p7') {
+    prompt = buildP7Prompt(runId);
   } else {
     prompt = buildP2Prompt(runId);
   }

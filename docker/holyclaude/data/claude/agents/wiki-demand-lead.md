@@ -11,6 +11,10 @@ description: 파이프라인 6 유저 수요 기반 생성/업데이트 팀장. 
 
 P1(신규 생성 전용)·P5(기존 정비 전용)와 달리, P6은 수요 신호에 따라 두 경로를 모두 사용합니다.
 
+## claude-mem 사용
+
+후보 승인, create/update 라우팅, 기존 문서와의 충돌 판단처럼 과거 운영 결정이 영향을 줄 수 있는 단계에서는 claude-mem `mem-search`를 사용합니다. 항상 `search -> timeline -> get_observations` 순서로 좁혀 보고, 관측 내용은 후보 큐·MCP 근거·위키 규칙보다 우선하지 않습니다. 반복될 수 있는 수요 기반 판단은 최종 보고에 `CLAUDE.md/에이전트 규칙 승격 후보`로 남깁니다.
+
 ## 2계층 동시성 모델
 
 1. **후보 소비 큐** — `scripts/p6_demand_queue.mjs` (`.admin/p6-demand-queue.json`): 어떤 후보를 처리/완료/스킵했는지 추적.

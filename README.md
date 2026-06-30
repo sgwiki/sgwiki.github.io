@@ -38,7 +38,7 @@ wiki/
 ├── docs/                 설계 문서 · 저작권 검토 · 계획
 ├── mkdocs.yml            MkDocs Material 설정
 ├── scripts/
-│   ├── run_holyclaude_pipeline.mjs   P1~P6 파이프라인 실행 래퍼
+│   ├── run_holyclaude_pipeline.mjs   P1~P7 파이프라인 실행 래퍼
 │   ├── wiki_work_registry.mjs        병렬 실행 중복 주제 방지용 작업 현황 registry
 │   ├── p6_demand_queue.mjs           P6 유저 수요 후보 소비 큐
 │   └── poll_suggestions.py           R2에서 제안 수신 → suggestions/inbox/
@@ -114,13 +114,14 @@ make shell           # 컨테이너 bash 접속
 
 ### 관리 UI (`http://localhost:3002`)
 
-- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) / 파이프라인 6 (수요 기반 작성) 수동 실행
+- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) / 파이프라인 6 (수요 기반 작성) / 파이프라인 7 (규칙 승격 제안) 수동 실행
 - 수동 트리거 시 **(선택) 사용자 지시** 입력 칸: 텍스트를 넣으면 팀장(team-lead) 에이전트 프롬프트에 추가 지시로 전달 (`POST /trigger/pN` 본문 `user_instruction`). 비워도 되며, 보안·게이트 규칙은 지시보다 우선합니다.
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
 - **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 대기 작업 순번·취소
 - 새로 작성되거나 변경된 `wiki/*.md` 페이지 검토: 보기 · 승인 · 거부
 - 제안 자동 처리: `suggestions/inbox/` 수신 제안과 파이프라인 2 자동 판정·작성 로그 (`GET /suggestions`)
+- 규칙 승격 검토: P7이 생성한 `.admin/rule-promotions/<run_id>/manifest.json` 제안을 파일별 diff로 확인하고, 제안 본문을 직접 수정한 뒤 승인해야 실제 규칙 파일에 적용 (`GET /rule-promotions`)
 
 ### 에이전트 메모리 (claude-mem)
 
@@ -131,6 +132,7 @@ make shell           # 컨테이너 bash 접속
 - **격리**: sg-wiki 전용 단일 볼륨·단일 worker — 다른 프로젝트 데이터는 섞이지 않습니다.
 - **요약 LLM·인증**: Z.AI `glm-5.2` 재사용 (`CLAUDE_MEM_MODEL`). claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로, `claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성합니다(별도 키 불필요). 파일이 없으면 OAuth 키체인으로 폴백 → "Not logged in" 루프로 observation/summary가 0건이 됩니다.
 - **동작**: 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로, `enabledPlugins`에 등록된 claude-mem 훅이 **모든 에이전트 세션에서 자동으로 캡처·주입**합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
+- **운영 기본값**: worker/install은 `claude-mem@13.9.1`로 고정합니다. 자동 context는 최근 observation/session만 좁게 주입하고 semantic inject는 끄며, `Read`/`LS`/`Grep` 같은 noisy tool은 캡처에서 제외합니다.
 
 > 변경(`Dockerfile`·`docker-compose.yaml`·`scripts/claude-mem-*`·s6 서비스)은 이미지에 베이크되므로 `make up`(재빌드)으로 반영합니다.
 
@@ -168,6 +170,16 @@ node scripts/run_holyclaude_pipeline.mjs p6 --run-id <id> --dry-run
 
 P6 팀장(`wiki-demand-lead`)은 `wiki-demand-analyst` 보고서를 근거로 `create` 또는 `update`를 판정합니다. `create`는 기존 P1 planner/writer 경로를, `update`는 단일 파일 타깃 보강 경로를 사용하며, sanitizer/linker/quality gate와 구조화 리포트(`.admin/runs/p6-<run_id>-report.json`)를 통과한 `wiki/*.md`만 commit/push합니다. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 git에 포함하지 않습니다.
 
+### 파이프라인 7 — 규칙 승격 제안
+
+P7은 claude-mem 관측에서 반복되는 운영 결정·품질 경고·표기 판단을 찾아, 규칙 파일로 승격할 **제안**만 생성합니다. 실행 자체는 규칙 파일을 직접 수정하지 않고 `.admin/rule-promotions/<run_id>/` 아래 manifest와 proposed 파일을 남깁니다.
+
+```bash
+node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run
+```
+
+적용 대상은 `AGENTS.md`, `README.md`, `wiki/README.md`, `docker/holyclaude/data/claude/CLAUDE.md`, `docker/holyclaude/data/claude/agents/*.md`로 제한됩니다. admin UI의 “규칙 승격 검토”에서 파일별 전후 diff를 확인하고, 필요하면 제안문을 수정한 뒤 승인해야 실제 파일에 적용됩니다. 대상 파일이 제안 생성 후 바뀌면 `before_sha256` 검증으로 승인 적용이 막힙니다.
+
 ### 위키 페이지 검토
 
 검토 패널은 upstream 이후 변경된 `wiki/*.md`와 아직 커밋되지 않은 `wiki/*.md`를 표시합니다. 승인하면 현재 파일 해시가 `.admin/wiki_reviews.json`에 기록되고, 거부하면 해당 파일을 upstream 기준으로 되돌리거나 새 파일을 제거합니다.
@@ -182,6 +194,7 @@ P6 팀장(`wiki-demand-lead`)은 `wiki-demand-analyst` 보고서를 근거로 `c
 - `ADMIN_CACHE_TTL_SECONDS`: 위키 현황/위키 검토 목록 API 응답 캐시 TTL, 기본값 `5`
 - `ADMIN_SUGGESTION_CACHE_TTL_SECONDS`: 제안 목록과 파이프라인 로그 API 응답 캐시 TTL, 기본값 `10`
 - `ADMIN_STATUS_CACHE_TTL_SECONDS`: 최근 실행 현황 API 응답 캐시 TTL, 기본값 `2`
+- `ADMIN_RULE_PROMOTION_ROOT`: P7 규칙 승격 제안 manifest/proposed 파일 저장 위치, 기본값 `/workspace/.admin/rule-promotions`
 - `HOLYCLAUDE_PIPELINE_MODEL`: 파이프라인 실행 모델, 기본값 `glm-5.2`
 - `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
 - `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)

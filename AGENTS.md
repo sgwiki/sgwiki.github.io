@@ -12,7 +12,7 @@
 |---|---|---|
 | `wiki/` | 위키 마크다운 본문 (배포 대상) | tracked |
 | `docs/` | 설계·계획·저작권 검토 문서 | tracked |
-| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6 파이프라인 실행 래퍼 | tracked |
+| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
 | `scripts/p6_demand_queue.mjs` | P6 유저 수요 후보 소비 큐 | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
@@ -50,6 +50,7 @@ node --check scripts/wiki_work_registry.mjs
 node --check scripts/p6_demand_queue.mjs
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --instruction "..." --dry-run   # 선택 사용자 지시(--instruction) 주입
+node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run   # claude-mem 규칙 승격 제안 dry-run
 ```
 
 세계선 맵 SPA 점검:
@@ -138,6 +139,24 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 - **commit 범위**: 통과한 `wiki/*.md`만 commit한다. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 절대 commit하지 않는다.
 - **dc_gallery 위생 규칙**: 유저 게시글 근거는 산문 가공 전용이다. 각주, 원문 직접 인용, gall_num, chunk ID, source 이름, 내부 경로를 위키 본문에 노출하지 않는다.
 
+### 파이프라인 7 (규칙 승격 제안)
+
+claude-mem 관측에서 반복되는 운영 결정·표기 판단·quality/sanitizer 경고를 찾아 규칙 파일로 승격할 **제안만** 생성한다. admin UI의 `/trigger/p7`가 `run_holyclaude_pipeline.mjs p7`를 실행한다.
+
+```
+claude-mem mem-search(search→timeline→get_observations)
+→ 반복성 있는 후보 선별
+→ .admin/rule-promotions/{run_id}/manifest.json
+→ .admin/rule-promotions/{run_id}/proposed/{proposal_id}.md
+→ admin UI에서 파일별 diff/수정/승인
+→ 승인된 proposal만 실제 규칙 파일에 적용
+```
+
+- **직접 적용 금지**: P7 실행 에이전트는 `AGENTS.md`, `README.md`, `wiki/README.md`, `docker/holyclaude/data/claude/CLAUDE.md`, `docker/holyclaude/data/claude/agents/*.md`를 직접 수정하지 않고 proposed 파일만 생성한다. git add/commit/push도 금지.
+- **사용자 승인 필수**: admin UI의 “규칙 승격 검토”에서 사용자가 파일별 전후 diff를 보고, 필요 시 proposed 내용을 수정한 뒤 승인해야 실제 파일에 적용된다.
+- **stale guard**: proposal의 `before_sha256`과 현재 대상 파일 hash가 다르면 승인 적용을 409로 막는다. 파일이 바뀐 경우 P7을 다시 실행하거나 proposed 내용을 재검토한다.
+- **공개 금지 정보 유지**: source_filter 이름, chunk ID, 내부 RAG 경로, 원문 직접 인용은 proposal에도 넣지 않는다.
+
 ### 동시 실행과 중복 주제 방지
 
 - **전역 풀 동시 실행 cap 10** (`ADMIN_MAX_CONCURRENT_RUNS`). p1/p2 혼합 가능. 초과분은 단일 전역 FIFO 대기열에 적재, 슬롯 해제 시 자동 시작.
@@ -167,16 +186,17 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 - **테스트**: FastAPI TestClient는 요청 사이에 `asyncio.create_task`로 만든 백그라운드 작업을 취소하므로, 동시성 로직 테스트 시 실제 실행 대신 task를 기록하는 방식으로 격리해야 함.
 - **동시 commit 경합**: cap 10 병렬 실행 시 `.git/index.lock` 충돌 가능. 드물게 발생하면 registry `committing` 상태 기반 직렬화 추가를 고려.
 - **세계선 맵 SPA**: `sg-worldline-map/src/data/*.json`은 tracked 배포 입력이고 `dist/`, `node_modules/`, `*.tsbuildinfo`는 로컬 산출물이다. 맵 경로는 `/maps/` 전제이므로 `vite.config.ts`의 `base`, `index.html`의 favicon 경로, SPA fallback route를 함께 확인한다.
-- **claude-mem 메모리 계층**: 에이전트 세션(도구 호출·편집·명령)을 자동 캡처·요약해 다음 세션에 맥락으로 주입. 뷰어 `http://localhost:37700`. 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로 `enabledPlugins`의 claude-mem 훅이 모든 에이전트 세션에서 자동 발화(캡처+주입). 능동 검색(`mem-search`)은 프롬프트 지시 시에만. 데이터는 named volume `sg-wiki-claude-mem`(`/home/claude/.claude-mem`, SQLite+Chroma) — drvfs bind mount가 아니라 재빌드에 보존·SQLite 락 안전. worker는 s6 longrun(`scripts/s6/claude-mem-worker` → `npx claude-mem start --daemon`)이 감독. `Dockerfile`·s6 스크립트·`docker-compose.yaml`은 이미지 베이크(재빌드 필요); `enabledPlugins`(`data/claude/settings.json`)는 마운트돼 즉시 반영. claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로 `scripts/claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성 — 없으면 OAuth 폴백으로 관측·요약 생성이 "Not logged in" 루프로 전부 실패(0건). claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로 `scripts/claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성 — 없으면 OAuth 폴백으로 관측·요약 생성이 "Not logged in" 루프로 전부 실패(0건).
+- **claude-mem 메모리 계층**: 에이전트 세션(도구 호출·편집·명령)을 자동 캡처·요약해 다음 세션에 맥락으로 주입. 뷰어 `http://localhost:37700`. 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로 `enabledPlugins`의 claude-mem 훅이 모든 에이전트 세션에서 자동 발화(캡처+주입). 능동 검색(`mem-search`)은 프롬프트 지시 시에만. 데이터는 named volume `sg-wiki-claude-mem`(`/home/claude/.claude-mem`, SQLite+Chroma) — drvfs bind mount가 아니라 재빌드에 보존·SQLite 락 안전. worker/install은 `claude-mem@13.9.1`로 고정하고 s6 longrun(`scripts/s6/claude-mem-worker`)이 `npx -y claude-mem@${CLAUDE_MEM_VERSION:-13.9.1} start --daemon`을 감독한다. 자동 context는 observation/session 수를 좁게 제한하고 `CLAUDE_MEM_SEMANTIC_INJECT=false`, `CLAUDE_MEM_SKIP_TOOLS=Read,LS,Grep,Glob,...`로 noisy 캡처를 줄인다. `Dockerfile`·s6 스크립트·`docker-compose.yaml`은 이미지 베이크(재빌드 필요); `enabledPlugins`(`data/claude/settings.json`)는 마운트돼 즉시 반영. claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로 `scripts/claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성 — 없으면 OAuth 폴백으로 관측·요약 생성이 "Not logged in" 루프로 전부 실패(0건).
 
 ## 컨테이너 상태 확인
 
 ```bash
 curl -s http://127.0.0.1:3002/running    # 동시 실행 현황 (jobs/limit/running/queued)
 curl -s http://127.0.0.1:3002/status     # 최근 실행 결과
+curl -s http://127.0.0.1:3002/rule-promotions # P7 규칙 승격 제안 목록
 docker logs --tail 50 sg-wiki-admin      # admin 서버 로그
 docker logs --tail 50 sg-wiki-holyclaude # 에이전트 팀 로그
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:37700/ # claude-mem worker 헬스 (200=정상)
+curl -s http://127.0.0.1:37700/api/health # claude-mem worker 헬스
 ```
 
 ## 추가 문서

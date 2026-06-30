@@ -1,4 +1,5 @@
 import asyncio
+import difflib
 import hashlib
 import json
 import os
@@ -23,6 +24,7 @@ from app.scheduler import add_p2_job, get_jobs, remove_p2_job, scheduler
 RUNS_DIR = Path(os.getenv("ADMIN_RUNS_DIR", ".admin/runs"))
 WORKSPACE = Path(os.getenv("WORKSPACE", "/workspace"))
 WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
+RULE_PROMOTION_ROOT = Path(os.getenv("ADMIN_RULE_PROMOTION_ROOT", WORKSPACE / ".admin/rule-promotions"))
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 HOLYCLAUDE_CONTAINER = os.getenv("HOLYCLAUDE_CONTAINER", "sg-wiki-holyclaude")
 PIPELINE_SCRIPT = os.getenv("PIPELINE_SCRIPT", os.getenv("P1_SCRIPT", "/workspace/scripts/run_holyclaude_pipeline.mjs"))
@@ -40,6 +42,15 @@ active_jobs_lock = threading.RLock()
 run_queue: deque[str] = deque()
 response_cache: dict[str, tuple[float, object]] = {}
 response_cache_lock = threading.RLock()
+
+RULE_PROMOTION_ALLOWED_FILES = {
+    "AGENTS.md",
+    "README.md",
+    "wiki/README.md",
+    "docker/holyclaude/data/claude/CLAUDE.md",
+    "docker/holyclaude/data/claude/agents/VOCAB_GUIDE.md",
+}
+RULE_PROMOTION_AGENT_PREFIX = "docker/holyclaude/data/claude/agents/"
 
 
 def _cached(key: str, ttl_seconds: float, loader):
@@ -70,6 +81,7 @@ def _invalidate_cache(*prefixes: str) -> None:
 async def lifespan(app: FastAPI):
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
     WIKI_REVIEW_STATE.parent.mkdir(parents=True, exist_ok=True)
+    RULE_PROMOTION_ROOT.mkdir(parents=True, exist_ok=True)
     scheduler.start()
     yield
     scheduler.shutdown(wait=False)
@@ -164,6 +176,17 @@ async def trigger_p6(body: TriggerBody | None = None):
         asyncio.create_task(_run_p6(run_id, started_at))
         return {"status": "started", "pipeline": "p6", "run_id": run_id}
     return {"status": "queued", "pipeline": "p6", "run_id": run_id, "queue_position": _queue_position(run_id)}
+
+
+@app.post("/trigger/p7")
+async def trigger_p7(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p7", "claude-mem 규칙 승격 제안 생성 준비 중", body.user_instruction if body else None
+    )
+    if status == "running":
+        asyncio.create_task(_run_p7(run_id, started_at))
+        return {"status": "started", "pipeline": "p7", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p7", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
 @app.get("/running")
@@ -290,6 +313,20 @@ class WikiReviewBody(BaseModel):
     reason: str | None = None
 
 
+class RulePromotionBody(BaseModel):
+    run_id: str
+    proposal_id: str
+    reason: str | None = None
+
+
+class RulePromotionSaveBody(RulePromotionBody):
+    proposed_content: str
+
+
+class RulePromotionApproveBody(RulePromotionBody):
+    proposed_content: str | None = None
+
+
 @app.get("/wiki-reviews")
 async def wiki_reviews():
     return await asyncio.to_thread(_wiki_reviews_response)
@@ -407,6 +444,261 @@ def _reject_wiki_review(body: WikiReviewBody) -> dict:
     _save_review_state(state)
     _invalidate_cache("wiki_reviews", "wiki_status", "status")
     return {"status": "rejected", "path": rel, "committed_revert": was_committed}
+
+
+@app.get("/rule-promotions")
+async def rule_promotions():
+    return await asyncio.to_thread(_rule_promotions_response)
+
+
+def _rule_promotions_response() -> dict:
+    return _cached("rule_promotions", ADMIN_CACHE_TTL_SECONDS, _load_rule_promotions)
+
+
+@app.get("/rule-promotion")
+async def rule_promotion_detail(run_id: str, proposal_id: str):
+    return await asyncio.to_thread(_rule_promotion_detail_response, run_id, proposal_id)
+
+
+@app.post("/rule-promotion/save")
+async def save_rule_promotion(body: RulePromotionSaveBody):
+    return await asyncio.to_thread(_save_rule_promotion, body)
+
+
+@app.post("/rule-promotion/approve")
+async def approve_rule_promotion(body: RulePromotionApproveBody):
+    return await asyncio.to_thread(_approve_rule_promotion, body)
+
+
+@app.post("/rule-promotion/reject")
+async def reject_rule_promotion(body: RulePromotionBody):
+    return await asyncio.to_thread(_reject_rule_promotion, body)
+
+
+def _safe_rule_id(value: str, label: str) -> str:
+    text = value.strip()
+    if not re.fullmatch(r"[A-Za-z0-9_.-]{1,80}", text):
+        raise HTTPException(status_code=400, detail=f"Invalid {label}: {value}")
+    return text
+
+
+def _safe_rule_target(value: str) -> str:
+    rel = value.strip().replace("\\", "/")
+    if rel.startswith("/") or ".." in Path(rel).parts:
+        raise HTTPException(status_code=400, detail=f"Invalid target path: {value}")
+    allowed_agent_file = (
+        rel.startswith(RULE_PROMOTION_AGENT_PREFIX)
+        and rel.endswith(".md")
+        and "/" not in rel[len(RULE_PROMOTION_AGENT_PREFIX):]
+    )
+    if rel not in RULE_PROMOTION_ALLOWED_FILES and not allowed_agent_file:
+        raise HTTPException(status_code=400, detail=f"Rule promotion target is not allowed: {value}")
+    abs_path = (WORKSPACE / rel).resolve()
+    if not abs_path.is_relative_to(WORKSPACE.resolve()):
+        raise HTTPException(status_code=400, detail=f"Invalid target path: {value}")
+    return rel
+
+
+def _rule_run_dir(run_id: str) -> Path:
+    rid = _safe_rule_id(run_id, "run_id")
+    path = (RULE_PROMOTION_ROOT / rid).resolve()
+    if not path.is_relative_to(RULE_PROMOTION_ROOT.resolve()):
+        raise HTTPException(status_code=400, detail=f"Invalid run_id: {run_id}")
+    return path
+
+
+def _rule_manifest_path(run_id: str) -> Path:
+    return _rule_run_dir(run_id) / "manifest.json"
+
+
+def _load_rule_manifest(run_id: str) -> dict:
+    path = _rule_manifest_path(run_id)
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="manifest not found")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"manifest unreadable: {exc}")
+    if not isinstance(data.get("proposals"), list):
+        data["proposals"] = []
+    return data
+
+
+def _save_rule_manifest(run_id: str, data: dict) -> None:
+    path = _rule_manifest_path(run_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    _invalidate_cache("rule_promotions")
+
+
+def _find_rule_proposal(data: dict, proposal_id: str) -> dict:
+    pid = _safe_rule_id(proposal_id, "proposal_id")
+    for proposal in data.get("proposals", []):
+        if proposal.get("id") == pid:
+            return proposal
+    raise HTTPException(status_code=404, detail="proposal not found")
+
+
+def _rule_proposed_path(run_id: str, proposal: dict) -> Path:
+    run_dir = _rule_run_dir(run_id)
+    raw = str(proposal.get("proposed_path") or "")
+    if not raw:
+        raw = f"proposed/{proposal.get('id', 'proposal')}.md"
+    rel = raw.strip().replace("\\", "/")
+    if rel.startswith("/") or ".." in Path(rel).parts:
+        raise HTTPException(status_code=400, detail=f"Invalid proposed_path: {raw}")
+    path = (run_dir / rel).resolve()
+    if not path.is_relative_to(run_dir.resolve()):
+        raise HTTPException(status_code=400, detail=f"Invalid proposed_path: {raw}")
+    return path
+
+
+def _sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _read_text_if_exists(path: Path) -> str:
+    if not path.exists():
+        return ""
+    return path.read_text(encoding="utf-8", errors="replace")
+
+
+def _rule_promotion_diff(target_path: str, current: str, proposed: str) -> str:
+    return "".join(
+        difflib.unified_diff(
+            current.splitlines(keepends=True),
+            proposed.splitlines(keepends=True),
+            fromfile=f"before/{target_path}",
+            tofile=f"after/{target_path}",
+        )
+    )
+
+
+def _rule_proposal_summary(run_id: str, proposal: dict, manifest_mtime: float) -> dict:
+    target = _safe_rule_target(str(proposal.get("target_path") or ""))
+    target_path = WORKSPACE / target
+    current = _read_text_if_exists(target_path)
+    current_hash = _sha256_text(current)
+    before_hash = str(proposal.get("before_sha256") or "")
+    proposed_path = _rule_proposed_path(run_id, proposal)
+    return {
+        "run_id": run_id,
+        "proposal_id": proposal.get("id"),
+        "target_path": target,
+        "title": proposal.get("title") or target,
+        "rationale": proposal.get("rationale") or "",
+        "status": proposal.get("status") or "pending",
+        "before_sha256": before_hash,
+        "current_sha256": current_hash,
+        "stale": bool(before_hash and before_hash != current_hash),
+        "has_proposed_file": proposed_path.exists(),
+        "created_at": proposal.get("created_at"),
+        "updated_at": datetime.fromtimestamp(manifest_mtime).isoformat(),
+    }
+
+
+def _load_rule_promotions() -> dict:
+    items: list[dict] = []
+    if not RULE_PROMOTION_ROOT.exists():
+        return {"items": []}
+    for manifest_path in sorted(RULE_PROMOTION_ROOT.glob("*/manifest.json"), reverse=True):
+        run_id = manifest_path.parent.name
+        try:
+            data = _load_rule_manifest(run_id)
+            for proposal in data.get("proposals", []):
+                item = _rule_proposal_summary(run_id, proposal, manifest_path.stat().st_mtime)
+                if item["status"] not in {"approved", "rejected"}:
+                    items.append(item)
+        except Exception:
+            continue
+    return {"items": items}
+
+
+def _rule_promotion_detail_response(run_id: str, proposal_id: str) -> dict:
+    data = _load_rule_manifest(run_id)
+    proposal = _find_rule_proposal(data, proposal_id)
+    target = _safe_rule_target(str(proposal.get("target_path") or ""))
+    current = _read_text_if_exists(WORKSPACE / target)
+    proposed_path = _rule_proposed_path(run_id, proposal)
+    proposed = _read_text_if_exists(proposed_path)
+    return {
+        "status": "ok",
+        "manifest": {
+            "run_id": data.get("run_id") or run_id,
+            "summary": data.get("summary") or "",
+            "created_at": data.get("created_at"),
+        },
+        "proposal": _rule_proposal_summary(run_id, proposal, _rule_manifest_path(run_id).stat().st_mtime),
+        "current_content": current,
+        "proposed_content": proposed,
+        "diff": _rule_promotion_diff(target, current, proposed),
+    }
+
+
+def _save_rule_promotion(body: RulePromotionSaveBody) -> dict:
+    data = _load_rule_manifest(body.run_id)
+    proposal = _find_rule_proposal(data, body.proposal_id)
+    _safe_rule_target(str(proposal.get("target_path") or ""))
+    proposed_path = _rule_proposed_path(body.run_id, proposal)
+    proposed_path.parent.mkdir(parents=True, exist_ok=True)
+    proposed_path.write_text(body.proposed_content, encoding="utf-8")
+    if proposal.get("status") == "pending":
+        proposal["status"] = "edited"
+    proposal["edited_at"] = datetime.now().isoformat()
+    proposal["edit_reason"] = body.reason or ""
+    _save_rule_manifest(body.run_id, data)
+    return {"status": "saved", "run_id": body.run_id, "proposal_id": body.proposal_id}
+
+
+def _approve_rule_promotion(body: RulePromotionApproveBody) -> dict:
+    data = _load_rule_manifest(body.run_id)
+    proposal = _find_rule_proposal(data, body.proposal_id)
+    target = _safe_rule_target(str(proposal.get("target_path") or ""))
+    target_path = WORKSPACE / target
+    if not target_path.exists():
+        raise HTTPException(status_code=404, detail=f"target file not found: {target}")
+
+    current = target_path.read_text(encoding="utf-8", errors="replace")
+    current_hash = _sha256_text(current)
+    before_hash = str(proposal.get("before_sha256") or "")
+    if before_hash and before_hash != current_hash:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "status": "stale",
+                "target_path": target,
+                "before_sha256": before_hash,
+                "current_sha256": current_hash,
+                "message": "대상 파일이 proposal 생성 이후 변경되었습니다. 제안을 다시 생성하거나 내용을 다시 확인하세요.",
+            },
+        )
+
+    proposed_path = _rule_proposed_path(body.run_id, proposal)
+    proposed = body.proposed_content if body.proposed_content is not None else _read_text_if_exists(proposed_path)
+    if proposed == "":
+        raise HTTPException(status_code=400, detail="proposed content is empty")
+
+    target_path.write_text(proposed, encoding="utf-8")
+    proposed_path.parent.mkdir(parents=True, exist_ok=True)
+    proposed_path.write_text(proposed, encoding="utf-8")
+    proposal["status"] = "approved"
+    proposal["approved_at"] = datetime.now().isoformat()
+    proposal["approved_reason"] = body.reason or ""
+    proposal["applied_sha256"] = _sha256_text(proposed)
+    _save_rule_manifest(body.run_id, data)
+    _invalidate_cache("rule_promotions", "status")
+    return {"status": "approved", "run_id": body.run_id, "proposal_id": body.proposal_id, "target_path": target}
+
+
+def _reject_rule_promotion(body: RulePromotionBody) -> dict:
+    data = _load_rule_manifest(body.run_id)
+    proposal = _find_rule_proposal(data, body.proposal_id)
+    _safe_rule_target(str(proposal.get("target_path") or ""))
+    proposal["status"] = "rejected"
+    proposal["rejected_at"] = datetime.now().isoformat()
+    proposal["rejected_reason"] = body.reason or ""
+    _save_rule_manifest(body.run_id, data)
+    return {"status": "rejected", "run_id": body.run_id, "proposal_id": body.proposal_id}
 
 
 def _git(args: list[str], check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -1018,6 +1310,15 @@ async def _run_p6(run_id: str, started_at: str) -> None:
         _pop_active_job(run_id)
 
 
+async def _run_p7(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
+    try:
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p7", run_id, started_at, user_instruction)
+        _save_run(log)
+    finally:
+        _pop_active_job(run_id)
+
+
 def _start_active_job(pipeline: str, last_line: str, user_instruction: str | None = None) -> tuple[str, str, str]:
     """Register a job. Returns (run_id, started_at, status).
 
@@ -1128,6 +1429,8 @@ def _dispatch_next_job() -> None:
             asyncio.create_task(_run_p5(rid, started_at))
         elif pipeline == "p6":
             asyncio.create_task(_run_p6(rid, started_at))
+        elif pipeline == "p7":
+            asyncio.create_task(_run_p7(rid, started_at))
 
 
 def _sanitize_instruction(value: str, limit: int = 4000) -> str:
@@ -1261,4 +1564,4 @@ def _save_run(data: dict) -> None:
     ts = datetime.now().strftime("%Y%m%dT%H%M%S")
     path = RUNS_DIR / f"{ts}-{data.get('run_id', 'run')}.json"
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
-    _invalidate_cache("status", "suggestions", "suggestion_logs", "wiki_status", "wiki_reviews")
+    _invalidate_cache("status", "suggestions", "suggestion_logs", "wiki_status", "wiki_reviews", "rule_promotions")

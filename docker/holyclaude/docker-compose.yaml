@@ -88,6 +88,15 @@ services:
       - CLAUDE_MEM_WORKER_HOST=0.0.0.0
       - CLAUDE_MEM_WORKER_PORT=37700
       - CLAUDE_MEM_ANTHROPIC_API_KEY=${ZAI_API_KEY}
+      - CLAUDE_MEM_CONTEXT_OBSERVATIONS=8
+      - CLAUDE_MEM_CONTEXT_SESSION_COUNT=5
+      - CLAUDE_MEM_CONTEXT_FULL_COUNT=0
+      - CLAUDE_MEM_CONTEXT_SHOW_LAST_SUMMARY=true
+      - CLAUDE_MEM_SEMANTIC_INJECT=false
+      - CLAUDE_MEM_SKIP_TOOLS=ListMcpResourcesTool,SlashCommand,Skill,TodoWrite,AskUserQuestion,Read,LS,Grep,Glob,NotebookRead
+      - DO_NOT_TRACK=1
+      - CLAUDE_MEM_TELEMETRY=0
+      - CLAUDE_MEM_TELEMETRY_ERRORS=0
 
   admin:
     build: ./admin/

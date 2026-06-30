@@ -17,6 +17,8 @@ PUID="${PUID:-1000}"
 PGID="${PGID:-1000}"
 CMEM_DIR="/home/claude/.claude-mem"
 SENTINEL="${CMEM_DIR}/.holyclaude-cmem-installed"
+CMEM_VERSION="${CLAUDE_MEM_VERSION:-13.9.1}"
+export CMEM_VERSION
 
 # 1. Ensure data dir exists and is owned by the (to-be-remapped) claude user.
 mkdir -p "${CMEM_DIR}"
@@ -58,7 +60,7 @@ echo "[claude-mem] first-time provision: marketplace + hooks + worker setup..."
 if ! su -s /bin/sh claude -c '
       set -e
       export HOME=/home/claude
-      npx -y claude-mem@latest install
+      npx -y "claude-mem@${CMEM_VERSION}" install
     ' </dev/null; then
   echo "[claude-mem] install failed — will retry on next boot." >&2
   exit 0

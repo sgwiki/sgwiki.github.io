@@ -107,6 +107,13 @@
     }
     .btn-demand:hover { background: #ec4899; }
 
+    .btn-rule {
+      background: #0f766e;
+      border-color: #2dd4bf;
+      color: #fff;
+    }
+    .btn-rule:hover { background: #14b8a6; }
+
     .btn-small {
       padding: 4px 9px;
       font-size: 11px;
@@ -406,6 +413,21 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
+    textarea.rule-editor {
+      width: 100%;
+      min-height: 420px;
+      max-height: 62vh;
+      overflow: auto;
+      background: #010409;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      padding: 12px;
+      font-family: 'Consolas', 'Menlo', monospace;
+      font-size: 11px;
+      line-height: 1.55;
+      resize: vertical;
+    }
     @media (max-width: 760px) {
       .review-item { grid-template-columns: 1fr; }
       .review-actions { justify-content: flex-start; }
@@ -440,6 +462,9 @@
       </span>
       <span class="tip" data-tip="수요 기반 작성 파이프라인&#10;① 후보 큐 정규화 → 유저 수요 후보 선점 (DCinside 세그먼트 분석 기반)&#10;② wiki-demand-analyst: 유저 실제 발화·오해·토론 분석 + 생성/업데이트 권고&#10;③ 생성=wiki-planner→writer / 업데이트=wiki-rewriter 타깃 보강&#10;④ source-sanitizer·wiki-linker·quality-lead 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
         <button class="btn btn-demand" onclick="triggerPipeline(6)">수요 기반 작성 팀 실행</button>
+      </span>
+      <span class="tip" data-tip="claude-mem 규칙 승격 제안 파이프라인&#10;① mem-search로 반복 결정·거절·수정 패턴 조회&#10;② AGENTS/CLAUDE/에이전트 규칙 후보만 산출&#10;③ 실제 규칙 파일은 수정하지 않고 .admin/rule-promotions/에 제안 저장&#10;④ 관리자가 파일별 전후 diff를 보고 수정·승인해야 적용">
+        <button class="btn btn-rule" onclick="triggerPipeline(7)">규칙 승격 제안 생성</button>
       </span>
     </div>
     <div class="row" style="align-items:flex-start;margin-top:14px">
@@ -513,6 +538,14 @@
     <p class="refresh-hint">새로 작성되거나 변경된 wiki/*.md 페이지를 표시합니다. 승인하면 현재 파일 해시가 승인 기록에 저장되고, 거부하면 해당 파일 변경을 되돌립니다.</p>
   </div>
 
+  <!-- 섹션 5.3: 규칙 승격 검토 -->
+  <div class="card full-card">
+    <h2>규칙 승격 검토</h2>
+    <div id="rule-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <div id="rule-msg" class="msg"></div>
+    <p class="refresh-hint">P7은 규칙 변경 제안만 생성합니다. 각 파일의 전후 diff를 확인하고 필요하면 직접 수정한 뒤 승인해야 실제 규칙 파일에 적용됩니다.</p>
+  </div>
+
   <!-- 섹션 5.5: 제안 검토 -->
   <div class="card full-card">
     <h2>제안 자동 처리 <span id="sugg-inbox-badge" style="font-size:12px;color:#f0883e;font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
@@ -552,6 +585,34 @@
 
 </div>
 
+<div class="modal" id="rule-promotion-modal" onclick="closeRulePromotion(event)">
+  <div class="modal-panel" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h2 id="rule-title">규칙 승격 제안</h2>
+      <button class="btn btn-small" style="margin-left:auto" onclick="saveRulePromotion()">저장</button>
+      <button class="btn btn-success btn-small" onclick="approveCurrentRulePromotion()">승인 적용</button>
+      <button class="btn btn-small" onclick="closeRulePromotion()">닫기</button>
+    </div>
+    <div class="modal-body">
+      <div id="rule-meta" style="color:#8b949e;font-size:12px;margin-bottom:12px"></div>
+      <div class="preview-grid">
+        <div class="preview-block">
+          <h3>현재 파일</h3>
+          <pre class="preview" id="rule-current"></pre>
+        </div>
+        <div class="preview-block">
+          <h3>제안 내용 / 직접 수정 가능</h3>
+          <textarea class="rule-editor" id="rule-proposed"></textarea>
+        </div>
+      </div>
+      <div class="preview-block" style="margin-top:12px">
+        <h3>Diff</h3>
+        <pre class="preview" id="rule-diff"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="wiki-preview-modal" onclick="closePreview(event)">
   <div class="modal-panel" onclick="event.stopPropagation()">
     <div class="modal-head">
@@ -575,7 +636,7 @@
 
 <script>
   // ── Pipeline name map ─────────────────────────────────────────────────────
-  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '수요 기반 작성 팀' };
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '수요 기반 작성 팀', '7': '규칙 승격 제안' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
   // ── Trigger ──────────────────────────────────────────────────────────────
@@ -897,6 +958,191 @@
     document.getElementById('wiki-preview-modal').classList.remove('show');
   }
 
+  // ── Rule promotion review ────────────────────────────────────────────────
+  let currentRulePromotion = null;
+
+  async function loadRulePromotions() {
+    try {
+      const res = await fetch('/rule-promotions');
+      const data = await readResponseJson(res);
+      const items = data.items ?? [];
+      const el = document.getElementById('rule-body');
+      if (items.length === 0) {
+        el.innerHTML = '<span style="color:#484f58">검토 대기 중인 규칙 승격 제안 없음</span>';
+        return;
+      }
+
+      el.innerHTML = '<div class="review-list">' + items.map(renderRulePromotionItem).join('') + '</div>';
+      document.querySelectorAll('[data-rule-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.getAttribute('data-rule-action');
+          const runId = btn.getAttribute('data-run-id');
+          const proposalId = btn.getAttribute('data-proposal-id');
+          if (action === 'view') viewRulePromotion(runId, proposalId);
+          if (action === 'approve') approveRulePromotion(runId, proposalId);
+          if (action === 'reject') rejectRulePromotion(runId, proposalId);
+        });
+      });
+    } catch (e) {
+      document.getElementById('rule-body').textContent = '로드 실패: ' + e.message;
+    }
+  }
+
+  function renderRulePromotionItem(item) {
+    const status = item.status === 'edited' ? '수정됨' : '대기';
+    const stale = item.stale ? ' · 대상 변경됨' : '';
+    const staleClass = item.stale ? 'off' : 'on';
+    return `
+      <div class="review-item">
+        <div>
+          <div class="review-title">${escapeHtml(item.title || item.target_path)}</div>
+          <div class="review-meta">
+            ${escapeHtml(item.target_path)} · ${escapeHtml(status)}${stale} · run ${escapeHtml(item.run_id)} · ${escapeHtml(item.updated_at || '')}
+          </div>
+          ${item.rationale ? `<div class="review-meta" style="color:#c9d1d9">${escapeHtml(item.rationale)}</div>` : ''}
+        </div>
+        <div class="review-actions">
+          ${item.stale ? `<span class="status-badge ${staleClass}" style="font-size:10px">재확인 필요</span>` : ''}
+          <button class="btn btn-small" data-rule-action="view" data-run-id="${escapeAttr(item.run_id)}" data-proposal-id="${escapeAttr(item.proposal_id)}">보기</button>
+          <button class="btn btn-success btn-small" data-rule-action="approve" data-run-id="${escapeAttr(item.run_id)}" data-proposal-id="${escapeAttr(item.proposal_id)}">승인 적용</button>
+          <button class="btn btn-danger btn-small" data-rule-action="reject" data-run-id="${escapeAttr(item.run_id)}" data-proposal-id="${escapeAttr(item.proposal_id)}">거부</button>
+        </div>
+      </div>`;
+  }
+
+  async function viewRulePromotion(runId, proposalId) {
+    currentRulePromotion = { runId, proposalId };
+    const modal = document.getElementById('rule-promotion-modal');
+    const title = document.getElementById('rule-title');
+    const meta = document.getElementById('rule-meta');
+    const current = document.getElementById('rule-current');
+    const proposed = document.getElementById('rule-proposed');
+    const diff = document.getElementById('rule-diff');
+    title.textContent = '규칙 승격 제안';
+    meta.textContent = runId + ' / ' + proposalId;
+    current.textContent = '불러오는 중...';
+    proposed.value = '';
+    diff.textContent = '';
+    modal.classList.add('show');
+    try {
+      const res = await fetch('/rule-promotion?run_id=' + encodeURIComponent(runId) + '&proposal_id=' + encodeURIComponent(proposalId));
+      const data = await readResponseJson(res);
+      if (!res.ok || data.status !== 'ok') {
+        current.textContent = JSON.stringify(data, null, 2);
+        return;
+      }
+      currentRulePromotion = {
+        runId,
+        proposalId,
+        targetPath: data.proposal.target_path,
+      };
+      title.textContent = data.proposal.title + ' — ' + data.proposal.target_path;
+      meta.textContent =
+        '상태: ' + data.proposal.status +
+        (data.proposal.stale ? ' · 대상 파일 변경됨: 다시 확인 필요' : '') +
+        (data.proposal.rationale ? ' · 근거: ' + data.proposal.rationale : '');
+      current.textContent = data.current_content || '';
+      proposed.value = data.proposed_content || '';
+      diff.textContent = data.diff || '(diff 없음)';
+    } catch (e) {
+      current.textContent = '로드 실패: ' + e.message;
+    }
+  }
+
+  async function saveRulePromotion() {
+    if (!currentRulePromotion) return;
+    const msg = document.getElementById('rule-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>제안 내용 저장 중...');
+    try {
+      const res = await fetch('/rule-promotion/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          run_id: currentRulePromotion.runId,
+          proposal_id: currentRulePromotion.proposalId,
+          proposed_content: document.getElementById('rule-proposed').value,
+        })
+      });
+      const data = await readResponseJson(res);
+      if (res.ok && data.status === 'saved') {
+        showMsg(msg, 'ok', '제안 저장 완료');
+        await viewRulePromotion(currentRulePromotion.runId, currentRulePromotion.proposalId);
+        await loadRulePromotions();
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '저장 실패: ' + e.message);
+    }
+  }
+
+  function approveCurrentRulePromotion() {
+    if (!currentRulePromotion) return;
+    approveRulePromotion(currentRulePromotion.runId, currentRulePromotion.proposalId);
+  }
+
+  async function approveRulePromotion(runId, proposalId) {
+    const modalOpen = document.getElementById('rule-promotion-modal').classList.contains('show');
+    const isCurrent = currentRulePromotion &&
+      currentRulePromotion.runId === runId &&
+      currentRulePromotion.proposalId === proposalId;
+    if (!confirm('이 규칙 변경을 실제 파일에 적용할까요? 적용 후에는 일반 git 변경사항으로 남습니다.')) return;
+
+    const body = { run_id: runId, proposal_id: proposalId };
+    if (modalOpen && isCurrent) {
+      body.proposed_content = document.getElementById('rule-proposed').value;
+    }
+
+    const msg = document.getElementById('rule-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>승인 적용 중...');
+    try {
+      const res = await fetch('/rule-promotion/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await readResponseJson(res);
+      if (res.ok && data.status === 'approved') {
+        showMsg(msg, 'ok', data.target_path + ' 적용 완료');
+        closeRulePromotion();
+        await loadRulePromotions();
+        await loadStatus();
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '승인 실패: ' + e.message);
+    }
+  }
+
+  async function rejectRulePromotion(runId, proposalId) {
+    if (!confirm('이 규칙 승격 제안을 거부할까요? 실제 파일은 변경되지 않습니다.')) return;
+    const msg = document.getElementById('rule-msg');
+    showMsg(msg, 'info', '<span class="spinner"></span>거부 처리 중...');
+    try {
+      const res = await fetch('/rule-promotion/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ run_id: runId, proposal_id: proposalId })
+      });
+      const data = await readResponseJson(res);
+      if (res.ok && data.status === 'rejected') {
+        showMsg(msg, 'ok', '제안 거부 완료');
+        closeRulePromotion();
+        await loadRulePromotions();
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '거부 실패: ' + e.message);
+    }
+  }
+
+  function closeRulePromotion(event) {
+    if (event && event.target.id !== 'rule-promotion-modal') return;
+    document.getElementById('rule-promotion-modal').classList.remove('show');
+  }
+
   // ── Status table ─────────────────────────────────────────────────────────
   async function loadStatus() {
     try {
@@ -983,6 +1229,7 @@
     runPoll('running', loadRunning);
     runPoll('wikiStatus', loadWikiStatus);
     runPoll('wikiReviews', loadWikiReviews);
+    runPoll('rulePromotions', loadRulePromotions);
     runPoll('suggestions', loadSuggestions);
   }
 
@@ -1219,6 +1466,7 @@
   schedulePoll('running',      loadRunning,       3000);
   schedulePoll('wikiStatus',   loadWikiStatus,   30000);
   schedulePoll('wikiReviews',  loadWikiReviews,  10000);
+  schedulePoll('rulePromotions', loadRulePromotions, 10000);
   schedulePoll('suggestions',  loadSuggestions,  30000);
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) refreshVisibleData();
