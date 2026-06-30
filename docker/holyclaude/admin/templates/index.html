@@ -533,8 +533,8 @@
       <span class="tip" data-tip="위키 정비 파이프라인&#10;① wiki/*.md 전체 스캔 → 정비 대상 선정&#10;② wiki-restructurer: 섹션 구조·헤더·링크 재정비&#10;③ wiki-rewriter: 문체·표현 개선 및 일관성 교정&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
         <button class="btn btn-maint pipeline-btn" data-pipeline="5" onclick="selectPipeline(5)">위키 정비 팀</button>
       </span>
-      <span class="tip" data-tip="수요 기반 작성 파이프라인&#10;① 후보 큐 정규화 → 유저 수요 후보 선점 (DCinside 세그먼트 분석 기반)&#10;② wiki-demand-analyst: 유저 실제 발화·오해·토론 분석 + 생성/업데이트 권고&#10;③ 생성=wiki-planner→writer / 업데이트=wiki-rewriter 타깃 보강&#10;④ source-sanitizer·wiki-linker·quality-lead 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
-        <button class="btn btn-demand pipeline-btn" data-pipeline="6" onclick="selectPipeline(6)">수요 기반 작성 팀</button>
+      <span class="tip" data-tip="커뮤니티 큐레이션 파이프라인&#10;① 후보 큐 정규화 → 커뮤니티 수요 후보 선점 (DCinside 세그먼트 분석 기반)&#10;② wiki-demand-analyst: 유저 실제 발화·오해·토론 분석 + 생성/업데이트 권고&#10;③ 생성=wiki-planner→writer / 업데이트=wiki-rewriter 타깃 보강&#10;④ source-sanitizer·wiki-linker·quality-lead 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
+        <button class="btn btn-demand pipeline-btn" data-pipeline="6" onclick="selectPipeline(6)">커뮤니티 큐레이션 팀</button>
       </span>
       <span class="tip" data-tip="claude-mem 규칙 승격 제안 파이프라인&#10;① mem-search로 반복 결정·거절·수정 패턴 조회&#10;② AGENTS/CLAUDE/에이전트 규칙 후보만 산출&#10;③ 실제 규칙 파일은 수정하지 않고 .admin/rule-promotions/에 제안 저장&#10;④ 관리자가 파일별 전후 diff를 보고 수정·승인해야 적용">
         <button class="btn btn-rule pipeline-btn" data-pipeline="7" onclick="selectPipeline(7)">규칙 승격 제안</button>
@@ -612,8 +612,14 @@
 
   <!-- 섹션 5: 새/변경 위키 페이지 검토 -->
   <div class="card full-card">
-    <h2>위키 페이지 검토</h2>
-    <div id="review-body" style="color:#484f58;font-size:12px">확인 중...</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <h2 style="margin-bottom:0">위키 페이지 검토</h2>
+      <label style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;color:#8b949e;cursor:pointer">
+        <input type="checkbox" id="auto-approve-toggle" onchange="setAutoApprove(this.checked)">
+        자동 승인
+      </label>
+    </div>
+    <div id="review-body" style="color:#484f58;font-size:12px;margin-top:12px">확인 중...</div>
     <div id="review-msg" class="msg"></div>
     <p class="refresh-hint">새로 작성되거나 변경된 wiki/*.md 페이지를 표시합니다. 승인하면 현재 파일 해시가 승인 기록에 저장되고, 거부하면 해당 파일 변경을 되돌립니다.</p>
   </div>
@@ -725,7 +731,7 @@
 
 <script>
   // ── Pipeline name map ─────────────────────────────────────────────────────
-  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '수요 기반 작성 팀', '7': '규칙 승격 제안' };
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '커뮤니티 큐레이션 팀', '7': '규칙 승격 제안' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
   // 팀별 사용자 지시 기본값(프리셋)은 서버의 presets.json에서 로드합니다.
@@ -967,6 +973,8 @@
       const res = await fetch('/wiki-reviews');
       const data = await res.json();
       const items = data.items ?? [];
+      const toggle = document.getElementById('auto-approve-toggle');
+      if (toggle && typeof data.auto_approve === 'boolean') toggle.checked = data.auto_approve;
       const el = document.getElementById('review-body');
       if (items.length === 0) {
         el.innerHTML = '<span style="color:#484f58">검토 대기 중인 위키 페이지 없음</span>';
@@ -1004,6 +1012,26 @@
           <button class="btn btn-danger btn-small" data-review-action="reject" data-path="${escapeAttr(item.path)}">거부</button>
         </div>
       </div>`;
+  }
+
+  async function setAutoApprove(enabled) {
+    const msg = document.getElementById('review-msg');
+    try {
+      const res = await fetch('/wiki-review/auto-approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled })
+      });
+      const data = await readResponseJson(res);
+      if (res.ok && data.status === 'ok') {
+        showMsg(msg, 'ok', '자동 승인 ' + (data.enabled ? '켜짐' : '꺼짐'));
+        await loadWikiReviews();
+      } else {
+        showMsg(msg, 'err', JSON.stringify(data, null, 2));
+      }
+    } catch (e) {
+      showMsg(msg, 'err', '자동 승인 설정 실패: ' + e.message);
+    }
   }
 
   async function viewWikiPage(path) {

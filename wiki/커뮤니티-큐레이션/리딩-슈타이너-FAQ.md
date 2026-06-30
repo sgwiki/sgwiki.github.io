@@ -1,6 +1,6 @@
 ---
 spoiler: endgame
-category: 자주묻는질문
+category: 커뮤니티-큐레이션
 type: lore_mechanics
 last_modified: 2026-06-30
 description: "리딩 슈타이너(운명탐지)의 정의·발동 조건·명명 유래·오카베 단독 보유 이유·SG0 비정상 발동·극장판 과부하까지, 팬덤에서 가장 많이 묻는 질문 10선을 정리한 FAQ."

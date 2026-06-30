@@ -14,7 +14,7 @@
 | `docs/` | 설계·계획·저작권 검토 문서 | tracked |
 | `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
-| `scripts/p6_demand_queue.mjs` | P6 유저 수요 후보 소비 큐 | tracked |
+| `scripts/p6_demand_queue.mjs` | P6 커뮤니티 큐레이션 후보 소비 큐 | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
 | `scripts/fetch_fandom_episodes.mjs` | Fandom `Category:Episodes` → `data/fandom_episodes/` 마크다운 수집·변환 (영문 원문+한국어 번역용 원문) | tracked |
 | `scripts/gen_episodes_readme.mjs` | `data/fandom_episodes/README.md` 인덱스 자동 생성 | tracked |
@@ -23,7 +23,7 @@
 | `docker/holyclaude/` | 에이전트 팀 + 관리 UI 컨테이너 정의 | tracked |
 | `docker/holyclaude/AGENTS.md` | holyclaude 컨테이너 작업 시 추가 주의사항 | tracked |
 | `mkdocs.yml` / `Makefile` | 위키 빌드 설정 · 명령 래퍼 | tracked |
-| `data/qaset_with_rag/`, `data/공식 자료집/`, `data/dc_gallery/`, `data/fandom_episodes/` | RAG 소스·공식 자료·P6 유저 수요 입력·Fandom 에피소드 데이터 (대용량) | **gitignored** |
+| `data/qaset_with_rag/`, `data/공식 자료집/`, `data/dc_gallery/`, `data/fandom_episodes/` | RAG 소스·공식 자료·P6 커뮤니티 큐레이션 입력·Fandom 에피소드 데이터 (대용량) | **gitignored** |
 | `suggestions/` | 수신 제안 + 처리 상태 (런타임) | **gitignored** |
 | `.admin/` | 실행 로그 · 위키 검토 · registry · locks (런타임) | **gitignored** |
 | `docker/holyclaude/data/cloudcli/` | GitHub 토큰 DB (`auth.db`) — **절대 커밋 금지** | **gitignored** |
@@ -126,9 +126,9 @@ wiki/*.md 전체 스캔 → wiki-restructurer(섹션·헤더·링크) → wiki-r
 
 - **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
 
-### 파이프라인 6 (수요 기반 작성)
+### 파이프라인 6 (커뮤니티 큐레이션)
 
-DCinside 슈타게 갤러리 유저 게시글 세그먼트 분석으로 만든 후보 큐를 소비해 위키 문서를 생성하거나 기존 문서를 보강한다. admin UI의 `/trigger/p6`가 `run_holyclaude_pipeline.mjs p6`를 실행하고, 팀장(`wiki-demand-lead`)은 `wiki-demand-analyst` 보고서를 근거로 `create`/`update`를 판정한다.
+DCinside 슈타게 갤러리 유저 게시글 세그먼트 분석으로 만든 후보 큐를 소비해 위키 문서를 생성하거나 기존 문서를 보강한다. FAQ·토론 정리 성격의 새 문서는 `wiki/커뮤니티-큐레이션/`을 우선 대상으로 삼는다. admin UI의 `/trigger/p6`가 `run_holyclaude_pipeline.mjs p6`를 실행하고, 커뮤니티 큐레이션 팀장(`wiki-demand-lead`)은 `wiki-demand-analyst` 보고서를 근거로 `create`/`update`를 판정한다.
 
 ```
 all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analyst

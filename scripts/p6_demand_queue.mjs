@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// 파이프라인 6 — 유저 수요 기반 콘텐츠 생성/업데이트 후보 큐.
+// 파이프라인 6 — 커뮤니티 큐레이션 콘텐츠 생성/업데이트 후보 큐.
 //
 // wiki_work_registry.mjs(파일 단위 동시성 락)와 별개로, 후보 "소비 큐"를 추적한다.
 // - normalize: all_wiki_candidates.csv(BOM·다중 cluster_id·중복 제목) → 정규화 큐

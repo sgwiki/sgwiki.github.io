@@ -390,27 +390,27 @@ function buildP5Prompt(runId) {
 }
 
 function buildP6Prompt(runId) {
-  return `파이프라인 6 - 유저 수요 기반 위키 생성/업데이트를 지금 실행하세요.
+  return `파이프라인 6 - 커뮤니티 큐레이션 위키 생성/업데이트를 지금 실행하세요.
 
 실행 ID: ${runId}
 작업 디렉토리: /workspace
 
 반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-demand-lead.md, wiki-demand-analyst.md 규칙을 준수하세요.
 
-당신은 파이프라인 6의 wiki-demand-lead(수요 기반 작성 팀장)입니다.
+당신은 파이프라인 6의 wiki-demand-lead(커뮤니티 큐레이션 팀장)입니다.
 
-파이프라인 6은 DCinside 슈타게 갤러리 유저 게시글을 세그먼트 분석해 도출한 위키 후보 큐를 소비해, 유저가 실제로 나누는 대화를 바탕으로 위키 페이지를 새로 생성하거나 기존 페이지를 업데이트합니다. P1(생성 전용)·P5(정비 전용)와 달리 두 경로를 자율 라우팅합니다.
+파이프라인 6은 DCinside 슈타게 갤러리 유저 게시글을 세그먼트 분석해 도출한 위키 후보 큐를 소비해, 커뮤니티에서 실제로 반복되는 질문·오해·토론을 바탕으로 위키 페이지를 새로 생성하거나 기존 페이지를 업데이트합니다. FAQ·토론 정리 성격의 새 문서는 wiki/커뮤니티-큐레이션/을 우선 대상으로 삼습니다. P1(생성 전용)·P5(정비 전용)와 달리 두 경로를 자율 라우팅합니다.
 
 목표:
 1. 후보 큐를 정규화하고 최우선 pending 후보를 선점하세요.
    node /workspace/scripts/p6_demand_queue.mjs normalize
    node /workspace/scripts/p6_demand_queue.mjs next --run-id ${runId} --priority high
-2. 선점한 후보로 wiki-demand-analyst를 스폰해 수요 분석 보고서(타입·생성/업데이트 권고)를 받으세요.
+2. 선점한 후보로 wiki-demand-analyst를 스폰해 커뮤니티 큐레이션 보고서(타입·생성/업데이트 권고)를 받으세요.
 3. 팀장이 APPROVED / REJECTED / REVISION REQUESTED 중 하나를 명시적으로 판정하세요.
 4. APPROVED면 큐와 파일 락을 모두 예약하세요. create는 mode=create(파일 부재), update는 mode=update(파일 존재)입니다.
    node /workspace/scripts/p6_demand_queue.mjs reserve --candidate-id <id> --run-id ${runId} --mode <create|update> --file wiki/{category}/{slug}.md
    node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file wiki/{category}/{slug}.md --topic "p6:<id>:{slug}"
-5. 라우팅: create는 wiki-planner→wiki-writer, update는 wiki-rewriter로 대상 파일을 수요 기반 타깃 보강하세요(전체 재정비 아님). 업데이트 시 사실 관계·스포일러 등급을 임의로 바꾸지 마세요.
+5. 라우팅: create는 wiki-planner→wiki-writer, update는 wiki-rewriter로 대상 파일에 커뮤니티 수요를 반영해 타깃 보강하세요(전체 재정비 아님). 업데이트 시 사실 관계·스포일러 등급을 임의로 바꾸지 마세요.
 6. source-sanitizer → wiki-linker → wiki-quality-lead(gate) 순으로 검증하세요. sanitizer fail은 최대 2회, linker/quality fail은 최대 1회 재작성 요청.
 7. commit 전에 구조화 리포트를 누적 저장하세요: /workspace/.admin/runs/p6-${runId}-report.json
    각 후보 항목에 candidate_id, type, cluster_ids, supporting_count(>0), decision, target_file, sanitizer("pass"), linker, quality("pass"|"warn"), commit_hash 를 포함하세요. 러너가 이 리포트를 검증합니다.
@@ -418,7 +418,7 @@ function buildP6Prompt(runId) {
 9. 1회 실행에서 최대 3개 후보를 순차 처리하세요. pending이 없으면 "처리할 후보 없음"을 보고하고 종료하세요.
 
 MCP 커버리지 게이트 (공통 하드 + 타입별):
-- 공통(전 타입, 러너가 코드로 강제): dataforge qaset_with_rag(가능 시), namuwiki MCP, dataforge dc_gallery(유저 수요 근거).
+- 공통(전 타입, 러너가 코드로 강제): dataforge qaset_with_rag(가능 시), namuwiki MCP, dataforge dc_gallery(커뮤니티 수요 근거).
 - lore/mechanics 타입 추가(팀장이 보고로 확인): dataforge sg_paper, sg-ontology MCP, dataforge sg_game_sg0_en.
 - dataforge dc_gallery는 dcinside 유저 게시글 소스입니다. source_names=["dc_gallery"], top_k는 반드시 30 이하로 조회하세요.
 - sg_game_sge는 배제 감사 전용입니다. 위키 본문·요약에 반영 금지.

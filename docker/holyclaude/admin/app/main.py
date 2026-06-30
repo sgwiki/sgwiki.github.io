@@ -30,6 +30,7 @@ PRESETS_FILE = Path(
 )
 PRESETS_FALLBACK = Path(__file__).parent.parent / "presets.json"
 WIKI_REVIEW_STATE = Path(os.getenv("ADMIN_WIKI_REVIEW_STATE", WORKSPACE / ".admin/wiki_reviews.json"))
+ADMIN_SETTINGS_STATE = Path(os.getenv("ADMIN_SETTINGS_STATE", WORKSPACE / ".admin/admin_settings.json"))
 SUGGESTION_ACK_STATE = Path(os.getenv("ADMIN_SUGGESTION_ACK_STATE", WORKSPACE / ".admin/suggestion_ack.json"))
 HOLYCLAUDE_GIT_WORKDIR = "/workspace"
 RULE_PROMOTION_ROOT = Path(os.getenv("ADMIN_RULE_PROMOTION_ROOT", WORKSPACE / ".admin/rule-promotions"))
@@ -201,7 +202,7 @@ async def trigger_p5(body: TriggerBody | None = None):
 @app.post("/trigger/p6")
 async def trigger_p6(body: TriggerBody | None = None):
     run_id, started_at, status = _start_active_job(
-        "p6", "holyclaude 수요 기반 작성 파이프라인 실행 준비 중", body.user_instruction if body else None
+        "p6", "holyclaude 커뮤니티 큐레이션 파이프라인 실행 준비 중", body.user_instruction if body else None
     )
     if status == "running":
         asyncio.create_task(_run_p6(run_id, started_at))
@@ -344,6 +345,10 @@ class WikiReviewBody(BaseModel):
     reason: str | None = None
 
 
+class WikiAutoApproveBody(BaseModel):
+    enabled: bool
+
+
 class RulePromotionBody(BaseModel):
     run_id: str
     proposal_id: str
@@ -365,7 +370,25 @@ async def wiki_reviews():
 
 def _wiki_reviews_response() -> dict:
     items = _cached("wiki_reviews", ADMIN_CACHE_TTL_SECONDS, _pending_wiki_review_items)
-    return {"items": items}
+    return {"items": items, "auto_approve": _wiki_auto_approve_enabled()}
+
+
+@app.get("/wiki-review/auto-approve")
+async def get_wiki_auto_approve():
+    return await asyncio.to_thread(lambda: {"enabled": _wiki_auto_approve_enabled()})
+
+
+@app.post("/wiki-review/auto-approve")
+async def set_wiki_auto_approve(body: WikiAutoApproveBody):
+    return await asyncio.to_thread(_set_wiki_auto_approve, body)
+
+
+def _set_wiki_auto_approve(body: WikiAutoApproveBody) -> dict:
+    settings = _load_admin_settings()
+    settings["wiki_auto_approve"] = bool(body.enabled)
+    _save_admin_settings(settings)
+    _invalidate_cache("wiki_reviews")
+    return {"status": "ok", "enabled": bool(body.enabled)}
 
 
 @app.get("/wiki-review")
@@ -781,6 +804,25 @@ def _save_review_state(state: dict) -> None:
     WIKI_REVIEW_STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _load_admin_settings() -> dict:
+    if not ADMIN_SETTINGS_STATE.exists():
+        return {}
+    try:
+        return json.loads(ADMIN_SETTINGS_STATE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_admin_settings(state: dict) -> None:
+    ADMIN_SETTINGS_STATE.parent.mkdir(parents=True, exist_ok=True)
+    ADMIN_SETTINGS_STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _wiki_auto_approve_enabled() -> bool:
+    """위키 검토 자동 승인 설정. 미설정 시 기본값 True."""
+    return bool(_load_admin_settings().get("wiki_auto_approve", True))
+
+
 def _load_ack_state() -> dict:
     """제안 '확인(과거 제한 사항)' 보관 상태. sid -> {acknowledged_at, ...}.
 
@@ -913,8 +955,10 @@ def _pending_wiki_review_items() -> list[dict]:
     working = _working_tree_wiki_changes()
     committed = _committed_wiki_changes()
     review_state = _load_review_state()
+    auto_approve = _wiki_auto_approve_enabled()
     candidates = set(committed) | set(working)
     items = []
+    auto_dirty = False
     for rel in sorted(candidates):
         try:
             item = _wiki_review_item(
@@ -925,8 +969,23 @@ def _pending_wiki_review_items() -> list[dict]:
             )
         except Exception:
             continue
-        if item and item["decision"] != "approved":
-            items.append(item)
+        if not item or item["decision"] == "approved":
+            continue
+        # 자동 승인이 켜져 있으면 아직 판정되지 않은(pending) 페이지를 자동으로 승인 기록에
+        # 남겨 검토 목록에서 제외한다. 운영자가 명시적으로 거부한 항목은 건드리지 않는다.
+        if auto_approve and item["decision"] == "pending":
+            review_state[_review_key(item["path"], item["hash"])] = {
+                "path": item["path"],
+                "hash": item["hash"],
+                "decision": "approved",
+                "reason": "auto-approved",
+                "reviewed_at": datetime.now().isoformat(),
+            }
+            auto_dirty = True
+            continue
+        items.append(item)
+    if auto_dirty:
+        _save_review_state(review_state)
     return items
 
 
