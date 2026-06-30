@@ -777,9 +777,15 @@ async function main() {
   const mcpServers = await loadMcpServers(DEFAULT_CWD);
   const mcpNames = Object.keys(mcpServers);
   const missingServers = missingConfiguredMcpServers(mcpServers);
+  const enableBatchAutoHooks =
+    process.env.HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH === '1' || args.command === 'p7';
+  const settingSources = enableBatchAutoHooks
+    ? ['project', 'user', 'local']
+    : ['project', 'local'];
 
   console.log(`[${args.command}:${args.runId}] starting holyclaude pipeline`);
   console.log(`[${args.command}:${args.runId}] cwd=${DEFAULT_CWD}`);
+  console.log(`[${args.command}:${args.runId}] settingSources=${settingSources.join(',')}`);
   console.log(
     `[${args.command}:${args.runId}] mcpServers=${mcpNames.length ? mcpNames.join(',') : '(none configured)'}`,
   );
@@ -805,7 +811,7 @@ async function main() {
       type: 'preset',
       preset: 'claude_code',
     },
-    settingSources: ['project', 'user', 'local'],
+    settingSources,
     tools: {
       type: 'preset',
       preset: 'claude_code',

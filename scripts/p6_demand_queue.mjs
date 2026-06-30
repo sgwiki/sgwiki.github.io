@@ -8,6 +8,7 @@
 // - reserve: create는 대상 파일 부재를, update는 파일 존재를 요구(상호 반대 조건)
 //   → wiki_work_registry.reserve가 기존 파일에서 항상 throw하던 P0 문제를 해결한다.
 // - complete / reject: 터미널 상태 기록
+// - reclaim-stale: 죽은 run이 점유한 in_progress 후보를 회수
 //
 // 출력은 항상 JSON 한 덩어리(stdout). 실패 시 stderr + exit 1.
 
@@ -33,8 +34,9 @@ const DEFAULT_CSV = path.join(
   'data/dc_gallery/wiki_candidates/all_wiki_candidates.csv',
 );
 const LOCK_TTL_MS = 2 * 60 * 1000;
+const IN_PROGRESS_TTL_MS = 30 * 60 * 1000;
 
-const TERMINAL = new Set(['created', 'updated', 'rejected', 'skipped']);
+const TERMINAL = new Set(['created', 'updated', 'rejected', 'skipped', 'abandoned']);
 const VALID_MODES = new Set(['create', 'update']);
 
 function nowIso() {
@@ -178,6 +180,24 @@ function splitIds(value) {
     .split(',')
     .map((token) => token.trim())
     .filter((token) => token.length > 0);
+}
+
+function splitRunIds(value) {
+  return new Set(splitIds(value));
+}
+
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function optionNow(options) {
+  if (!options.now) return Date.now();
+  const parsed = Date.parse(options.now);
+  if (Number.isNaN(parsed)) {
+    throw new Error(`Invalid --now timestamp: ${options.now}`);
+  }
+  return parsed;
 }
 
 function splitClusterIds(value) {
@@ -400,6 +420,54 @@ function reject(queue, options, status) {
   return { status: 'ok', action: status, candidate: cand };
 }
 
+function reclaimStale(queue, options) {
+  const activeRunIds = splitRunIds(options['active-run-ids'] || '');
+  const ttlMs = parsePositiveInt(options['ttl-ms'], IN_PROGRESS_TTL_MS);
+  const cutoff = optionNow(options) - ttlMs;
+  const reclaimed = [];
+  const abandoned = [];
+
+  for (const cand of Object.values(queue.candidates)) {
+    if (cand.status !== 'in_progress') continue;
+    if (cand.run_id && activeRunIds.has(cand.run_id)) continue;
+
+    const updated = Date.parse(cand.updated_at || cand.created_at || 0);
+    if (!Number.isNaN(updated) && updated > cutoff) continue;
+
+    const prior = { ...cand };
+    const reason = `stale in_progress reclaimed from run ${cand.run_id || '(none)'}`;
+
+    if (!cand.target_file && !cand.decision) {
+      cand.status = 'pending';
+      cand.run_id = null;
+      cand.reason = reason;
+      cand.updated_at = nowIso();
+      reclaimed.push({ candidate_id: cand.candidate_id, previous_run_id: prior.run_id });
+      queue.history.push({ ...prior, status: 'stale_reclaimed', reason, finished_at: nowIso() });
+    } else {
+      cand.status = 'abandoned';
+      cand.reason = reason;
+      cand.updated_at = nowIso();
+      abandoned.push({
+        candidate_id: cand.candidate_id,
+        previous_run_id: prior.run_id,
+        target_file: cand.target_file || null,
+      });
+      queue.history.push({ ...cand, finished_at: nowIso() });
+    }
+  }
+
+  return {
+    status: 'ok',
+    action: 'reclaim-stale',
+    ttl_ms: ttlMs,
+    active_run_ids: [...activeRunIds],
+    reclaimed,
+    abandoned,
+    counts: countByStatus(queue),
+  };
+}
+
 function main() {
   const { command, options } = parseArgs(process.argv.slice(2));
   let fd = null;
@@ -432,9 +500,12 @@ function main() {
       case 'skip':
         result = reject(queue, options, 'skipped');
         break;
+      case 'reclaim-stale':
+        result = reclaimStale(queue, options);
+        break;
       default:
         throw new Error(
-          'Usage: p6_demand_queue.mjs normalize|list|next|reserve|complete|reject|skip ...',
+          'Usage: p6_demand_queue.mjs normalize|list|next|reserve|complete|reject|skip|reclaim-stale ...',
         );
     }
 

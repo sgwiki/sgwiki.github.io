@@ -120,7 +120,8 @@ make shell           # 컨테이너 bash 접속
 - **(선택) 사용자 지시** 입력 칸: 텍스트를 넣으면 팀장(team-lead) 에이전트 프롬프트에 추가 지시로 전달 (`POST /trigger/pN` 본문 `user_instruction`). 비워도 되며, 보안·게이트 규칙은 지시보다 우선합니다.
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
 - 최근 실행 로그 자동 갱신
-- **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 대기 작업 순번·취소
+- **진행 중 / 대기 중 작업** 패널: 동시 실행 현황(실행 N/cap · 대기 M), 실행 경과·마지막 출력·wall/idle deadline, 실행/대기 작업 취소
+- 런타임 진단: `/diagnostics/runtime`에서 active run ID, holyclaude 프로세스 스냅샷, claude-mem proxy health 확인
 - 새로 작성되거나 변경된 `wiki/*.md` 페이지 검토: 보기 · 승인 · 거부
 - 제안 자동 처리: `suggestions/inbox/` 수신 제안과 파이프라인 2 자동 판정·작성 로그 (`GET /suggestions`)
 - 규칙 승격 검토: P7이 생성한 `.admin/rule-promotions/<run_id>/manifest.json` 제안을 파일별 diff로 확인하고, 제안 본문을 직접 수정한 뒤 승인해야 실제 규칙 파일에 적용 (`GET /rule-promotions`)
@@ -133,20 +134,21 @@ make shell           # 컨테이너 bash 접속
 - **데이터**: named volume `sg-wiki-claude-mem` → `/home/claude/.claude-mem` (SQLite + Chroma). drvfs bind mount가 아닌 Docker 로컬 볼륨이라 SQLite 락이 안전하고 컨테이너 재빌드에도 보존됩니다.
 - **격리**: sg-wiki 전용 단일 볼륨·단일 worker — 다른 프로젝트 데이터는 섞이지 않습니다.
 - **요약 LLM·인증**: Z.AI `glm-4-flash` 사용 (`CLAUDE_MEM_MODEL`). claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로, `claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성합니다(별도 키 불필요). 파일이 없으면 OAuth 키체인으로 폴백 → "Not logged in" 루프로 observation/summary가 0건이 됩니다.
-- **동작**: 파이프라인이 `settingSources: ['user']`로 `~/.claude/settings.json`을 로드하므로, `enabledPlugins`에 등록된 claude-mem 훅이 **모든 에이전트 세션에서 자동으로 캡처·주입**합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
-- **운영 기본값**: worker/install은 `claude-mem@13.9.1`로 고정합니다. 자동 context는 최근 observation/session만 좁게 주입하고 semantic inject는 끄며, `Read`/`LS`/`Grep` 같은 noisy tool은 캡처에서 제외합니다.
+- **동작**: 배치 파이프라인 P1~P6은 기본적으로 `settingSources: ['project','local']`만 로드해 user plugin hook 자동 발화를 차단합니다. P7 또는 `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH=1`일 때만 user settings까지 로드합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
+- **운영 기본값**: worker/install은 `claude-mem@13.9.1`로 고정합니다. s6 longrun은 `worker-service.cjs --daemon`을 감시하고 없을 때만 worker를 다시 시작합니다. 자동 context는 최근 observation/session만 좁게 주입하고 semantic inject는 끄며, `Read`/`LS`/`Grep` 같은 noisy tool은 캡처에서 제외합니다.
+- **LLM proxy**: claude-mem LLM 요청은 `claude-mem-llm-proxy`를 거쳐 admin의 실행/대기 작업 수가 임계값 이하일 때만 upstream으로 전달됩니다. proxy는 admin 조회 timeout, fail-open, queue cap, queue TTL, `/health`를 제공합니다.
 
 > 변경(`Dockerfile`·`docker-compose.yaml`·`scripts/claude-mem-*`·s6 서비스)은 이미지에 베이크되므로 `make up`(재빌드)으로 반영합니다.
 
 ## 파이프라인
 
-각 파이프라인은 `sg-wiki-admin`이 Docker socket을 통해 `sg-wiki-holyclaude` 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다. 실행 중 상태는 관리 UI와 `sg-wiki-holyclaude` 로그 스트림에서, 결과 요약은 `.admin/runs/*.json`에서 확인합니다.
+각 파이프라인은 `sg-wiki-admin`이 Docker socket을 통해 `sg-wiki-holyclaude` 컨테이너 안에서 `/workspace/scripts/run_holyclaude_pipeline.mjs`를 실행합니다. admin은 실행을 `setsid` 프로세스 그룹으로 격리하고 wall/idle watchdog과 running cancel을 적용합니다. 실행 중 상태는 관리 UI와 `sg-wiki-holyclaude` 로그 스트림에서, 결과 요약은 `.admin/runs/*.json`에서 확인합니다.
 
 ### 동시 실행과 중복 주제 방지
 
 - 파이프라인은 **전역 풀로 최대 10개까지 병렬 실행**(`ADMIN_MAX_CONCURRENT_RUNS`). p1/p2가 섞여 실행될 수 있습니다.
-- 초과 트리거는 **단일 전역 FIFO 대기열**에 들어가, 실행 슬롯이 비면 자동으로 시작됩니다. 관리 UI에서 순번 확인 및 취소(`DELETE /run/{run_id}`) 가능합니다.
-- 동일 주제·동일 파일 중복 작성은 `scripts/wiki_work_registry.mjs`가 막습니다. 팀장 에이전트는 주제 선정 전 registry를 읽어 진행 중인 주제/파일을 회피하고, writer 호출 전 `reserve`로 최종 점유합니다. 완료/거부 시 `complete`/`release`로 registry에서 제거합니다.
+- 초과 트리거는 **단일 전역 FIFO 대기열**에 들어가, 실행 슬롯이 비면 자동으로 시작됩니다. 관리 UI에서 순번 확인 및 실행/대기 작업 취소(`DELETE /run/{run_id}`) 가능합니다.
+- 동일 주제·동일 파일 중복 작성은 `scripts/wiki_work_registry.mjs`가 막습니다. 팀장 에이전트는 주제 선정 전 registry를 읽어 진행 중인 주제/파일을 회피하고, writer 호출 전 `reserve`로 최종 점유합니다. 완료/거부 시 `complete`/`release`로 registry에서 제거합니다. admin reaper는 active run 목록 밖의 stale registry 예약을 `reconcile`로 정리합니다.
 
 ### 파이프라인 1 — 콘텐츠 생성
 
@@ -198,10 +200,17 @@ node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run
 - `ADMIN_CACHE_TTL_SECONDS`: 위키 현황/위키 검토 목록 API 응답 캐시 TTL, 기본값 `5`
 - `ADMIN_SUGGESTION_CACHE_TTL_SECONDS`: 제안 목록과 파이프라인 로그 API 응답 캐시 TTL, 기본값 `10`
 - `ADMIN_STATUS_CACHE_TTL_SECONDS`: 최근 실행 현황 API 응답 캐시 TTL, 기본값 `2`
+- `ADMIN_ACTIVE_RUNS_STATE`: active/queued run 상태 파일, 기본값 `/workspace/.admin/active-runs.json`
+- `ADMIN_RUN_MARKER_DIR`: 프로세스 그룹 PGID marker 디렉터리, 기본값 `/tmp/sg-wiki-runs`
+- `ADMIN_TERMINATE_GRACE_SECONDS`: cancel/timeout 시 TERM 후 KILL까지 대기 시간, 기본값 `20`
+- `ADMIN_REAPER_INTERVAL_SECONDS`: stale 예약 회수/timeout 점검 주기, 기본값 `60`
+- `ADMIN_P{N}_WALL_TIMEOUT_SECONDS`, `ADMIN_P{N}_IDLE_TIMEOUT_SECONDS`: 파이프라인별 watchdog override
 - `ADMIN_RULE_PROMOTION_ROOT`: P7 규칙 승격 제안 manifest/proposed 파일 저장 위치, 기본값 `/workspace/.admin/rule-promotions`
 - `ADMIN_SUGGESTION_ACK_STATE`: 제안 "확인"(과거 제한 사항) 보관 상태 파일, 기본값 `/workspace/.admin/suggestion_ack.json`
 - `ADMIN_PRESETS_FILE`: 관리 UI 수동 실행 팀별 사용자 지시 프리셋 JSON, 기본값 `/workspace/docker/holyclaude/admin/presets.json`
 - `HOLYCLAUDE_PIPELINE_MODEL`: 파이프라인 실행 모델, 기본값 `glm-5.2`
+- `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH`: `1`이면 P1~P6도 user settings hook을 로드, 기본값 `0`
+- `CLAUDE_MEM_ADMIN_URL`, `CLAUDE_MEM_PROXY_ADMIN_TIMEOUT_MS`, `CLAUDE_MEM_PROXY_FAIL_OPEN_AFTER_MS`, `CLAUDE_MEM_PROXY_MAX_QUEUE`, `CLAUDE_MEM_PROXY_MAX_QUEUED_AGE_MS`, `CLAUDE_MEM_PROXY_UPSTREAM_TIMEOUT_MS`: claude-mem LLM proxy 안정성/큐 제어
 - `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
 - `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)
 - `R2_ACCESS_KEY` / `R2_SECRET_KEY`: R2 API 토큰 자격증명

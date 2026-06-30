@@ -794,7 +794,8 @@
     }
   }
 
-  async function cancelRun(runId) {
+  async function cancelRun(runId, status) {
+    if (status && status !== 'queued' && !confirm(runId + ' 실행을 중단할까요?')) return;
     try {
       const res = await fetch('/run/' + encodeURIComponent(runId), { method: 'DELETE' });
       const data = await res.json();
@@ -889,6 +890,29 @@
   }
 
   // ── Running jobs ─────────────────────────────────────────────────────────
+  function formatSeconds(value) {
+    if (value == null || value === '') return '-';
+    const n = Math.max(0, Math.abs(parseInt(value, 10) || 0));
+    const h = Math.floor(n / 3600);
+    const m = Math.floor((n % 3600) / 60);
+    const s = n % 60;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  function formatDeadline(value) {
+    if (value == null || value === '') return '-';
+    const n = parseInt(value, 10) || 0;
+    return (n < 0 ? '초과 ' : '남음 ') + formatSeconds(Math.abs(n));
+  }
+
+  function runningStatusLabel(status) {
+    if (status === 'terminating') return '종료 중';
+    if (status === 'queued') return '대기';
+    return '실행 중';
+  }
+
   async function loadRunning() {
     try {
       const res  = await fetch('/running');
@@ -904,31 +928,42 @@
       }
       const cards = jobs.map(j => {
         const name  = pipelineName(j.pipeline?.replace('p','') ?? '?');
-        const runId = escapeHtml(j.run_id ?? '');
+        const rawRunId = j.run_id ?? '';
+        const runId = escapeHtml(rawRunId);
+        const status = j.status || 'running';
         const lastLine = escapeHtml(j.last_line ?? '');
         if (j.status === 'queued') {
           return `
         <div style="display:grid;grid-template-columns:16px 1fr auto;gap:8px;margin-bottom:8px">
-          <span style="margin-top:2px;color:#f0883e">⏳</span>
+          <span style="margin-top:2px;color:#f0883e">...</span>
           <div>
             <div><b style="color:#c9d1d9">${name}</b>
             &nbsp;<span style="color:#484f58">${runId}</span>
             &nbsp;<span class="status-badge off" style="font-size:10px;text-transform:none;letter-spacing:0">대기 ${escapeHtml(j.queue_position ?? '?')}번째</span></div>
             <div style="color:#8b949e;font-size:11px;line-height:1.5">${lastLine}</div>
+            <div style="color:#484f58;font-size:10px;line-height:1.5">대기 ${formatSeconds(j.queued_seconds)}</div>
           </div>
-          <button class="btn btn-danger" style="font-size:11px;padding:4px 10px" onclick="cancelRun('${runId}')">취소</button>
+          <button class="btn btn-danger" style="font-size:11px;padding:4px 10px" onclick="cancelRun('${escapeAttr(rawRunId)}','queued')">취소</button>
         </div>`;
         }
+        const isTerminating = status === 'terminating';
         return `
         <div style="display:grid;grid-template-columns:16px 1fr auto;gap:8px;margin-bottom:8px">
           <span class="spinner" style="margin-top:2px"></span>
           <div>
             <div><b style="color:#c9d1d9">${name}</b>
             &nbsp;<span style="color:#484f58">${runId}</span>
+            &nbsp;<span class="status-badge ${isTerminating ? 'off' : 'on'}" style="font-size:10px;text-transform:none;letter-spacing:0">${runningStatusLabel(status)}</span>
             &nbsp;<span style="color:#8b949e">${escapeHtml(j.started_at?.slice(11,19) ?? '')}</span></div>
             <div style="color:#8b949e;font-size:11px;line-height:1.5">${lastLine}</div>
+            <div style="color:#484f58;font-size:10px;line-height:1.5">
+              경과 ${formatSeconds(j.duration_seconds)}
+              · 마지막 출력 ${formatSeconds(j.last_output_age_seconds)} 전
+              · wall ${formatDeadline(j.wall_deadline_in_seconds)}
+              · idle ${formatDeadline(j.idle_deadline_in_seconds)}
+            </div>
           </div>
-          <span></span>
+          <button class="btn btn-danger" style="font-size:11px;padding:4px 10px" ${isTerminating ? 'disabled' : ''} onclick="cancelRun('${escapeAttr(rawRunId)}','${escapeAttr(status)}')">취소</button>
         </div>`;
       }).join('');
       el.innerHTML = '<div style="margin-bottom:8px;color:#8b949e;font-size:11px">실행 ' + runningCount + '/' + limit + ' · 대기 ' + queuedCount + '</div>' + cards;

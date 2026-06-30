@@ -8,6 +8,7 @@ const ADMIN_DIR = path.join(WORKSPACE, '.admin');
 const REGISTRY_PATH = path.join(ADMIN_DIR, 'p1-work-registry.json');
 const LOCK_PATH = path.join(ADMIN_DIR, 'p1-work-registry.lock');
 const ACTIVE_TTL_MS = 12 * 60 * 60 * 1000;
+const RECONCILE_TTL_MS = 30 * 60 * 1000;
 const LOCK_TTL_MS = 2 * 60 * 1000;
 
 function parseArgs(argv) {
@@ -20,7 +21,7 @@ function parseArgs(argv) {
     }
     const key = item.slice(2);
     const value = argv[index + 1];
-    if (!value || value.startsWith('--')) {
+    if (value === undefined || value.startsWith('--')) {
       throw new Error(`Missing value for --${key}`);
     }
     options[key] = value;
@@ -49,6 +50,27 @@ function normalizeWikiFile(value) {
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+function splitIds(value) {
+  return String(value || '')
+    .split(',')
+    .map((token) => token.trim())
+    .filter((token) => token.length > 0);
+}
+
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function optionNow(options) {
+  if (!options.now) return Date.now();
+  const parsed = Date.parse(options.now);
+  if (Number.isNaN(parsed)) {
+    throw new Error(`Invalid --now timestamp: ${options.now}`);
+  }
+  return parsed;
 }
 
 function loadRegistry() {
@@ -178,6 +200,42 @@ function finish(registry, options, status) {
   return { status: 'ok', action: status, entry: finished };
 }
 
+function reconcile(registry, options) {
+  const activeRunIds = new Set(splitIds(options['active-run-ids'] || ''));
+  const ttlMs = parsePositiveInt(options['ttl-ms'], RECONCILE_TTL_MS);
+  const cutoff = optionNow(options) - ttlMs;
+  const released = [];
+
+  for (const [file, entry] of Object.entries(registry.active || {})) {
+    if (entry.run_id && activeRunIds.has(entry.run_id)) continue;
+
+    const updated = Date.parse(entry.updated_at || entry.started_at || 0);
+    if (!Number.isNaN(updated) && updated > cutoff) continue;
+
+    const reason = `stale registry reservation reconciled from run ${entry.run_id || '(none)'}`;
+    const finished = {
+      ...entry,
+      file,
+      status: options.status || 'stale_released',
+      reason,
+      released_at: nowIso(),
+      updated_at: nowIso(),
+    };
+    registry.history.push(finished);
+    delete registry.active[file];
+    released.push({ file, previous_run_id: entry.run_id || null });
+  }
+
+  return {
+    status: 'ok',
+    action: 'reconcile',
+    ttl_ms: ttlMs,
+    active_run_ids: [...activeRunIds],
+    released,
+    active_count: Object.keys(registry.active || {}).length,
+  };
+}
+
 function main() {
   const { command, options } = parseArgs(process.argv.slice(2));
   let fd = null;
@@ -197,10 +255,12 @@ function main() {
       result = finish(registry, options, 'completed');
     } else if (command === 'release') {
       result = finish(registry, options, options.status || 'released');
+    } else if (command === 'reconcile') {
+      result = reconcile(registry, options);
     } else if (command === 'list') {
       result = { status: 'ok', registry };
     } else {
-      throw new Error('Usage: wiki_work_registry.mjs reserve|status|complete|release|list ...');
+      throw new Error('Usage: wiki_work_registry.mjs reserve|status|complete|release|reconcile|list ...');
     }
 
     saveRegistry(registry);

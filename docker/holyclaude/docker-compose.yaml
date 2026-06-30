@@ -45,7 +45,6 @@ services:
     shm_size: 2g                           # Chromium needs this — don't remove
     mem_limit: 48g                         # 에이전트 spawn storm 메모리 상한
     pids_limit: 512                        # 프로세스 무한 증식 방지
-    network_mode: bridge
     extra_hosts:
       - "host.docker.internal:host-gateway"   # Linux에서 MCP HTTP 연결 필수
     cap_add:
@@ -82,10 +81,18 @@ services:
       - API_TIMEOUT_MS=3000000
       - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       - HOLYCLAUDE_PIPELINE_MODEL=glm-5.2
+      - HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH=0
 
       # claude-mem worker config (worker bind host + port + Z.AI summarization model)
       - CLAUDE_MEM_MODEL=glm-4.7
       - CLAUDE_MEM_PROXY_N=3
+      - CLAUDE_MEM_ADMIN_URL=http://admin:3002/running
+      - CLAUDE_MEM_PROXY_ADMIN_TIMEOUT_MS=2000
+      - CLAUDE_MEM_PROXY_FAIL_OPEN_AFTER_MS=10000
+      - CLAUDE_MEM_PROXY_MAX_QUEUE=100
+      - CLAUDE_MEM_PROXY_MAX_QUEUED_AGE_MS=300000
+      - CLAUDE_MEM_PROXY_UPSTREAM_TIMEOUT_MS=120000
+      - CLAUDE_MEM_PROXY_HOST=0.0.0.0
       - CLAUDE_MEM_WORKER_HOST=0.0.0.0
       - CLAUDE_MEM_WORKER_PORT=37700
       - CLAUDE_MEM_ANTHROPIC_API_KEY=${ZAI_API_KEY}

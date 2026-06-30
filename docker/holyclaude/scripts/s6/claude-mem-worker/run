@@ -14,7 +14,17 @@
 export HOME=/home/claude
 CMEM_VERSION="${CLAUDE_MEM_VERSION:-13.9.1}"
 export CMEM_VERSION
-# `claude-mem start` (no flag) spawns a DETACHED daemon and exits, which makes
-# s6 restart-loop. `--daemon` IS the foreground worker — s6 supervises it
-# directly, giving proper crash-restart with no churn.
-exec s6-setuidgid claude npx -y "claude-mem@${CMEM_VERSION}" start --daemon
+
+worker_running() {
+  ps -eo args | grep -F "worker-service.cjs --daemon" | grep -v grep >/dev/null 2>&1
+}
+
+# claude-mem v13 starts the actual worker as a daemonized plugin process. Keep
+# this s6 longrun alive as a small monitor so s6 does not restart-loop npx while
+# the daemon is already running.
+while true; do
+  if ! worker_running; then
+    s6-setuidgid claude npx -y "claude-mem@${CMEM_VERSION}" start --daemon || true
+  fi
+  sleep 30
+done

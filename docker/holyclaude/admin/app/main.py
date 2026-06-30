@@ -3,6 +3,7 @@ import difflib
 import hashlib
 import json
 import os
+import queue
 import re
 import shlex
 import subprocess
@@ -45,6 +46,21 @@ P2_POLL_MATCH_WINDOW_SECONDS = int(os.getenv("ADMIN_P2_POLL_MATCH_WINDOW_SECONDS
 ADMIN_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_CACHE_TTL_SECONDS", "5"))
 ADMIN_SUGGESTION_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_SUGGESTION_CACHE_TTL_SECONDS", "10"))
 ADMIN_STATUS_CACHE_TTL_SECONDS = float(os.getenv("ADMIN_STATUS_CACHE_TTL_SECONDS", "2"))
+ACTIVE_RUNS_STATE = Path(os.getenv("ADMIN_ACTIVE_RUNS_STATE", WORKSPACE / ".admin/active-runs.json"))
+RUN_MARKER_DIR = os.getenv("ADMIN_RUN_MARKER_DIR", "/tmp/sg-wiki-runs")
+ADMIN_TERMINATE_GRACE_SECONDS = int(os.getenv("ADMIN_TERMINATE_GRACE_SECONDS", "20"))
+ADMIN_REAPER_INTERVAL_SECONDS = int(os.getenv("ADMIN_REAPER_INTERVAL_SECONDS", "60"))
+
+PIPELINE_TIMEOUT_DEFAULTS = {
+    "p1": (4 * 60 * 60, 30 * 60),
+    "p2": (2 * 60 * 60, 20 * 60),
+    "p3": (4 * 60 * 60, 30 * 60),
+    "p4": (2 * 60 * 60, 20 * 60),
+    "p5": (4 * 60 * 60, 30 * 60),
+    "p6": (4 * 60 * 60, 30 * 60),
+    "p7": (45 * 60, 15 * 60),
+}
+ACTIVE_RUN_STATUSES = {"running", "terminating"}
 
 active_jobs: dict[str, dict] = {}
 active_jobs_lock = threading.RLock()
@@ -92,9 +108,19 @@ async def lifespan(app: FastAPI):
     WIKI_REVIEW_STATE.parent.mkdir(parents=True, exist_ok=True)
     SUGGESTION_ACK_STATE.parent.mkdir(parents=True, exist_ok=True)
     RULE_PROMOTION_ROOT.mkdir(parents=True, exist_ok=True)
+    ACTIVE_RUNS_STATE.parent.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(_reconcile_persisted_active_runs)
+    reaper_task = asyncio.create_task(_runtime_reaper_loop())
     scheduler.start()
-    yield
-    scheduler.shutdown(wait=False)
+    try:
+        yield
+    finally:
+        reaper_task.cancel()
+        try:
+            await reaper_task
+        except asyncio.CancelledError:
+            pass
+        scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title="sg-wiki Admin", lifespan=lifespan)
@@ -224,16 +250,14 @@ async def trigger_p7(body: TriggerBody | None = None):
 @app.get("/running")
 async def get_running():
     with active_jobs_lock:
-        running = [dict(j) for j in active_jobs.values() if j.get("status") == "running"]
+        running = [_public_job(j) for j in active_jobs.values() if j.get("status") in ACTIVE_RUN_STATUSES]
         queued = []
         position = 1
         for rid in run_queue:
             job = active_jobs.get(rid)
             if job is None:
                 continue  # tombstone (cancelled while queued)
-            item = dict(job)
-            item["queue_position"] = position
-            queued.append(item)
+            queued.append(_public_job(job, queue_position=position))
             position += 1
         return {
             "jobs": running + queued,
@@ -245,6 +269,7 @@ async def get_running():
 
 @app.delete("/run/{run_id}")
 async def cancel_run(run_id: str):
+    should_kill = False
     with active_jobs_lock:
         job = active_jobs.get(run_id)
         if job is None:
@@ -252,17 +277,28 @@ async def cancel_run(run_id: str):
                 status_code=404,
                 detail={"status": "not_found", "run_id": run_id},
             )
-        if job.get("status") == "running":
-            raise HTTPException(
-                status_code=409,
-                detail={
-                    "status": "running",
-                    "run_id": run_id,
-                    "message": "실행 중인 작업은 취소할 수 없습니다",
-                },
+        if job.get("status") in ACTIVE_RUN_STATUSES:
+            now = datetime.now().isoformat()
+            job.update(
+                status="terminating",
+                cancel_requested=True,
+                termination_reason="cancel_requested",
+                terminating_at=now,
+                updated_at=now,
+                last_line="취소 요청됨: 프로세스 그룹 종료 중",
             )
-        # queued → remove from active_jobs; deque keeps a tombstone that dispatch will skip
-        active_jobs.pop(run_id, None)
+            _persist_active_jobs_locked()
+            should_kill = True
+        elif job.get("status") == "queued":
+            # queued → remove from active_jobs; deque keeps a tombstone that dispatch will skip
+            active_jobs.pop(run_id, None)
+            _persist_active_jobs_locked()
+        else:
+            active_jobs.pop(run_id, None)
+            _persist_active_jobs_locked()
+    if should_kill:
+        await asyncio.to_thread(_terminate_run_id_sync, run_id, "cancel_requested")
+        return {"status": "terminating", "run_id": run_id}
     return {"status": "cancelled", "run_id": run_id}
 
 
@@ -1499,6 +1535,292 @@ async def set_config(body: ConfigBody):
     return {"status": "ok", **changes}
 
 
+@app.get("/diagnostics/runtime")
+async def diagnostics_runtime():
+    active_ids = _active_run_ids()
+    snapshot = await asyncio.to_thread(_holyclaude_process_snapshot)
+    proxy = await asyncio.to_thread(_claude_mem_proxy_health)
+    return {
+        "active_run_ids": active_ids,
+        "active_count": len(active_ids),
+        "processes": snapshot,
+        "claude_mem_proxy": proxy,
+    }
+
+
+def _env_int(name: str, fallback: int) -> int:
+    try:
+        value = int(os.getenv(name, ""))
+    except ValueError:
+        return fallback
+    return value if value >= 0 else fallback
+
+
+def _pipeline_limits(pipeline: str) -> tuple[int, int]:
+    default_wall, default_idle = PIPELINE_TIMEOUT_DEFAULTS.get(pipeline, PIPELINE_TIMEOUT_DEFAULTS["p1"])
+    key = pipeline.upper()
+    wall = _env_int(f"ADMIN_{key}_WALL_TIMEOUT_SECONDS", _env_int("ADMIN_WALL_TIMEOUT_SECONDS", default_wall))
+    idle = _env_int(f"ADMIN_{key}_IDLE_TIMEOUT_SECONDS", _env_int("ADMIN_IDLE_TIMEOUT_SECONDS", default_idle))
+    return wall, idle
+
+
+def _future_iso(seconds: int, *, base: float | None = None) -> str:
+    return datetime.fromtimestamp((base if base is not None else time.time()) + seconds).isoformat()
+
+
+def _parse_dt(value) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value))
+    except ValueError:
+        return None
+
+
+def _seconds_since(value) -> int | None:
+    dt = _parse_dt(value)
+    if dt is None:
+        return None
+    return max(0, int((datetime.now() - dt).total_seconds()))
+
+
+def _seconds_until(value) -> int | None:
+    dt = _parse_dt(value)
+    if dt is None:
+        return None
+    return int((dt - datetime.now()).total_seconds())
+
+
+def _running_job_fields(pipeline: str, started_at: str) -> dict:
+    wall_timeout, idle_timeout = _pipeline_limits(pipeline)
+    now_ts = time.time()
+    return {
+        "wall_timeout_seconds": wall_timeout,
+        "idle_timeout_seconds": idle_timeout,
+        "deadline_at": _future_iso(wall_timeout, base=now_ts),
+        "idle_deadline_at": _future_iso(idle_timeout, base=now_ts),
+        "last_output_at": started_at,
+        "cancel_requested": False,
+    }
+
+
+def _public_job(job: dict, queue_position: int | None = None) -> dict:
+    item = dict(job)
+    if queue_position is not None:
+        item["queue_position"] = queue_position
+    item["duration_seconds"] = _seconds_since(item.get("started_at"))
+    item["queued_seconds"] = _seconds_since(item.get("queued_at"))
+    item["last_output_age_seconds"] = _seconds_since(item.get("last_output_at") or item.get("updated_at"))
+    item["wall_deadline_in_seconds"] = _seconds_until(item.get("deadline_at"))
+    item["idle_deadline_in_seconds"] = _seconds_until(item.get("idle_deadline_at"))
+    return item
+
+
+def _active_status_count_locked() -> int:
+    return sum(1 for job in active_jobs.values() if job.get("status") in ACTIVE_RUN_STATUSES)
+
+
+def _active_run_ids() -> list[str]:
+    with active_jobs_lock:
+        return [
+            run_id
+            for run_id, job in active_jobs.items()
+            if job.get("status") in ACTIVE_RUN_STATUSES
+        ]
+
+
+def _persist_active_jobs_locked() -> None:
+    data = {
+        "updated_at": datetime.now().isoformat(),
+        "active_jobs": active_jobs,
+        "run_queue": list(run_queue),
+    }
+    try:
+        ACTIVE_RUNS_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = ACTIVE_RUNS_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(ACTIVE_RUNS_STATE)
+    except Exception as exc:
+        print(f"[admin] active-runs persist failed: {exc}", flush=True)
+
+
+def _load_active_jobs_state() -> dict:
+    try:
+        return json.loads(ACTIVE_RUNS_STATE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+    except Exception as exc:
+        print(f"[admin] active-runs load failed: {exc}", flush=True)
+        return {}
+
+
+def _reconcile_persisted_active_runs() -> None:
+    state = _load_active_jobs_state()
+    stale_jobs = [
+        job
+        for job in (state.get("active_jobs") or {}).values()
+        if isinstance(job, dict) and job.get("status") in ACTIVE_RUN_STATUSES
+    ]
+    for job in stale_jobs:
+        run_id = job.get("run_id")
+        if not run_id:
+            continue
+        _terminate_run_id_sync(run_id, "admin_startup_reconcile")
+        try:
+            _save_run(
+                _run_error_log(
+                    job.get("pipeline") or "p?",
+                    run_id,
+                    job.get("started_at") or datetime.now().isoformat(),
+                    "admin 재시작으로 이전 active run을 실패 처리하고 프로세스 그룹을 정리했습니다",
+                )
+            )
+        except Exception as exc:
+            print(f"[admin] failed to save reconciled run {run_id}: {exc}", flush=True)
+    with active_jobs_lock:
+        active_jobs.clear()
+        run_queue.clear()
+        _persist_active_jobs_locked()
+    _reclaim_stale_reservations([])
+
+
+async def _runtime_reaper_loop() -> None:
+    while True:
+        await asyncio.sleep(ADMIN_REAPER_INTERVAL_SECONDS)
+        try:
+            await asyncio.to_thread(_runtime_reaper_once)
+        except Exception as exc:
+            print(f"[admin] runtime reaper failed: {exc}", flush=True)
+
+
+def _runtime_reaper_once() -> None:
+    active_ids = _active_run_ids()
+    for run_id in active_ids:
+        reason = _watchdog_reason(run_id)
+        if reason and reason != "cancel_requested":
+            _mark_terminating(run_id, reason)
+            _terminate_run_id_sync(run_id, reason)
+    _reclaim_stale_reservations(active_ids)
+
+
+def _watchdog_reason(run_id: str) -> str | None:
+    with active_jobs_lock:
+        job = active_jobs.get(run_id)
+        if not job or job.get("status") not in ACTIVE_RUN_STATUSES:
+            return None
+        if job.get("cancel_requested"):
+            return "cancel_requested"
+        now = datetime.now()
+        wall_deadline = _parse_dt(job.get("deadline_at"))
+        if wall_deadline and now >= wall_deadline:
+            return "wall_timeout"
+        idle_deadline = _parse_dt(job.get("idle_deadline_at"))
+        if idle_deadline and now >= idle_deadline:
+            return "idle_timeout"
+    return None
+
+
+def _mark_terminating(run_id: str, reason: str) -> None:
+    now = datetime.now().isoformat()
+    with active_jobs_lock:
+        job = active_jobs.get(run_id)
+        if not job:
+            return
+        job.update(
+            status="terminating",
+            termination_reason=reason,
+            terminating_at=job.get("terminating_at") or now,
+            updated_at=now,
+            last_line=f"{reason}: 프로세스 그룹 종료 중",
+        )
+        if reason == "cancel_requested":
+            job["cancel_requested"] = True
+        _persist_active_jobs_locked()
+
+
+def _get_holyclaude_container():
+    import docker as docker_sdk
+
+    client = docker_sdk.from_env()
+    return client.containers.get(HOLYCLAUDE_CONTAINER)
+
+
+def _terminate_run_id_sync(run_id: str, reason: str) -> None:
+    try:
+        container = _get_holyclaude_container()
+        _terminate_run_process_group(container, run_id, reason)
+    except Exception as exc:
+        print(f"[admin] terminate failed for run {run_id}: {exc}", flush=True)
+
+
+def _terminate_run_process_group(container, run_id: str, reason: str) -> None:
+    marker = f"{RUN_MARKER_DIR}/{run_id}.pgid"
+    pattern = f"--run-id {run_id}"
+    script = f"""
+set +e
+marker={shlex.quote(marker)}
+reason={shlex.quote(reason)}
+pgid="$(cat "$marker" 2>/dev/null || true)"
+case "$pgid" in
+  ""|*[!0-9]*|1) pgid="" ;;
+esac
+if [ -n "$pgid" ]; then
+  echo "[admin] terminating run {shlex.quote(run_id)} pgid=$pgid reason=$reason" >&2
+  kill -TERM -- "-$pgid" 2>/dev/null || true
+  sleep {ADMIN_TERMINATE_GRACE_SECONDS}
+  kill -KILL -- "-$pgid" 2>/dev/null || true
+  rm -f "$marker"
+else
+  echo "[admin] no pgid marker for run {shlex.quote(run_id)}, using pkill fallback reason=$reason" >&2
+  pkill -TERM -f -- {shlex.quote(pattern)} 2>/dev/null || true
+  sleep {ADMIN_TERMINATE_GRACE_SECONDS}
+  pkill -KILL -f -- {shlex.quote(pattern)} 2>/dev/null || true
+fi
+"""
+    container.exec_run(["bash", "-lc", script], user="root", workdir="/workspace")
+
+
+def _reclaim_stale_reservations(active_ids: list[str]) -> None:
+    active_csv = ",".join(active_ids)
+    command = (
+        "cd /workspace && "
+        f"node scripts/p6_demand_queue.mjs reclaim-stale --active-run-ids {shlex.quote(active_csv)} >/tmp/p6-reclaim.json 2>/tmp/p6-reclaim.err || true; "
+        f"node scripts/wiki_work_registry.mjs reconcile --active-run-ids {shlex.quote(active_csv)} >/tmp/registry-reconcile.json 2>/tmp/registry-reconcile.err || true"
+    )
+    try:
+        container = _get_holyclaude_container()
+        container.exec_run(["bash", "-lc", command], user="root", workdir="/workspace")
+    except Exception as exc:
+        print(f"[admin] stale reservation reclaim failed: {exc}", flush=True)
+
+
+def _holyclaude_process_snapshot() -> dict:
+    try:
+        container = _get_holyclaude_container()
+        result = container.exec_run(
+            ["bash", "-lc", "ps -eo pid,ppid,pgid,stat,etime,cmd | grep -E 'run_holyclaude_pipeline|claude|claude-mem' | grep -v grep | head -80"],
+            user="root",
+            workdir="/workspace",
+        )
+        output = result.output.decode("utf-8", errors="replace") if isinstance(result.output, bytes) else str(result.output)
+        return {"status": "ok", "exit_code": result.exit_code, "output": output}
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}
+
+
+def _claude_mem_proxy_health() -> dict:
+    import urllib.error
+    import urllib.request
+
+    url = os.getenv("CLAUDE_MEM_PROXY_HEALTH_URL", "http://holyclaude:37701/health")
+    try:
+        with urllib.request.urlopen(url, timeout=2) as response:
+            data = response.read(16_384).decode("utf-8", errors="replace")
+        return json.loads(data)
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
+        return {"status": "error", "url": url, "error": str(exc)}
+
+
 @app.get("/status")
 async def get_status():
     return await asyncio.to_thread(_status_response)
@@ -1587,7 +1909,7 @@ def _start_active_job(pipeline: str, last_line: str, user_instruction: str | Non
     now = datetime.now().isoformat()
     run_id = str(uuid.uuid4())[:8]
     with active_jobs_lock:
-        running_count = sum(1 for j in active_jobs.values() if j.get("status") == "running")
+        running_count = _active_status_count_locked()
         if running_count < MAX_CONCURRENT_RUNS:
             status = "running"
             started_at = now
@@ -1599,6 +1921,7 @@ def _start_active_job(pipeline: str, last_line: str, user_instruction: str | Non
                 "last_line": last_line,
                 "user_instruction": instruction,
                 "updated_at": started_at,
+                **_running_job_fields(pipeline, started_at),
             }
         else:
             status = "queued"
@@ -1614,6 +1937,7 @@ def _start_active_job(pipeline: str, last_line: str, user_instruction: str | Non
                 "updated_at": now,
             }
             run_queue.append(run_id)
+        _persist_active_jobs_locked()
         return run_id, started_at, status
 
 
@@ -1639,11 +1963,13 @@ def _update_active_job(run_id: str, **values) -> None:
     with active_jobs_lock:
         if run_id in active_jobs:
             active_jobs[run_id].update(values)
+            _persist_active_jobs_locked()
 
 
 def _pop_active_job(run_id: str) -> None:
     with active_jobs_lock:
         active_jobs.pop(run_id, None)
+        _persist_active_jobs_locked()
     _dispatch_next_job()
 
 
@@ -1658,7 +1984,7 @@ def _dispatch_next_job() -> None:
     with active_jobs_lock:
         while run_queue:
             running_count = (
-                sum(1 for j in active_jobs.values() if j.get("status") == "running")
+                _active_status_count_locked()
                 + len(to_start)
             )
             if running_count >= MAX_CONCURRENT_RUNS:
@@ -1669,8 +1995,14 @@ def _dispatch_next_job() -> None:
                 continue  # tombstone / unexpected state
             pipeline = job.get("pipeline")
             started_at = datetime.now().isoformat()
-            job.update(status="running", started_at=started_at, updated_at=started_at)
+            job.update(
+                status="running",
+                started_at=started_at,
+                updated_at=started_at,
+                **_running_job_fields(pipeline, started_at),
+            )
             to_start.append((pipeline, rid, started_at))
+        _persist_active_jobs_locked()
     for pipeline, rid, started_at in to_start:
         if pipeline == "p1":
             asyncio.create_task(_run_p1(rid, started_at))
@@ -1722,14 +2054,31 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
     inner = f"cd /workspace && node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
     if instruction:
         inner += f" --instruction {shlex.quote(instruction)}"
+    marker = f"{RUN_MARKER_DIR}/{run_id}.pgid"
+    group_script = (
+        f"echo $$ > {shlex.quote(marker)}; "
+        f"trap 'rm -f {shlex.quote(marker)}' EXIT; "
+        f"set -o pipefail; "
+        f"su claude -s /bin/sh -c {shlex.quote(inner)} 2>&1 | tee /proc/1/fd/1"
+    )
     command = [
         "bash",
         "-lc",
-        f"set -o pipefail; su claude -s /bin/sh -c {shlex.quote(inner)} 2>&1 | tee /proc/1/fd/1",
+        f"mkdir -p {shlex.quote(RUN_MARKER_DIR)}; setsid bash -lc {shlex.quote(group_script)}",
     ]
 
-    _update_active_job(run_id, last_line=f"docker exec {HOLYCLAUDE_CONTAINER}")
+    _update_active_job(
+        run_id,
+        last_line=f"docker exec {HOLYCLAUDE_CONTAINER}",
+        process_group_marker=marker,
+        updated_at=datetime.now().isoformat(),
+    )
     output: list[str] = []
+    idle_timeout = _pipeline_limits(pipeline)[1]
+    exec_id = None
+    termination_reason = None
+    termination_started = None
+    stream_error = None
     try:
         exec_id = client.api.exec_create(
             container.id,
@@ -1739,17 +2088,79 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
             stdout=True,
             stderr=True,
         )["Id"]
+        _update_active_job(
+            run_id,
+            exec_id=exec_id,
+            last_line=f"exec_id={exec_id}",
+            updated_at=datetime.now().isoformat(),
+        )
         stream = client.api.exec_start(exec_id, stream=True, demux=False)
-        for chunk in stream:
-            text = _ANSI.sub("", chunk.decode("utf-8", errors="replace"))
-            output.append(text)
-            for line in text.splitlines():
-                if line.strip():
+        events: queue.Queue[tuple[str, object]] = queue.Queue()
+
+        def read_stream() -> None:
+            try:
+                for chunk in stream:
+                    events.put(("chunk", chunk))
+            except Exception as exc:
+                events.put(("error", exc))
+            finally:
+                events.put(("done", None))
+
+        reader = threading.Thread(target=read_stream, name=f"run-stream-{run_id}", daemon=True)
+        reader.start()
+
+        while True:
+            try:
+                kind, payload = events.get(timeout=1)
+            except queue.Empty:
+                reason = _watchdog_reason(run_id)
+                if reason and termination_reason is None:
+                    termination_reason = reason
+                    termination_started = time.monotonic()
+                    _mark_terminating(run_id, reason)
+                    _terminate_run_process_group(container, run_id, reason)
+                if (
+                    termination_reason
+                    and termination_started
+                    and time.monotonic() - termination_started > ADMIN_TERMINATE_GRACE_SECONDS + 10
+                ):
+                    output.append(
+                        f"\n[admin] terminate grace exceeded for run {run_id} reason={termination_reason}\n"
+                    )
+                    break
+                continue
+
+            if kind == "chunk":
+                chunk = payload if isinstance(payload, bytes) else bytes(payload or b"")
+                text = _ANSI.sub("", chunk.decode("utf-8", errors="replace"))
+                output.append(text)
+                last_line = None
+                for line in text.splitlines():
+                    if line.strip():
+                        last_line = line[-300:]
+                if last_line is not None:
+                    now_iso = datetime.now().isoformat()
                     _update_active_job(
                         run_id,
-                        last_line=line[-300:],
-                        updated_at=datetime.now().isoformat(),
+                        last_line=last_line,
+                        updated_at=now_iso,
+                        last_output_at=now_iso,
+                        idle_deadline_at=_future_iso(idle_timeout),
                     )
+                continue
+
+            if kind == "error":
+                stream_error = payload
+                output.append(f"\n[admin] docker stream error: {payload}\n")
+                continue
+
+            if kind == "done":
+                break
+
+        if termination_reason is None:
+            with active_jobs_lock:
+                job = active_jobs.get(run_id) or {}
+                termination_reason = job.get("termination_reason")
 
         inspect = client.api.exec_inspect(exec_id)
         exit_code = inspect.get("ExitCode")
@@ -1758,21 +2169,39 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
 
     stdout_tail = _tail_text("".join(output), RUN_OUTPUT_LIMIT)
     completed_at = datetime.now().isoformat()
-    ok = exit_code == 0
+    ok = exit_code == 0 and not termination_reason and stream_error is None
+    if termination_reason == "cancel_requested":
+        status = "cancelled"
+        message = "파이프라인 실행 취소됨"
+        errors = ["cancel_requested"]
+    elif termination_reason:
+        status = "failed"
+        message = f"파이프라인 실행 실패: {termination_reason}"
+        errors = [termination_reason]
+    elif stream_error is not None:
+        status = "failed"
+        message = f"파이프라인 실행 실패: docker stream error ({stream_error})"
+        errors = [str(stream_error)]
+    else:
+        status = "completed" if ok else "failed"
+        message = _pipeline_message(pipeline, ok)
+        errors = [] if ok else [f"holyclaude exit_code={exit_code}"]
     log = {
         "run_id": run_id,
         "pipeline": pipeline,
         "timestamp": completed_at,
         "started_at": started_at,
         "completed_at": completed_at,
-        "status": "completed" if ok else "failed",
-        "message": _pipeline_message(pipeline, ok),
+        "status": status,
+        "message": message,
         "user_instruction": instruction,
         "container": HOLYCLAUDE_CONTAINER,
+        "exec_id": exec_id,
+        "termination_reason": termination_reason,
         "exit_code": exit_code,
         "processed": 1 if ok else 0,
         "skipped": 0,
-        "errors": [] if ok else [f"holyclaude exit_code={exit_code}"],
+        "errors": errors,
         "stdout_tail": stdout_tail,
     }
     if pipeline == "p2":
