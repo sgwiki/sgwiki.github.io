@@ -25,6 +25,8 @@ import sys
 
 # 인라인 링크 [text](href) — 이미지 ![..]는 선행 ! 제외
 LINK_RE = re.compile(r'(?<!\!)\[([^\]]+)\]\(([^)]+)\)')
+# 이미지 링크 ![alt](href) — href = group 1
+IMAGE_RE = re.compile(r'!\[[^\]]*\]\(([^)]+)\)')
 # Obsidian 위키링크 [[...]]
 WIKILINK_RE = re.compile(r'\[\[[^\]]+\]\]')
 # 각주 정의 라인 [^id]: ...
@@ -70,8 +72,12 @@ def classify_href(href: str, file_dir: str, index: dict[str, list[str]]):
         return 'external', {'href': href}
     if base.startswith('mailto:'):
         return 'ok', None
+    if base.startswith('/'):
+        return 'ok', None          # 절대 사이트 경로(예: /maps/anime/) — 유효
+    if base.endswith('/'):
+        return 'ok', None          # 디렉토리/섹션 링크(예: ../애니메이션-에피소드/steins-gate/) — 유효
     if not base.endswith('.md'):
-        # .md 가 아닌 내부 참조(디렉토리·확장자 누락 등) — 정밀 검사 대상
+        # .md 가 아닌 내부 참조(확장자 누락 등) — 정밀 검사 대상
         return 'suspicious', {'why': 'non-md-internal', 'href': href}
 
     resolved = os.path.normpath(os.path.join(file_dir, base))
@@ -145,6 +151,13 @@ def lint_file(path: str, index: dict[str, list[str]], apply: bool):
             continue
         recognized_spans: list[tuple[int, int]] = []
         events: list[tuple[int, int, str, str]] = []  # (start, end, oldtoken, newtoken)
+
+        # 이미지 링크 ![alt](href) — 인식만 하고 debris 오탐 방지(외부 URL은 목록화)
+        for m in IMAGE_RE.finditer(line):
+            recognized_spans.append((m.start(), m.end()))
+            href = m.group(1)
+            if href.strip().startswith('http://') or href.strip().startswith('https://'):
+                report['external'].append({'line': lineno, 'href': href.strip()})
 
         for m in LINK_RE.finditer(line):
             text, href = m.group(1), m.group(2)

@@ -104,7 +104,8 @@ class LinkLintTest(unittest.TestCase):
         self.assertTrue(any('소괄호 누락' in w for w in whys))
 
     def test_suspicious_non_md_internal(self):
-        r, _ = self._lint('[맵](/maps/anime/)\n')
+        # 절대경로(/)·디렉토리(/끝)가 아닌, 확장자 없는 상대 내부 참조만 의심
+        r, _ = self._lint('[x](../lore/bar)\n')
         whys = [s['why'] for s in r['suspicious']]
         self.assertTrue(any('non-md' in w for w in whys))
 
@@ -119,6 +120,21 @@ class LinkLintTest(unittest.TestCase):
     def test_no_false_positive_date_bracket(self):
         r, _ = self._lint('[베타 세계선: 크리스 사망 (7/28)] 항목\n')
         self.assertEqual(r['summary']['suspicious'], 0)
+
+    def test_no_false_positive_image(self):
+        r, _ = self._lint('![figure](https://i.imgur.com/abc.jpeg) 설명\n')
+        self.assertEqual(r['summary']['suspicious'], 0)
+        self.assertEqual(r['summary']['external'], 1)
+
+    def test_ok_absolute_site_path(self):
+        r, _ = self._lint('[맵](/maps/anime/){: .md-button }\n')
+        self.assertEqual(r['summary']['suspicious'], 0)
+        self.assertEqual(r['summary']['ok'], 1)
+
+    def test_ok_directory_link(self):
+        r, _ = self._lint('[목록](../애니메이션-에피소드/steins-gate/)\n')
+        self.assertEqual(r['summary']['suspicious'], 0)
+        self.assertEqual(r['summary']['ok'], 1)
 
     def test_no_false_positive_code_fence(self):
         body = '```js\ndocument.getElementById("x").addEventListener("submit", fn(\n```\n정상 문장\n'
