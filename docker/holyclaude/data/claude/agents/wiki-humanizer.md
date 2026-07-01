@@ -21,6 +21,26 @@ P5/P6 batch 세션은 user settings 전체를 로드하지 않으므로, `run_ho
 - 플러그인은 `author-context.yaml`(sg-wiki 보이스 프로파일)을 자동 로드합니다. 합니다체 유지, 인용 블록·스포일러 배지·내부 식별자 불변 규칙이 이 프로파일에 정의돼 있습니다.
 - 플러그인이 설치돼 있지 않거나(`/humanize` 미인식) 실행이 실패하면, 파일을 수정하지 말고 `changed: false` + `error` 사유로 보고합니다. 억지로 수동 교정하지 마세요.
 
+## 보호 블록 가드
+
+Humanize KR 플러그인이 인용 블록을 건드리는 경우가 반복 관측되었습니다. `/humanize --strict` 실행 전후로 직접 가드하세요.
+
+```bash
+cp wiki/{category}/{slug}.md /tmp/wiki-humanizer-before-{slug}.md
+grep '^>' /tmp/wiki-humanizer-before-{slug}.md > /tmp/wiki-humanizer-before-{slug}.blockquote || true
+```
+
+`/humanize --strict` 실행 후:
+
+```bash
+grep '^>' wiki/{category}/{slug}.md > /tmp/wiki-humanizer-after-{slug}.blockquote || true
+diff -u /tmp/wiki-humanizer-before-{slug}.blockquote /tmp/wiki-humanizer-after-{slug}.blockquote
+```
+
+- diff가 있으면 protected blockquote 위반입니다. 즉시 `cp /tmp/wiki-humanizer-before-{slug}.md wiki/{category}/{slug}.md`로 humanize 변경을 되돌리고, `changed: false` + `error: "humanize changed protected blockquote; restored"`로 보고하세요.
+- 인용 블록 안의 볼드(`> **[공식]**`, `> **[팬 분석]**`, `> **소속:**`), 따옴표, 쉼표, 조사 하나도 바꾸면 실패입니다.
+- 이 error는 플러그인 실행 실패와 동일하게 취급합니다. 수동으로 대체 humanize를 하지 마세요.
+
 ## 금지 (wiki-rewriter 금지 블록 상속)
 
 - 사실 관계(인물, 사건, 날짜, 세계선 수치 `1.048596` 등) 변경
@@ -40,8 +60,10 @@ P5/P6 batch 세션은 user settings 전체를 로드하지 않으므로, `run_ho
 ## 작업 순서
 
 1. 파일 읽기 (전/후 카테고리 변화 리포트 기준선 확보)
-2. `/humanize --strict wiki/{category}/{slug}.md` 실행 → 결과를 원본 파일에 반영
-3. 변경 여부와 카테고리별 변경 수를 팀장에게 JSON으로 보고
+2. 보호 블록 가드용 스냅샷과 인용 블록 목록 생성
+3. `/humanize --strict wiki/{category}/{slug}.md` 실행 → 결과를 원본 파일에 반영
+4. 인용 블록 목록을 diff로 비교. 차이가 있으면 humanize 변경을 즉시 원복하고 error 보고
+5. 변경 여부와 카테고리별 변경 수를 팀장에게 JSON으로 보고
 
 ## 출력 형식
 
@@ -77,5 +99,15 @@ P5/P6 batch 세션은 user settings 전체를 로드하지 않으므로, `run_ho
   "mode": "strict",
   "changed": false,
   "error": "humanize skill unavailable"
+}
+```
+
+**보호 블록 위반(원복 완료):**
+```json
+{
+  "file": "wiki/lore/foo.md",
+  "mode": "strict",
+  "changed": false,
+  "error": "humanize changed protected blockquote; restored"
 }
 ```

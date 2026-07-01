@@ -90,6 +90,7 @@ cp wiki/{category}/{slug}.md /tmp/humanize-before-{slug}.md
 
 - wiki-humanizer는 Humanize KR 플러그인의 `/humanize --strict`를 실행하고 카테고리별 변경 수를 JSON으로 보고한다.
 - 플러그인 미설치·실행 실패(`error`)이면 문체 제거 없이 다음 단계로 진행한다(파이프라인 중단 사유 아님).
+- wiki-humanizer가 `humanize changed protected blockquote; restored`를 보고하면 humanize 변경은 이미 원복된 상태다. restructurer/rewriter 변경은 유지한 채 source-sanitizer와 fact guard를 계속 진행하되, 해당 파일은 humanize_coverage에 mark하지 않는다.
 
 ### ⑤ source-sanitizer
 
@@ -147,7 +148,7 @@ git push
 # 성공
 node /workspace/scripts/wiki_work_registry.mjs complete --run-id "$RUN_ID" --file wiki/{category}/{slug}.md
 
-# humanize가 error 없이 실행되고 humanize_fact_guard까지 통과한 파일은 commit/push 후 백필 표식 기록
+# humanize가 error 없이 실행되고 humanize_fact_guard까지 통과한 파일만 commit/push 후 백필 표식 기록
 node /workspace/scripts/humanize_coverage.mjs mark --run-id "$RUN_ID" --file wiki/{category}/{slug}.md
 
 # 실패·건너뜀
