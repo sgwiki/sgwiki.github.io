@@ -30,6 +30,7 @@ P5·P6의 `wiki-humanizer` 에이전트가 쓰는 한국어 AI-문체 제거 플
 
 - **부트스트랩**: `scripts/humanize-bootstrap.sh`가 `entrypoint-cmem.sh`에서 claude-mem 부트스트랩과 함께 base entrypoint **전에** 순차 실행된다. **매 부팅마다 marketplace update + plugin install로 최신 버전을 refresh**(자동 추종)하고, 실패 시 warn 후 exit 0으로 부팅을 막지 않는다(기존 버전 유지).
 - **sentinel/persist**: sentinel(`~/.claude/plugins/.humanize-installed`)은 최초 설치 표식으로만 쓰고 업데이트는 sentinel과 무관하게 실행. 플러그인은 bind-mount된 `~/.claude/plugins/`에 설치되므로 재빌드 후에도 persist(별도 볼륨 불필요).
+- **Batch slash command 등록**: P5/P6 batch는 user settings 전체를 로드하지 않는다(`settingSources=project,local`). `scripts/run_holyclaude_pipeline.mjs`가 `HUMANIZE_PLUGIN_DIR`(기본 `~/.claude/plugins/cache/im-not-ai/humanize-korean/1.5.0`)을 SDK local plugin으로 주입해 `/humanize` slash command를 등록한다.
 - **버전 pin**: `HUMANIZE_PLUGIN_REF` env를 설정하면 최신 추종 대신 특정 버전으로 고정(upstream 회귀 임시 격리).
 - **보이스 프로파일**: `data/claude/author-context.yaml`은 sg-wiki 보이스 계약(합니다체·인용 블록/스포일러 배지/내부 식별자 불변·고유명사 화이트리스트)이다. upstream v1.5 fast path의 자동 로드는 보장하지 않으므로, 에이전트 지침과 결정적 가드를 함께 유지한다.
 - **사실 불변 가드**: `/workspace/scripts/humanize_fact_guard.py`가 humanize 전/후 숫자·인용·스포일러 동일성을 결정적으로 검증. 위반 시 파일 되돌림·미커밋. P5 백필 완료 표식은 `/workspace/scripts/humanize_coverage.mjs`가 `.admin/humanize-coverage.json`에 기록한다.

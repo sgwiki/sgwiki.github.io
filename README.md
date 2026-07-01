@@ -152,6 +152,7 @@ make shell           # 컨테이너 bash 접속
 `sg-wiki-holyclaude` 컨테이너에 [Humanize KR](https://github.com/epoko77-ai/im-not-ai)(`humanize-korean@im-not-ai`, MIT) 플러그인이 설치돼 있습니다. P5·P6의 `wiki-humanizer` 에이전트가 `/humanize --strict`로 한국어 AI 작성 흔적(번역투·헤징·형식명사·기계적 리듬)을 사실 불변으로 제거합니다.
 
 - **부트스트랩(최신 자동 추종)**: `docker/holyclaude/scripts/humanize-bootstrap.sh`가 claude-mem 부트스트랩과 동일하게 entrypoint에 체인되어 **매 부팅마다 marketplace update + plugin install로 최신 버전을 refresh**합니다. sentinel(`~/.claude/plugins/.humanize-installed`)은 최초 설치 표식으로만 쓰고 업데이트는 sentinel과 무관하게 실행합니다. 네트워크/설치 실패 시 warn 후 exit 0으로 부팅을 막지 않으며(기존 버전 유지), 플러그인은 bind-mount된 `~/.claude/plugins/`에 설치되어 재빌드 후에도 persist합니다.
+- **Batch slash command 등록**: P1~P6 batch 실행은 user hooks 차단을 위해 기본적으로 `settingSources=project,local`만 사용합니다. 따라서 P5/P6는 `scripts/run_holyclaude_pipeline.mjs`가 `HUMANIZE_PLUGIN_DIR`(기본 `~/.claude/plugins/cache/im-not-ai/humanize-korean/1.5.0`)을 SDK local plugin으로 명시 주입해 `/humanize` slash command를 등록합니다.
 - **버전 pin**: `HUMANIZE_PLUGIN_REF` 환경변수를 설정하면 최신 자동 추종 대신 특정 버전으로 고정합니다(upstream 파괴적 변경 임시 격리용). 비워두면 최신을 따릅니다.
 - **보이스 프로파일**: `docker/holyclaude/data/claude/author-context.yaml`이 sg-wiki 문체 규칙(합니다체 유지, 인용 블록 `> **[공식]**`/`> **[팬 분석]**`/`> **[심층]**` 불변, 스포일러 배지 불변, 내부 식별자 미삽입, 고유명사 화이트리스트)을 정의합니다. upstream v1.5 fast path에서는 자동 로드가 보장되지 않으므로, deterministic safety는 아래 가드와 팀장 diff가 담당합니다.
 - **사실 불변 가드**: humanize 전/후의 숫자 토큰·인용 블록 텍스트·frontmatter `spoiler` 동일성은 `scripts/humanize_fact_guard.py`가 결정적으로 검증하며, 위반 시 해당 파일은 되돌려지고 커밋되지 않습니다.

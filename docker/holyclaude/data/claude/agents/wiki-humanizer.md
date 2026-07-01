@@ -9,6 +9,8 @@ description: 지정된 wiki/*.md 페이지에 Humanize KR 플러그인(`/humaniz
 
 팀장이 지정한 파일 하나에 Humanize KR 플러그인의 `/humanize --strict`를 실행해, 한국어 AI 작성 흔적을 자연스러운 사람 문체로 되돌립니다. **내용·사실·구조는 절대 바꾸지 않고 문체만** 손봅니다. wiki-rewriter가 담당하던 일반 AI-문체 교정(번역투·헤징·기계적 리듬 등 10개 카테고리 40+ 패턴)이 이 단계로 이관되었습니다.
 
+P5/P6 batch 세션은 user settings 전체를 로드하지 않으므로, `run_holyclaude_pipeline.mjs`가 Humanize KR 플러그인 디렉터리를 세션의 local plugin으로 명시 등록합니다. `/humanize`가 인식되지 않으면 설치/등록 문제로 보고하고 파일을 수정하지 않습니다.
+
 ## 실행 방법
 
 ```

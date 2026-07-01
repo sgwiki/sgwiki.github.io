@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 const SDK_PATH =
@@ -8,6 +9,8 @@ const SDK_PATH =
 
 const DEFAULT_CWD = '/workspace';
 const DEFAULT_MODEL = 'glm-5.2';
+const HUMANIZE_PLUGIN_DIR =
+  process.env.HUMANIZE_PLUGIN_DIR || '/home/claude/.claude/plugins/cache/im-not-ai/humanize-korean/1.5.0';
 const REQUIRED_MCP_SERVERS = ['dataforge', 'namuwiki', 'sg-ontology'];
 const REQUIRED_MCP_COVERAGE = [
   {
@@ -711,6 +714,16 @@ function missingConfiguredMcpServers(mcpServers) {
   return REQUIRED_MCP_SERVERS.filter((name) => !Object.hasOwn(mcpServers, name));
 }
 
+function pluginDirsForPipeline(command) {
+  if (!['p5', 'p6'].includes(command)) {
+    return [];
+  }
+  if (!HUMANIZE_PLUGIN_DIR || !existsSync(HUMANIZE_PLUGIN_DIR)) {
+    return [];
+  }
+  return [{ type: 'local', path: HUMANIZE_PLUGIN_DIR }];
+}
+
 // 파이프라인 6 구조화 리포트 검증. 팀장이 commit 전 산출한 후보별 리포트의
 // 필수 필드·게이트 결과를 확인한다. 리포트가 없으면(처리 후보 0건 등) 경고만 하고
 // 실패시키지 않는다. 리포트가 있으면 각 후보가 게이트를 통과했는지 강제한다.
@@ -815,6 +828,12 @@ async function main() {
   console.log(`[${args.command}:${args.runId}] starting holyclaude pipeline`);
   console.log(`[${args.command}:${args.runId}] cwd=${DEFAULT_CWD}`);
   console.log(`[${args.command}:${args.runId}] settingSources=${settingSources.join(',')}`);
+  const plugins = pluginDirsForPipeline(args.command);
+  if (plugins.length > 0) {
+    console.log(`[${args.command}:${args.runId}] pluginDirs=${plugins.map((plugin) => plugin.path).join(',')}`);
+  } else if (['p5', 'p6'].includes(args.command)) {
+    console.log(`[${args.command}:${args.runId}] pluginDirs=(none; Humanize KR plugin dir not found)`);
+  }
   console.log(
     `[${args.command}:${args.runId}] mcpServers=${mcpNames.length ? mcpNames.join(',') : '(none configured)'}`,
   );
@@ -846,6 +865,10 @@ async function main() {
       preset: 'claude_code',
     },
   };
+
+  if (plugins.length > 0) {
+    options.plugins = plugins;
+  }
 
   if (mcpNames.length > 0) {
     options.mcpServers = mcpServers;

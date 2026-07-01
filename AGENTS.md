@@ -143,7 +143,7 @@ wiki/*.md 전체 스캔 + humanize_coverage 미처리 우선
 
 - **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
 - **P5 runaway 방지**: 1회 실행은 기본 최대 5개 파일(`ADMIN_P5_MAX_FILES_PER_RUN`)만 처리한다. admin watchdog은 registry 처리 파일 수가 예산을 초과하면 `p5_file_budget_exceeded`로 프로세스 그룹을 종료한다. `/running` 응답은 `p5_files_processed`/`p5_files_active`/`p5_files_total`/`p5_file_budget`을 노출한다.
-- **Humanize KR**: 컨테이너 부팅 시 `docker/holyclaude/scripts/humanize-bootstrap.sh`가 `humanize-korean@im-not-ai` 플러그인을 best-effort로 refresh한다. `docker/holyclaude/data/claude/author-context.yaml`은 sg-wiki 보이스 계약이며, 실제 안전성은 `source-sanitizer`와 `humanize_fact_guard`가 강제한다.
+- **Humanize KR**: 컨테이너 부팅 시 `docker/holyclaude/scripts/humanize-bootstrap.sh`가 `humanize-korean@im-not-ai` 플러그인을 best-effort로 refresh한다. P5/P6 batch는 user settings를 로드하지 않으므로 `scripts/run_holyclaude_pipeline.mjs`가 `HUMANIZE_PLUGIN_DIR`을 SDK local plugin으로 주입해 `/humanize` slash command를 등록한다. `docker/holyclaude/data/claude/author-context.yaml`은 sg-wiki 보이스 계약이며, 실제 안전성은 `source-sanitizer`와 `humanize_fact_guard`가 강제한다.
 - **한자/영한 혼동 정리**: P5 `wiki-rewriter`는 `제0` → `제로` 같은 작품명 표기, 한자 혼입, 번역 누락형 영어/한글 혼동을 검사·교정한다. 작품명·고유 명사·세계관 로어에서 정착한 영어/약어와 한국어 혼용은 유지하되, 한자 자체는 공개 본문에 남기지 않는다.
 
 ### 파이프라인 6 (커뮤니티 큐레이션)
