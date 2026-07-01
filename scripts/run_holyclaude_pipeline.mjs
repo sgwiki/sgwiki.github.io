@@ -56,6 +56,20 @@ const P6_REQUIRED_COVERAGE = [
   },
 ];
 
+// 파이프라인 9 하드 커버리지: 모든 조사 대상에 보편 적용 가능한 3개 항목만 코드로
+// 강제한다(qaset_with_rag/namuwiki/sg-ontology). sg_game_sg0_en/sg_paper/sg_game_sge/
+// fandom_episodes/dc_gallery는 팀장·researcher 보고로 "시도 여부"만 확인한다.
+const P9_REQUIRED_COVERAGE = [
+  {
+    key: 'qaset_with_rag',
+    label: 'dataforge:qaset_with_rag',
+    type: 'dataforge-source',
+    source: 'qaset_with_rag',
+  },
+  { key: 'namuwiki', label: 'namuwiki MCP', type: 'mcp-server' },
+  { key: 'sg_ontology', label: 'sg-ontology MCP', type: 'mcp-server' },
+];
+
 function parseArgs(argv) {
   const args = {
     command: null,
@@ -83,10 +97,10 @@ function parseArgs(argv) {
 
   if (!args.command) {
     throw new Error(
-      'Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5|p6|p7|p8> --run-id <id> [--instruction "text"] [--dry-run]',
+      'Usage: run_holyclaude_pipeline.mjs <p1|p2|p3|p4|p5|p6|p7|p8|p9> --run-id <id> [--instruction "text"] [--dry-run]',
     );
   }
-  if (!['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'].includes(args.command)) {
+  if (!['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9'].includes(args.command)) {
     throw new Error(`Unsupported pipeline: ${args.command}`);
   }
   return args;
@@ -575,6 +589,100 @@ function buildP8Prompt(runId) {
 - 완료 시 처리 파일, detector 후보 수, fact audit 결과, commit hash 또는 미커밋 사유를 보고하세요.`;
 }
 
+function buildP9Prompt(runId) {
+  return `파이프라인 9 - 위키 심층 조사 팀을 지금 실행하세요.
+
+실행 ID: ${runId}
+작업 디렉토리: /workspace
+
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-research-lead.md, wiki-deep-researcher.md, wiki-research-auditor.md, wiki-research-editor.md, source-sanitizer.md, wiki-linker.md, wiki-quality-lead.md, wiki-planner.md, wiki-writer.md 규칙을 준수하세요.
+
+당신은 파이프라인 9의 wiki-research-lead(위키 심층 조사 팀장)입니다.
+
+파이프라인 9는 기존 8개 파이프라인 중 유일하게 기존 wiki/*.md에 이미 적힌 사실을 근거에 따라 직접 정정(correction)할 권한을 가집니다. P5/P8은 사실 변경이 절대 금지고 P6은 정전 페이지 정정이 금지이므로, 이 권한은 파이프라인 9에 한정된 예외입니다. 강력한 권한인 만큼 발견(읽기 전용) → 근거 판정(읽기 전용) → 제한 편집 3단계를 반드시 분리하세요.
+
+대상 선정 우선순위 (D2, 순서대로 확인):
+① 사용자 지정 위키 페이지/주제(추가 사용자 지시가 있으면 그것)
+② 최신 /workspace/.admin/quality-audit-*.json의 warn/fail 페이지
+③ /workspace/.admin/p9-research-log.json 기준 가장 오래 전에 조사된 파일 순차 선택 (로그가 없거나 비어 있으면 wiki/ 전체를 순회 후보로 삼으세요)
+감사 리포트가 없으면(첫 실행 등) 즉시 3순위로 폴백하세요. 이는 정상 동작입니다.
+
+작업 흐름:
+⓪ VOCAB_GUIDE.md를 먼저 숙지하세요.
+① 위 우선순위로 대상 1건(기존 페이지 경로 또는 신규 주제명)을 선정하세요.
+② node /workspace/scripts/wiki_work_registry.mjs list 로 진행 중 파일을 확인해 후보에서 제외하고, reserve로 대상을 점유하세요:
+   node /workspace/scripts/wiki_work_registry.mjs reserve --run-id ${runId} --file wiki/{category}/{slug}.md --topic "p9:research:{slug}"
+   reserve 실패 시 해당 대상은 포기하고 다음 후보를 고르거나 중단하세요.
+③ wiki-deep-researcher 에이전트를 스폰해 대상 1건을 조사시키고 조사 대조 리포트를 받으세요. 이 에이전트는 읽기 전용이며 git/Write를 수행하지 않습니다.
+④ wiki-research-auditor 에이전트를 스폰해 조사 리포트를 판정시키고 approved_items(addition/correction)·new_page_recommendation·verdict를 받으세요. 이 에이전트도 읽기 전용입니다.
+⑤ 팀장이 "APPROVED FINDINGS"/"REJECTED FINDINGS"를 건별로 로그에 남기세요.
+⑥ 판정에 따라 분기하세요:
+   - approved_items(addition/correction)가 있으면 → wiki-research-editor 에이전트에 대상 파일과 approved_items를 전달해 해당 위치에 한해 직접 편집하게 하세요.
+   - new_page_recommendation이 있으면 → 기존 파이프라인 1 경로를 재사용하세요: wiki-planner 스폰 → 팀장 승인(APPROVED PLAN) → wiki-writer 스폰. registry로 중복 작성을 방지하세요.
+   - 둘 다 없으면 → "조사 완료, 반영 사항 없음"을 보고하고 registry release 후 다음 대상으로 진행하거나 종료하세요.
+⑦ source-sanitizer 에이전트로 내부 식별자 누출을 검사하세요. fail이면 editor/writer에 최대 2회까지 재작성을 요청하세요. 2회 초과 fail이면 git checkout으로 되돌리고 registry release.
+⑧ wiki-linker 에이전트(file 모드)로 링크를 직접 검사·교정하세요. 자동 교정 불가 broken_links가 남으면 git checkout으로 되돌리고 registry release.
+⑨ wiki-quality-lead 에이전트(gate 모드)로 검증하세요. FAIL이면 최대 1회 수정 요청.
+⑩ 팀장이 직접 diff를 검토하세요(아래 필수 확인 항목). 통과하면 registry status를 committing으로 갱신.
+⑪ commit/push:
+   git add wiki/{category}/{slug}.md
+   git commit -m "{addition이면 feat, correction이면 fix}(wiki): {slug} 심층 조사 — {요약}"
+   git push
+⑫ /workspace/.admin/p9-research-log.json을 갱신하세요(대상, 조사 시각, run_id, 반영 결과). **반드시 원자적으로 쓰세요**: 임시 파일(예: p9-research-log.json.tmp-${runId})에 갱신된 전체 JSON을 쓴 뒤 원본 경로로 rename하세요. 직접 덮어쓰기(open write truncate)로 갱신하지 마세요 — 동시 실행 중인 다른 파이프라인 9 run과 겹치면 마지막 쓰기가 이전 갱신을 덮어써 손상되거나 갱신 1건이 소실될 수 있습니다(원자적 쓰기는 파일 손상을 막고, 최악의 경우도 "타임스탬프 갱신 1건 소실"로 제한합니다).
+⑬ registry complete(성공) 또는 release(실패/중단)를 호출하고, 처리 결과를 /workspace/.admin/runs/p9-${runId}-report.json 에 누적 저장하세요(아래 리포트 형식).
+
+근거 판정 기준 (addition/correction 이원 게이트 — wiki-research-auditor가 적용, 팀장은 결과를 신뢰하되 diff 검토에서 재확인):
+- addition(누락 보강, 기존 서술과 충돌 없음): 다음 중 1개 이상 충족 — (a) wiki/근거자료/공식 또는 wiki/근거자료/비공식 단일 근거, (b) dataforge 2개 이상 source 일치, (c) dataforge/namuwiki/sg-ontology 중 1개 이상 뒷받침.
+- correction(기존 서술 정정 — 가장 강한 권한, 이 파이프라인에만 있음): 다음 중 1개 이상 충족 — (a) wiki/근거자료/공식/* 직접 근거로 현재 서술과 명백히 모순, (b) 서로 다른 소스 유형 2개 이상(예: dataforge+namuwiki, 또는 서로 다른 dataforge source 2개)이 일치되게 현재 서술과 다른 사실을 뒷받침. addition 기준(c)의 "MCP 1개"만으로는 correction을 승인할 수 없습니다.
+- insufficient: 위 조건 미충족, 근거 상충, 또는 조사가 불충분하면 편집하지 말고 reject 하세요(fail-closed).
+- correction을 addition 기준만으로 승인하는 것은 절대 금지입니다.
+
+MCP 커버리지 게이트 (하드 3종 — 러너가 코드로 강제):
+1. dataforge source_filter/source_names: qaset_with_rag
+2. namuwiki MCP
+3. sg-ontology MCP
+위 3개는 조사 대상 성격과 무관하게 항상 시도·성공시켜야 하는 하드 게이트입니다. 다음 5개는 팀장·researcher 보고로 "시도했는지"만 확인하세요(코드 하드 게이트 없음 — 조사 대상과 무관할 수 있어 하드 게이트화하면 좁은 주제에서 불필요한 실행 차단 위험이 있습니다): dataforge sg_game_sg0_en(파라프레이즈만), dataforge sg_paper, dataforge sg_game_sge(배제 감사 전용, 내용 사용 금지), dataforge fandom_episodes(산문 가공), dataforge dc_gallery(수요/화제 신호 참고용).
+dc_gallery는 절대 사실 근거·각주로 사용하지 마세요. "이런 화제/오해가 있다"는 조사 단서로만 사용하세요(다른 파이프라인과 동일한 위생 규칙).
+
+1회 실행 최대 처리 파일 수: **1개**. wiki-deep-researcher+wiki-research-auditor 왕복은 대상 1건에 8개 커버리지 항목 + 로컬 근거자료 대조까지 포함해 다른 파이프라인보다 비용이 크므로, 1개 파일을 처리했으면 새 파일을 예약하지 말고 완료 보고 후 종료하세요.
+
+팀장 diff 검토 필수 확인 항목(commit 전, 생략 금지):
+- correction 항목이 실제로 위 correction 기준(공식 직접 근거 또는 이종 소스 2개 이상)을 충족하는지 auditor 출력을 재확인하세요.
+- source 식별자(소스명·chunk ID·내부 경로) 미노출을 확인하세요.
+- spoiler 등급 변경이 있다면 auditor의 preserve_note에 명시적 근거가 있는지 확인하세요.
+- git status --short로 대상 문서 외 변경이 없는지 확인하세요.
+
+.admin/runs/p9-${runId}-report.json 리포트 형식(대상 1건에 승인 항목이 여러 개면 items 배열에 각각 누적):
+{
+  "items": [
+    {
+      "target": "wiki/{category}/{slug}.md 또는 신규 주제명",
+      "finding_type": "addition|correction|new_page",
+      "evidence_sources": ["wiki/근거자료/공식/qa-자료집.md Q12", "dataforge:sg_paper"],
+      "evidence_grade": "official_single|dataforge_multi|mcp_single|official_direct|cross_source_dual",
+      "sanitizer": "pass",
+      "quality": "pass|warn",
+      "commit_hash": "..."
+    }
+  ]
+}
+finding_type이 correction인 항목은 evidence_sources 배열 길이가 2 이상이거나 evidence_grade가 official_direct여야 합니다. 이 조건을 만족하지 못하면 러너의 verifyP9Report 검증이 실패 처리합니다.
+
+중요 — verifyP9Report 검증의 한계(과신 금지): 러너의 verifyP9Report는 팀장이 스스로 작성한 리포트 JSON만 읽고 검증합니다. 즉 evidence_sources 개수·evidence_grade 검사는 팀장이 "주장한" 값을 확인할 뿐 실제 근거가 존재함을 보증하지 않는 자체보고(self-attested) 기반 보조 게이트입니다. 이 코드 검사를 correction의 1급 안전 통제로 과신하지 마세요. correction의 실질 안전망은 (1) 위 팀장 diff 검토(commit 전)와 (2) 관리자의 /wiki-review/reject를 통한 commit 후 사후 롤백입니다. 따라서 리포트에 근거를 정확하고 정직하게 기록하고, diff 검토를 형식적으로 넘기지 마세요.
+
+운영 제약:
+- 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
+- registry 예약 없이 wiki-research-editor/wiki-writer를 호출하지 마세요.
+- sanitizer fail 상태에서 commit하지 마세요.
+- wiki-quality-lead FAIL 상태에서 commit하지 마세요.
+- 팀장 diff 검토 없이 commit하지 마세요.
+- 하위 에이전트에게 git commit/push를 위임하지 마세요.
+- correction을 addition 기준만으로 승인하지 마세요.
+- dc_gallery를 사실 근거·각주로 사용하지 마세요.
+- 내부 경로, chunk ID, source_filter 이름은 공개 위키에 노출하지 마세요.
+- 완료 시 처리 대상, finding_type(addition/correction/new_page), 근거 요약, sanitizer/quality 결과, commit hash 또는 미커밋 사유, .admin/p9-research-log.json 갱신 여부를 요약하세요.`;
+}
+
 function formatUserInstruction(instruction) {
   const text = String(instruction ?? '').trim();
   if (!text) {
@@ -604,6 +712,8 @@ function buildPrompt(command, runId, instruction = '') {
     prompt = buildP7Prompt(runId);
   } else if (command === 'p8') {
     prompt = buildP8Prompt(runId);
+  } else if (command === 'p9') {
+    prompt = buildP9Prompt(runId);
   } else {
     prompt = buildP2Prompt(runId);
   }
@@ -782,6 +892,65 @@ async function verifyP6Report(runId) {
   return null;
 }
 
+// 파이프라인 9 구조화 리포트 검증. 팀장이 commit 전 산출한 처리 항목별 리포트의
+// 필수 필드·게이트 결과를 확인한다. 리포트가 없으면(처리 항목 0건 등) 경고만 하고
+// 실패시키지 않는다. 리포트가 있으면 각 항목이 게이트를 통과했는지 강제한다.
+// correction 항목은 evidence_sources 2개 이상 또는 evidence_grade가 official_direct여야 한다.
+// 주의: 이 검증은 팀장이 스스로 작성한 리포트 값만 확인하는 자체보고 기반 보조 게이트이며,
+// correction의 1급 안전 통제는 팀장 diff 검토 + 관리자 사후 롤백이다(§buildP9Prompt 참고).
+// 반환: 실패 사유 문자열(있으면) 또는 null(통과).
+async function verifyP9Report(runId) {
+  const reportPath = path.join(DEFAULT_CWD, '.admin', 'runs', `p9-${runId}-report.json`);
+  let report;
+  try {
+    report = JSON.parse(await readFile(reportPath, 'utf8'));
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log(`[p9:${runId}] no report file (no items committed?): ${reportPath}`);
+      return null;
+    }
+    return `report unreadable: ${error.message}`;
+  }
+
+  const items = Array.isArray(report.items) ? report.items : null;
+  if (!items) {
+    return 'report missing items array';
+  }
+  if (items.length === 0) {
+    return null;
+  }
+
+  for (const item of items) {
+    const id = item.target || '(unknown)';
+    if (!item.target || !item.finding_type || !item.commit_hash) {
+      return `item ${id} missing required fields (target/finding_type/commit_hash)`;
+    }
+    if (!['addition', 'correction', 'new_page'].includes(item.finding_type)) {
+      return `item ${id} invalid finding_type: ${item.finding_type}`;
+    }
+    if (!Array.isArray(item.evidence_sources) || item.evidence_sources.length === 0) {
+      return `item ${id} evidence_sources empty`;
+    }
+    if (!item.evidence_grade) {
+      return `item ${id} missing evidence_grade`;
+    }
+    if (item.sanitizer !== 'pass') {
+      return `item ${id} sanitizer != pass (${item.sanitizer})`;
+    }
+    if (item.quality === 'fail') {
+      return `item ${id} quality == fail`;
+    }
+    if (item.finding_type === 'correction') {
+      const hasDualSources = item.evidence_sources.length >= 2;
+      const isOfficialDirect = item.evidence_grade === 'official_direct';
+      if (!hasDualSources && !isOfficialDirect) {
+        return `item ${id} correction requires evidence_sources.length >= 2 or evidence_grade == official_direct`;
+      }
+    }
+  }
+  return null;
+}
+
 function emitMessage(message, coverage) {
   if (!message || typeof message !== 'object') {
     return;
@@ -890,7 +1059,9 @@ async function main() {
       ? REQUIRED_MCP_COVERAGE
       : args.command === 'p6'
         ? P6_REQUIRED_COVERAGE
-        : null;
+        : args.command === 'p9'
+          ? P9_REQUIRED_COVERAGE
+          : null;
   const coverage = coverageRequired ? createMcpCoverageTracker(coverageRequired) : null;
   const stream = query({ prompt, options });
   let sawResult = false;
@@ -936,6 +1107,14 @@ async function main() {
     const reportFailure = await verifyP6Report(args.runId);
     if (reportFailure) {
       console.log(`[p6:${args.runId}] report verification failed: ${reportFailure}`);
+      exitCode = 1;
+    }
+  }
+
+  if (args.command === 'p9') {
+    const reportFailure = await verifyP9Report(args.runId);
+    if (reportFailure) {
+      console.log(`[p9:${args.runId}] report verification failed: ${reportFailure}`);
       exitCode = 1;
     }
   }

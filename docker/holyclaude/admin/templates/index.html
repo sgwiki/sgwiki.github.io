@@ -114,6 +114,13 @@
     }
     .btn-rule:hover { background: #14b8a6; }
 
+    .btn-research {
+      background: #86198f;
+      border-color: #c026d3;
+      color: #fff;
+    }
+    .btn-research:hover { background: #c026d3; }
+
     .btn-small {
       padding: 4px 9px;
       font-size: 11px;
@@ -542,6 +549,9 @@
       <span class="tip" data-tip="AI 문체 제거 파이프라인&#10;① wiki-style-detector: AI 문체 후보 range 탐지(읽기 전용)&#10;② wiki-fact-auditor: 사실 민감도 감사, 불확실하면 편집 금지&#10;③ wiki-style-editor: 승인된 작은 range만 문체 완화&#10;④ source-sanitizer·wiki-linker·quality gate·팀장 diff 검토 후 commit">
         <button class="btn btn-maint pipeline-btn" data-pipeline="8" onclick="selectPipeline(8)">AI 문체 제거 팀</button>
       </span>
+      <span class="tip" data-tip="위키 심층 조사 파이프라인&#10;① 대상 선정(지정 주제 > P4 감사 리포트 > 순차 순회)&#10;② wiki-deep-researcher: dataforge 6종+namuwiki+sg-ontology+근거자료 전수 조사(읽기 전용)&#10;③ wiki-research-auditor: addition/correction 근거 등급 판정(읽기 전용, correction은 이종 소스 2개+ 요구)&#10;④ wiki-research-editor: 승인 항목만 반영 / 신규 주제는 planner→writer&#10;⑤ source-sanitizer·wiki-linker·quality-lead 검증 → 팀장 diff 검토 → commit">
+        <button class="btn btn-research pipeline-btn" data-pipeline="9" onclick="selectPipeline(9)">위키 심층 조사 팀</button>
+      </span>
     </div>
     <div style="margin-top:10px;font-size:12px;color:#8b949e">
       위 팀을 선택하면 기본 지시가 채워집니다. 내용을 수정·삭제한 뒤 <b>실행</b>을 누르세요.
@@ -734,7 +744,7 @@
 
 <script>
   // ── Pipeline name map ─────────────────────────────────────────────────────
-  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '커뮤니티 큐레이션 팀', '7': '규칙 승격 제안', '8': 'AI 문체 제거 팀' };
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '커뮤니티 큐레이션 팀', '7': '규칙 승격 제안', '8': 'AI 문체 제거 팀', '9': '위키 심층 조사 팀' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
   // 팀별 사용자 지시 기본값(프리셋)은 서버의 presets.json에서 로드합니다.

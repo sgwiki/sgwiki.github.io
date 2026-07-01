@@ -51,6 +51,7 @@ RUN_MARKER_DIR = os.getenv("ADMIN_RUN_MARKER_DIR", "/tmp/sg-wiki-runs")
 ADMIN_TERMINATE_GRACE_SECONDS = int(os.getenv("ADMIN_TERMINATE_GRACE_SECONDS", "20"))
 ADMIN_REAPER_INTERVAL_SECONDS = int(os.getenv("ADMIN_REAPER_INTERVAL_SECONDS", "60"))
 P5_MAX_FILES_PER_RUN = int(os.getenv("ADMIN_P5_MAX_FILES_PER_RUN", "5"))
+P9_MAX_FILES_PER_RUN = int(os.getenv("ADMIN_P9_MAX_FILES_PER_RUN", "1"))
 
 PIPELINE_TIMEOUT_DEFAULTS = {
     "p1": (4 * 60 * 60, 30 * 60),
@@ -61,6 +62,7 @@ PIPELINE_TIMEOUT_DEFAULTS = {
     "p6": (4 * 60 * 60, 30 * 60),
     "p7": (45 * 60, 15 * 60),
     "p8": (4 * 60 * 60, 30 * 60),
+    "p9": (5 * 60 * 60, 40 * 60),
 }
 ACTIVE_RUN_STATUSES = {"running", "terminating"}
 TERMINAL_REGISTRY_STATUSES = {
@@ -265,6 +267,17 @@ async def trigger_p8(body: TriggerBody | None = None):
         asyncio.create_task(_run_p8(run_id, started_at))
         return {"status": "started", "pipeline": "p8", "run_id": run_id}
     return {"status": "queued", "pipeline": "p8", "run_id": run_id, "queue_position": _queue_position(run_id)}
+
+
+@app.post("/trigger/p9")
+async def trigger_p9(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p9", "holyclaude 위키 심층 조사 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
+    if status == "running":
+        asyncio.create_task(_run_p9(run_id, started_at))
+        return {"status": "started", "pipeline": "p9", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p9", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
 @app.get("/running")
@@ -1697,13 +1710,15 @@ def _public_job(job: dict, queue_position: int | None = None) -> dict:
     item = dict(job)
     if queue_position is not None:
         item["queue_position"] = queue_position
-    if item.get("pipeline") == "p5" and item.get("run_id"):
+    pl = item.get("pipeline")
+    if pl in ("p5", "p9") and item.get("run_id"):
         progress = _registry_progress_for_run(item["run_id"])
-        item["p5_file_budget"] = P5_MAX_FILES_PER_RUN
-        item["p5_files_processed"] = progress["terminal"]
-        item["p5_files_active"] = progress["active"]
-        item["p5_files_total"] = progress["total"]
-        item["p5_active_files"] = progress["active_files"]
+        budget = P9_MAX_FILES_PER_RUN if pl == "p9" else P5_MAX_FILES_PER_RUN
+        item[f"{pl}_file_budget"] = budget
+        item[f"{pl}_files_processed"] = progress["terminal"]
+        item[f"{pl}_files_active"] = progress["active"]
+        item[f"{pl}_files_total"] = progress["total"]
+        item[f"{pl}_active_files"] = progress["active_files"]
     item["duration_seconds"] = _seconds_since(item.get("started_at"))
     item["queued_seconds"] = _seconds_since(item.get("queued_at"))
     item["last_output_age_seconds"] = _seconds_since(item.get("last_output_at") or item.get("updated_at"))
@@ -1813,10 +1828,11 @@ def _watchdog_reason(run_id: str) -> str | None:
         idle_deadline = _parse_dt(job.get("idle_deadline_at"))
         if idle_deadline and now >= idle_deadline:
             return "idle_timeout"
-        if job.get("pipeline") == "p5":
+        if job.get("pipeline") in ("p5", "p9"):
             progress = _registry_progress_for_run(run_id)
-            if progress["total"] > P5_MAX_FILES_PER_RUN:
-                return "p5_file_budget_exceeded"
+            limit = P9_MAX_FILES_PER_RUN if job.get("pipeline") == "p9" else P5_MAX_FILES_PER_RUN
+            if progress["total"] > limit:
+                return "p5_file_budget_exceeded" if job.get("pipeline") == "p5" else "p9_file_budget_exceeded"
     return None
 
 
@@ -2005,6 +2021,15 @@ async def _run_p8(run_id: str, started_at: str) -> None:
         _pop_active_job(run_id)
 
 
+async def _run_p9(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
+    try:
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p9", run_id, started_at, user_instruction)
+        _save_run(log)
+    finally:
+        _pop_active_job(run_id)
+
+
 def _start_active_job(pipeline: str, last_line: str, user_instruction: str | None = None) -> tuple[str, str, str]:
     """Register a job. Returns (run_id, started_at, status).
 
@@ -2136,6 +2161,8 @@ def _dispatch_next_job() -> None:
             asyncio.create_task(_run_p7(rid, started_at))
         elif pipeline == "p8":
             asyncio.create_task(_run_p8(rid, started_at))
+        elif pipeline == "p9":
+            asyncio.create_task(_run_p9(rid, started_at))
 
 
 def _sanitize_instruction(value: str, limit: int = 4000) -> str:
@@ -2168,7 +2195,7 @@ def _run_holyclaude_pipeline(pipeline: str, run_id: str, started_at: str, user_i
     # p2(제안 자동 처리) push 승인 게이트:
     #   p2는 프롬프트 지침으로 commit까지만 수행하고 push하지 않는다. 미push 커밋은
     #   관리자 승인 엔드포인트(/suggestions/push/approve)가 별도로 push한다.
-    #   p1/3/5/6 은 기존대로 자동 push 한다.
+    #   p2 외 파이프라인(p1/3/4/5/6/7/8/9)은 기존대로 자동 push 한다.
     inner = f"cd /workspace && node {shlex.quote(PIPELINE_SCRIPT)} {shlex.quote(pipeline)} --run-id {shlex.quote(run_id)}"
     if instruction:
         inner += f" --instruction {shlex.quote(instruction)}"

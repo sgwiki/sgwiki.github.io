@@ -282,6 +282,50 @@ DCinside 슈타게 갤러리 유저 게시글을 커뮤니티 세그먼테이션
 - 1회 실행 최대 3개 후보 순차. 큐(소비 추적)와 registry(파일 락)를 **모두** 사용한다.
 - `dc_gallery`(dcinside) 근거는 산문 전용·각주 금지·식별자(gall_num·chunk ID·source 이름·내부 경로) 노출 금지.
 
+### 파이프라인 9 — 위키 심층 조사
+
+기존 `wiki/*.md` 페이지(지정 주제/감사 경고/순차 순회로 선정) 또는 위키에 없는 완전 신규 주제를 대상으로 dataforge 6종+namuwiki+sg-ontology+`wiki/근거자료/` 로컬 자료를 총동원해 심층 조사한다. P9은 전 파이프라인 중 **유일하게 기존 위키 서술의 사실 정정(correction) 권한**을 가진다(P5/P6/P8은 사실 변경 절대 금지 — 이 예외는 P9에만 적용된다).
+
+**대상 선정 우선순위(D2):** ① 사용자 지정 위키 페이지/주제(`user_instruction`) → ② 최신 `.admin/quality-audit-*.json`의 warn/fail 항목 → ③ `.admin/p9-research-log.json` 기준 가장 오래 전에 조사된 파일 순차 선택. 감사 리포트가 없으면(첫 실행 등) 즉시 3순위로 폴백한다.
+
+**근거 등급 이원 게이트(addition/correction, fail-closed):**
+
+| 유형 | 승인 조건(하나라도 충족) |
+|---|---|
+| addition(누락 보강, 기존 서술과 충돌 없음) | (a) `wiki/근거자료/공식` 또는 `비공식` 단일 근거, 또는 (b) dataforge 2개 이상 source 일치, 또는 (c) dataforge/namuwiki/sg-ontology 중 1개 이상 뒷받침 |
+| correction(기존 서술 정정 — 가장 강한 권한) | (a) `wiki/근거자료/공식/*` 직접 근거로 현재 서술과 명백히 모순, 또는 (b) 서로 다른 소스 유형 2개 이상(예: dataforge+namuwiki, 또는 dataforge 서로 다른 2 source)이 일치되게 현재 서술과 다른 사실을 뒷받침. addition 기준(c)의 "MCP 1개"만으로는 correction 승인 불가 |
+
+근거가 위 조건을 충족하지 못하면 편집하지 않는다 — correction 후보는 addition으로 강등하거나 insufficient로 reject한다.
+
+```
+① wiki-research-lead가 대상 선정(D2) → registry list로 진행 중 파일 제외, reserve로 대상 점유(topic: "p9:research:{slug}")
+② Agent(wiki-deep-researcher, 대상) → 조사 대조 리포트(읽기 전용)
+③ Agent(wiki-research-auditor, 리포트) → approved_items(addition/correction) + new_page_recommendation(읽기 전용)
+④ 팀장 판정 로그: APPROVED FINDINGS / REJECTED FINDINGS(건별)
+⑤ 분기:
+   [addition/correction 있음] → Agent(wiki-research-editor, 대상+approved_items) → 대상 페이지 직접 편집
+   [new_page_recommendation 있음] → 기존 파이프라인 1 경로 재사용: Agent(wiki-planner) → 팀장 승인 → Agent(wiki-writer)
+   [둘 다 없음] → "조사 완료, 반영 사항 없음" 보고 후 registry release, 다음 대상으로
+⑥ Agent(source-sanitizer) → fail 시 editor/writer에 최대 2회 재작성 요청
+⑦ Agent(wiki-linker, file 모드) → 자동 교정 불가 broken_links 잔존 시 되돌림
+⑧ Agent(wiki-quality-lead, gate 모드) → FAIL 시 최대 1회 수정
+⑨ 팀장 diff 검토(필수: correction 항목이 위 표의 강화 기준을 실제로 충족하는지 auditor 출력 재확인·source 식별자(소스명·chunk ID·내부 경로) 미노출·spoiler 등급 변경 시 preserve_note 명시 근거 확인·대상 문서 외 변경 없음(`git status --short`)) → registry status committing
+⑩ git add <file> && git commit -m "{addition: feat|correction: fix}(wiki): {slug} 심층 조사 — {요약}" && git push
+⑪ .admin/p9-research-log.json 갱신(대상, 조사 시각, 반영 결과) + registry complete/release
+```
+
+**커버리지 게이트:** `qaset_with_rag`·`namuwiki`·`sg-ontology` 3개는 러너가 코드로 강제하는 하드 게이트다(모든 조사 대상에 보편 적용 가능한 항목만 하드 게이트 — 좁은 주제에서 무관한 소스 때문에 실행이 막히는 것을 방지). `sg_game_sg0_en`·`sg_paper`·`sg_game_sge`·`fandom_episodes`·`dc_gallery`는 시도(조회 1회)만 확인하며 결과 유무는 게이트에 영향을 주지 않는다. `dc_gallery`는 P6과 동일하게 수요/화제 신호 참고용일 뿐이며 사실 근거·각주로 사용 금지.
+
+**`.admin/p9-research-log.json`:** 순차 순회(D2 3순위) 대상 선정을 위해 "가장 오래 전에 조사된 파일"을 추적하는 상태 로그. `wiki_work_registry.mjs`는 wiki 파일만 잠그고 이 로그 자체는 보호하지 않으므로, 팀장은 반드시 **원자적 쓰기**(임시 파일에 쓰고 rename)로 갱신해 동시 실행 간 lost-update로 인한 파일 손상을 막는다.
+
+**커밋 메시지 접두어:** addition은 `feat`, correction은 `fix`로 시작해 운영자가 `git log`만으로 정정/보강 여부를 구분할 수 있게 한다.
+
+**1회 실행 최대 처리 파일 수: 1개.** 대상당 8항목 커버리지 조사(dataforge 6종+namuwiki+sg-ontology) + 근거자료 대조 + auditor 왕복 비용이 크므로 P5(5개)·P6(3개)보다 보수적으로 설정한다.
+
+**안전 통제:** `verifyP9Report`의 근거 개수 코드 검사는 팀장 자체 리포트를 신뢰하는 보조 게이트일 뿐, correction의 1급 안전 통제가 아니다. 실질 통제는 위 ⑨ 팀장 diff 검토(commit 전)와 관리자의 `/wiki-review/reject` 사후 롤백(commit 후)이다.
+
+**재사용(수정 없음):** `wiki-planner`·`wiki-writer`·`source-sanitizer`·`wiki-linker`·`wiki-quality-lead`(신규 페이지 경로는 파이프라인 1과 동일). dataforge/namuwiki MCP 호출 방법은 아래 "MCP 연결 및 소스 정책" 섹션을 그대로 따른다(P9 전용 스니펫 없음).
+
 ### MCP 연결 및 소스 정책
 
 | MCP | 방식 | 용도 |
