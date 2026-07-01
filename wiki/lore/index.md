@@ -1,5 +1,7 @@
 ---
+title: "설정 해설 인덱스"
 description: "위 순서 + SERN과 라운더 → 슈타인즈 게이트 세계선 → 루프 폐쇄"
+spoiler: none
 ---
 
 # 설정 해설 인덱스
