@@ -33,6 +33,8 @@ artifacts/
 
 # Large local data (qaset JSON, archives, raw source collections, P6 inputs — not in git)
 data/
+# 예외: HolyClaude 에이전트/설정 소스는 tracked (런타임·시크릿 하위 디렉터리는 아래에서 다시 무시)
+!/docker/holyclaude/data/
 
 # Reference material — local RAG 소스, 서버 불필요
 reference/
@@ -72,6 +74,7 @@ docker/holyclaude/data/claude/project-config.json
 docker/holyclaude/data/claude/plugins/
 docker/holyclaude/data/claude/projects/
 # Claude Code 런타임 산출물
+docker/holyclaude/data/claude/history.jsonl
 docker/holyclaude/data/claude/sessions/
 docker/holyclaude/data/claude/shell-snapshots/
 docker/holyclaude/data/claude/backups/

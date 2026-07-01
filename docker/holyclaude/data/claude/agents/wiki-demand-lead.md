@@ -25,7 +25,7 @@ P1(신규 생성 전용)·P5(기존 정비 전용)와 달리, P6은 커뮤니티
 ## 작업 흐름
 
 ```
-⓪ VOCAB_GUIDE 숙지 → ① 큐 정규화·후보 선점 → ② analyst 수요 보고서 → ③ 팀장 판정 + 큐/파일 예약
+⓪ VOCAB_GUIDE 숙지 → ① 큐 정규화·후보 선점(없으면 클러스터 마이닝 fallback) → ② analyst 수요 보고서 → ③ 팀장 판정 + 큐/파일 예약
 → ④ 분기: [create-fact] planner→writer / [editorial] writer 사설 / [content-update] writer 섹션 병합 / [style-only] rewriter
 → ⑤ source-sanitizer → ⑤-b wiki-linker → ⑤-c wiki-quality-lead(gate)
 → ⑥ 팀장 diff 검토 + 커버리지 확인 → ⑦ 구조화 리포트 산출 → ⑧ commit/push → ⑨ 큐 complete
@@ -41,7 +41,14 @@ node /workspace/scripts/p6_demand_queue.mjs next --run-id "$RUN_ID" --priority h
 ```
 - `next`가 pending 최우선 후보를 in_progress로 선점해 반환한다. high 소진 시 `--priority` 생략으로 medium/low 소비.
 - 1회 실행에서 **최대 3개** 후보를 순차 처리한다.
-- pending 후보가 없으면 "처리할 후보 없음"을 보고하고 종료.
+- pending 후보가 없으면 **클러스터 마이닝 모드**로 진입한다. 순서는 반드시 아래와 같다.
+  1. `node /workspace/scripts/p6_cluster_miner.mjs normalize`
+  2. `node /workspace/scripts/p6_cluster_miner.mjs next --run-id "$RUN_ID"`로 total_score 우선 클러스터 1개 선점.
+  3. 선점한 `cluster_<id>/report.md`와 `eda.csv`를 입력으로 `wiki-demand-miner`를 스폰해 후보 JSON 배열(최대 3개)을 받는다.
+  4. `node /workspace/scripts/p6_demand_queue.mjs add-candidates --file <miner-output.json> --run-id "$RUN_ID"`로 큐에 병합한다. **이 단계는 cluster complete보다 반드시 먼저 실행한다.**
+  5. `node /workspace/scripts/p6_cluster_miner.mjs complete --cluster-id <id> --run-id "$RUN_ID" --candidate-ids <added_ids>`로 클러스터를 완료 처리한다.
+  6. 같은 run에서 `node /workspace/scripts/p6_demand_queue.mjs next --run-id "$RUN_ID"`를 다시 실행해 새 pending 후보 1개를 즉시 소비한다.
+- 마이닝 대상 클러스터가 없거나 add-candidates 결과 새 후보가 0개면 "처리할 후보 없음"을 보고하고 종료한다.
 
 ### ② analyst 수요 보고서
 선점한 후보의 정규화 JSON을 전달해 `wiki-demand-analyst`를 스폰 → 수요 보고서(type·생성/업데이트 권고 포함) 수신.
@@ -137,7 +144,7 @@ git add wiki/{category}/{slug}.md
 git commit -m "wiki: {제목} — 커뮤니티 큐레이션 {생성|보강}"
 git push
 ```
-- 대상 wiki 파일만 commit. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 **절대 git add 금지**.
+- 대상 wiki 파일만 commit. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일, `.admin/p6-cluster-mining-state.json`은 **절대 git add 금지**.
 - commit 전 `git status --short`, `git diff --check`, 대상 diff 확인.
 
 ### ⑨ 큐/락 정리
@@ -154,7 +161,7 @@ node /workspace/scripts/wiki_work_registry.mjs complete --run-id "$RUN_ID" --fil
 - sanitizer fail 또는 quality-lead FAIL 상태에서 commit.
 - 업데이트 시 사실 관계·스포일러 등급 임의 변경.
 - dc_gallery(dcinside) 근거를 각주(`[^N]`)로 표기하거나 gall_num/chunk ID/source 이름·내부 경로를 위키 본문에 노출.
-- `data/dc_gallery/`·`.admin/`·큐/리포트 파일 commit.
+- `data/dc_gallery/`·`.admin/`·큐/리포트 파일·`.admin/p6-cluster-mining-state.json` commit.
 - 하위 에이전트에게 git commit/push 위임.
 - 동일 파일 동시 수정.
 - 근거 불충분(`evidence_grade=community_only`)한데 기존 정전(canon) 페이지의 사실을 변경/업데이트.

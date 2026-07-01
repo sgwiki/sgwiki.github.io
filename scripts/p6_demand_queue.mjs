@@ -420,6 +420,96 @@ function reject(queue, options, status) {
   return { status: 'ok', action: status, candidate: cand };
 }
 
+function addCandidates(queue, options) {
+  const runId = requireOption(options, 'run-id');
+  const filePath = path.resolve(WORKSPACE, requireOption(options, 'file'));
+  if (!existsSync(filePath)) {
+    throw new Error(`Candidate JSON file not found: ${filePath}`);
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch (error) {
+    throw new Error(`Invalid JSON in ${filePath}: ${error.message}`);
+  }
+  const items = Array.isArray(parsed) ? parsed : Array.isArray(parsed.candidates) ? parsed.candidates : null;
+  if (!items) {
+    throw new Error('Candidate JSON must be an array (or { candidates: [...] })');
+  }
+
+  // 이미 큐에 존재하는 normalized_title(터미널 포함) 집합 — 후보 단위 결정적 중복 차단.
+  const terminalTitles = new Set();
+  for (const cand of Object.values(queue.candidates)) {
+    if (TERMINAL.has(cand.status)) {
+      terminalTitles.add(cand.normalized_title);
+    }
+  }
+
+  const added = [];
+  const skippedDuplicate = [];
+  for (const item of items) {
+    const title = normalizeTitle(item && item.wiki_title);
+    if (!title) {
+      throw new Error('Each candidate requires a non-empty wiki_title');
+    }
+    const id = candidateId(title);
+    // 중복 차단(수용 기준 8): 동일 candidate_id 존재, 또는 동일 normalized_title이 터미널 상태.
+    if (queue.candidates[id] || terminalTitles.has(title)) {
+      skippedDuplicate.push({ candidate_id: id, wiki_title: title });
+      continue;
+    }
+
+    const clusterIds = Array.isArray(item.cluster_ids)
+      ? item.cluster_ids
+      : splitClusterIds(item.cluster_ids);
+    const sourceClusterIds = Array.isArray(item.source_cluster_ids)
+      ? item.source_cluster_ids
+      : splitClusterIds(item.source_cluster_ids != null ? item.source_cluster_ids : item.cluster_ids);
+    const gallIds = Array.isArray(item.supporting_gall_ids)
+      ? item.supporting_gall_ids.map((g) => String(g))
+      : splitIds(item.supporting_gall_ids);
+
+    queue.candidates[id] = {
+      candidate_id: id,
+      wiki_title: title,
+      normalized_title: title,
+      content_to_include: item.content_to_include != null ? String(item.content_to_include) : '',
+      cluster_ids: clusterIds,
+      cluster_theme: item.cluster_theme != null ? String(item.cluster_theme) : '',
+      rationale: item.rationale != null ? String(item.rationale) : '',
+      supporting_gall_ids: gallIds,
+      priority: item.priority != null ? normalizeTitle(item.priority) : '',
+      status: 'pending',
+      decision: null,
+      target_file: null,
+      commit_hash: null,
+      reason: null,
+      run_id: null,
+      // 마이닝 원천 추적 필드(소비 경로는 참조하지 않음 — 관측·감사용).
+      source_kind: 'segmentation_cluster',
+      source_cluster_ids: sourceClusterIds,
+      mined_from: item.mined_from != null ? String(item.mined_from) : null,
+      mining_run_id: runId,
+      mining_reason: item.mining_reason != null ? String(item.mining_reason) : null,
+      dedupe_key: item.dedupe_key != null ? String(item.dedupe_key) : title,
+      created_at: nowIso(),
+      updated_at: nowIso(),
+    };
+    added.push(id);
+    terminalTitles.add(title); // 같은 배치 내 중복도 차단.
+  }
+
+  return {
+    status: 'ok',
+    action: 'add-candidates',
+    added: added.length,
+    skipped_duplicate: skippedDuplicate.length,
+    candidates: added,
+    skipped: skippedDuplicate,
+    counts: countByStatus(queue),
+  };
+}
+
 function reclaimStale(queue, options) {
   const activeRunIds = splitRunIds(options['active-run-ids'] || '');
   const ttlMs = parsePositiveInt(options['ttl-ms'], IN_PROGRESS_TTL_MS);
@@ -503,9 +593,12 @@ function main() {
       case 'reclaim-stale':
         result = reclaimStale(queue, options);
         break;
+      case 'add-candidates':
+        result = addCandidates(queue, options);
+        break;
       default:
         throw new Error(
-          'Usage: p6_demand_queue.mjs normalize|list|next|reserve|complete|reject|skip|reclaim-stale ...',
+          'Usage: p6_demand_queue.mjs normalize|list|next|reserve|complete|reject|skip|reclaim-stale|add-candidates ...',
         );
     }
 

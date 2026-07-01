@@ -15,7 +15,8 @@
 | `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
 | `scripts/wiki_link_lint.py` | 내부 링크 결정적 검사·자동 교정 funnel(wiki-linker 강제 사용). `--file`/`--scan`, `--apply`, `--json`. ok/autofix/broken/suspicious/external 분류 | tracked |
-| `scripts/p6_demand_queue.mjs` | P6 커뮤니티 큐레이션 후보 소비 큐 | tracked |
+| `scripts/p6_demand_queue.mjs` | P6 커뮤니티 큐레이션 후보 소비 큐 (`add-candidates`로 외부 후보 병합 지원) | tracked |
+| `scripts/p6_cluster_miner.mjs` | P6 클러스터 원천 마이닝 상태 큐 (`data/dc_gallery/segmentation/all_clusters_summary.csv` 소비, pending 후보 소진 시 fallback) | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
 | `scripts/fetch_fandom_episodes.mjs` | Fandom `Category:Episodes` → `data/fandom_episodes/` 마크다운 수집·변환 (영문 원문+한국어 번역용 원문) | tracked |
 | `scripts/gen_episodes_readme.mjs` | `data/fandom_episodes/README.md` 인덱스 자동 생성 | tracked |
@@ -50,6 +51,7 @@ make worker-dev          # 제안 폼 Worker 로컬 개발
 node --check scripts/run_holyclaude_pipeline.mjs
 node --check scripts/wiki_work_registry.mjs
 node --check scripts/p6_demand_queue.mjs
+node --check scripts/p6_cluster_miner.mjs
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --instruction "..." --dry-run   # 선택 사용자 지시(--instruction) 주입
 node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run   # claude-mem 규칙 승격 제안 dry-run
@@ -138,7 +140,9 @@ DCinside 슈타게 갤러리 유저 게시글을 커뮤니티 세그먼테이션
 - **근거 등급(evidence_grade)**: `corroborated`(사실검증 소스가 뒷받침)면 fact 페이지, `community_only`(수요만, 미검증)면 **`editorial`로 강등**(사실 단정·정전 페이지 업데이트 금지).
 
 ```
-all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analyst(genre·evidence_grade 판정)
+all_wiki_candidates.csv → p6_demand_queue normalize/next
+  (pending 없으면 fallback: p6_cluster_miner normalize/next → wiki-demand-miner → p6_demand_queue add-candidates → 같은 run에서 next 재소비)
+→ wiki-demand-analyst(genre·evidence_grade 판정)
 → 팀장 APPROVED 판정 → p6_demand_queue reserve + wiki_work_registry reserve
 → create(fact): wiki-planner→wiki-writer / editorial: wiki-writer 사설 브리프
   / content-update: wiki-writer 섹션 병합(rewriter 아님) / style-only: wiki-rewriter
@@ -147,9 +151,10 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next → wiki-demand-analy
 ```
 
 - **2계층 동시성**: `scripts/p6_demand_queue.mjs`는 후보 소비 상태(`.admin/p6-demand-queue.json`)를, `scripts/wiki_work_registry.mjs`는 대상 wiki 파일 락을 담당한다. 둘 중 하나라도 예약 실패하면 writer/rewriter를 호출하지 않는다.
+- **클러스터 마이닝 fallback**: pending 후보가 없으면 `scripts/p6_cluster_miner.mjs`(상태: `.admin/p6-cluster-mining-state.json`)가 `data/dc_gallery/segmentation/all_clusters_summary.csv`를 `total_score` 내림차순으로 소비해 미마이닝 클러스터 1개를 선점하고, `wiki-demand-miner`가 그 `cluster_<id>/report.md`·`eda.csv`에서 후보 JSON을 **최대 3개** 생성한다. 팀장이 `p6_demand_queue.mjs add-candidates`로 큐에 병합(후보 단위 중복 차단: 동일 `candidate_id` 또는 터미널 상태 동일 `normalized_title` skip)한 뒤 **cluster complete보다 먼저 실행**하는 순서를 지킨다. 새 후보 1개를 같은 run에서 즉시 소비하며, 마이닝 후 새 후보가 0개면 종료한다. `wiki-demand-miner`는 후보 JSON만 생성하고 글 작성·검증·commit을 하지 않는다.
 - **업데이트 게이트**: `decision=update`는 `evidence_grade=corroborated`이고 새 사실 출처가 합리적일 때만 허용한다. 내용 보강은 문체 전용인 `wiki-rewriter`가 아니라 `wiki-writer`(섹션 병합)로 라우팅한다.
 - **러너 강제 게이트**: P6 러너 강제 MCP 커버리지(`P6_REQUIRED_COVERAGE`)는 `qaset_with_rag`, `namuwiki`, `dc_gallery` 3개다. `fandom_episodes`는 analyst가 조회하는 공통 권장 소스이나 러너 강제 항목은 아니다. 러너는 구조화 리포트의 `supporting_count>0`, `sanitizer=pass`, `quality!=fail`을 검증한다(`genre`·`evidence_grade`는 선택 관측 필드로 미검증). `editorial`은 `decision=create`로 게이트를 통과한다.
-- **commit 범위**: 통과한 `wiki/*.md`만 commit한다. `data/dc_gallery/`, `.admin/`, 큐/리포트 파일은 절대 commit하지 않는다.
+- **commit 범위**: 통과한 `wiki/*.md`만 commit한다. `data/dc_gallery/`, `.admin/`(`p6-cluster-mining-state.json` 포함), 큐/리포트 파일은 절대 commit하지 않는다.
 - **dc_gallery 위생 규칙**: 유저 게시글 근거는 산문 가공 전용이다. 각주, 원문 직접 인용, gall_num, chunk ID, source 이름, 내부 경로를 위키 본문에 노출하지 않는다.
 
 ### 파이프라인 7 (규칙 승격 제안)

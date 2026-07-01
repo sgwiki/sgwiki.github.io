@@ -437,7 +437,15 @@ function buildP6Prompt(runId) {
 7. commit 전에 구조화 리포트를 누적 저장하세요: /workspace/.admin/runs/p6-${runId}-report.json
    각 후보 항목에 candidate_id, type, genre, evidence_grade, cluster_ids, supporting_count(>0), decision, target_file, sanitizer("pass"), linker, quality("pass"|"warn"), commit_hash 를 포함하세요. genre·evidence_grade는 관측용 선택 필드로 러너 게이트는 이를 검증하지 않으며, 강제 필드(decision∈{create,update}, supporting_count>0, sanitizer=pass, quality!=fail)는 그대로입니다. editorial은 decision=create로 처리해 게이트를 통과합니다.
 8. 통과한 wiki 파일만 git add/commit/push 하세요. 완료 후 큐와 락을 정리하세요(complete/release).
-9. 1회 실행에서 최대 3개 후보를 순차 처리하세요. pending이 없으면 "처리할 후보 없음"을 보고하고 종료하세요.
+9. 1회 실행에서 최대 3개 후보를 순차 처리하세요. pending이 없으면 클러스터 마이닝 fallback을 시도하세요.
+   - node /workspace/scripts/p6_cluster_miner.mjs normalize
+   - node /workspace/scripts/p6_cluster_miner.mjs next --run-id ${runId}
+   - 선점한 cluster_<id>/report.md와 eda.csv를 입력으로 wiki-demand-miner를 스폰해 후보 JSON 배열(최대 3개)을 받으세요.
+   - node /workspace/scripts/p6_demand_queue.mjs add-candidates --file <miner-output.json> --run-id ${runId}
+   - add-candidates는 반드시 p6_cluster_miner complete보다 먼저 실행하세요.
+   - node /workspace/scripts/p6_cluster_miner.mjs complete --cluster-id <id> --run-id ${runId} --candidate-ids <added_ids>
+   - 같은 run에서 node /workspace/scripts/p6_demand_queue.mjs next --run-id ${runId} 를 다시 실행해 새 pending 후보 1개를 즉시 소비하세요.
+   - 마이닝 대상 클러스터가 없거나 새 후보가 0개면 "처리할 후보 없음"을 보고하고 종료하세요.
 
 MCP 커버리지 게이트 (공통 하드 + 타입별):
 - 공통(전 타입, 러너가 코드로 강제): dataforge qaset_with_rag(가능 시), namuwiki MCP, dataforge dc_gallery(커뮤니티 수요 근거).
@@ -448,7 +456,7 @@ MCP 커버리지 게이트 (공통 하드 + 타입별):
 위생 규칙 (절대 준수):
 - dc_gallery(dcinside) 근거는 산문 가공 전용. 원문 직접 인용 블록·각주([^N]) 금지, gall_num/chunk ID/source 이름·내부 경로(data/dc_gallery/...)를 위키 본문에 노출 금지.
 - sg_game_sge·sg_game_sg0_en은 파라프레이즈만, 소스명·chunk ID 노출 금지.
-- data/dc_gallery/, .admin/, 큐/리포트 파일은 절대 git add 금지. 대상 wiki/*.md만 commit.
+- data/dc_gallery/, .admin/, 큐/리포트 파일, .admin/p6-cluster-mining-state.json은 절대 git add 금지. 대상 wiki/*.md만 commit.
 
 운영 제약:
 - 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
