@@ -358,7 +358,7 @@ function buildP5Prompt(runId) {
 2. wiki-restructurer 에이전트 스폰 → 섹션 구조·헤더·frontmatter 정비 (링크는 다루지 않음).
    보고가 \`changed: false\`이면 restructurer 단계 완료로 간주.
 
-3. wiki-rewriter 에이전트 스폰 → 위키 고유 교정(VOCAB_GUIDE 용어 통일·내부 식별자 스크럽·사실/스포일러 보존 검토)만 수행. 번역투·헤징·리듬 등 일반 AI-문체 교정은 다음 단계 humanize로 이관됐으므로 rewriter가 손대지 않음.
+3. wiki-rewriter 에이전트 스폰 → 위키 고유 교정(VOCAB_GUIDE 용어 통일·한자/영한 혼동 정리·내부 식별자 스크럽·사실/스포일러 보존 검토)만 수행. 한자 자체는 본문에 남기지 않고 한국어로 풀어쓰되, 작품명·고유 명사·세계관 로어에서 정착한 영어/약어와 한국어 혼용은 유지. 번역투·헤징·리듬 등 일반 AI-문체 교정은 다음 단계 humanize로 이관됐으므로 rewriter가 손대지 않음.
    보고가 \`changed: false\`이면 rewriter 단계 완료로 간주.
 
 4. humanize 전 스냅샷 확보 후 wiki-humanizer 에이전트 스폰(AI-문체 제거):
@@ -381,6 +381,7 @@ function buildP5Prompt(runId) {
    - 사실 관계 변경 없음 확인
    - 스포일러 등급 변경 없음 확인
    - source 식별자 미노출 확인
+   - 한자 혼입 없음 확인(작품명·고유 명사·세계관 로어의 정착 영어/약어 혼용은 허용)
 
 9. 통과 시 commit/push:
    node /workspace/scripts/wiki_work_registry.mjs status --run-id ${runId} --file wiki/{category}/{slug}.md --status committing
