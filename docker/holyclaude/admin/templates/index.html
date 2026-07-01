@@ -530,7 +530,7 @@
       <span class="tip" data-tip="위키 품질 검사 파이프라인 (전체 감사)&#10;① wiki/*.md 전체 대상 선정 (현재 188개 파일)&#10;② wiki-format-inspector: frontmatter·인용 형식·섹션 구조 검사&#10;③ wiki-completeness-checker: 미치환 placeholder·빈 섹션·완성도 검사&#10;④ wiki-consistency-checker: 세계선 수치·날짜·인물명 교차 검사&#10;⑤ 감사 리포트 생성 (.admin/quality-audit-{날짜}.json)">
         <button class="btn btn-quality pipeline-btn" data-pipeline="4" onclick="selectPipeline(4)">품질 검사 팀</button>
       </span>
-      <span class="tip" data-tip="위키 정비 파이프라인&#10;① wiki/*.md 전체 스캔 → 정비 대상 선정&#10;② wiki-restructurer: 섹션 구조·헤더·링크 재정비&#10;③ wiki-rewriter: 문체·표현 개선 및 일관성 교정&#10;④ source-sanitizer: 내부 경로·청크 ID 유출 검사&#10;⑤ 팀장 검토 → git commit → Pages 배포">
+      <span class="tip" data-tip="위키 정비 파이프라인&#10;① wiki/*.md 전체 스캔 → 정비 대상 선정&#10;② wiki-restructurer: 섹션 구조·헤더·frontmatter 정비&#10;③ wiki-rewriter: 용어 통일·한자/영한 혼동·내부 식별자 정리&#10;④ source-sanitizer·wiki-linker 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
         <button class="btn btn-maint pipeline-btn" data-pipeline="5" onclick="selectPipeline(5)">위키 정비 팀</button>
       </span>
       <span class="tip" data-tip="커뮤니티 큐레이션 파이프라인&#10;① 후보 큐 정규화 → 커뮤니티 수요 후보 선점 (DCinside 세그먼트 분석 기반)&#10;② wiki-demand-analyst: 유저 실제 발화·오해·토론 분석 + 생성/업데이트 권고&#10;③ 생성=wiki-planner→writer / 업데이트=wiki-rewriter 타깃 보강&#10;④ source-sanitizer·wiki-linker·quality-lead 검증&#10;⑤ 팀장 검토 → git commit → Pages 배포">
@@ -538,6 +538,9 @@
       </span>
       <span class="tip" data-tip="claude-mem 규칙 승격 제안 파이프라인&#10;① mem-search로 반복 결정·거절·수정 패턴 조회&#10;② AGENTS/CLAUDE/에이전트 규칙 후보만 산출&#10;③ 실제 규칙 파일은 수정하지 않고 .admin/rule-promotions/에 제안 저장&#10;④ 관리자가 파일별 전후 diff를 보고 수정·승인해야 적용">
         <button class="btn btn-rule pipeline-btn" data-pipeline="7" onclick="selectPipeline(7)">규칙 승격 제안</button>
+      </span>
+      <span class="tip" data-tip="AI 문체 제거 파이프라인&#10;① wiki-style-detector: AI 문체 후보 range 탐지(읽기 전용)&#10;② wiki-fact-auditor: 사실 민감도 감사, 불확실하면 편집 금지&#10;③ wiki-style-editor: 승인된 작은 range만 문체 완화&#10;④ source-sanitizer·wiki-linker·quality gate·팀장 diff 검토 후 commit">
+        <button class="btn btn-maint pipeline-btn" data-pipeline="8" onclick="selectPipeline(8)">AI 문체 제거 팀</button>
       </span>
     </div>
     <div style="margin-top:10px;font-size:12px;color:#8b949e">
@@ -731,7 +734,7 @@
 
 <script>
   // ── Pipeline name map ─────────────────────────────────────────────────────
-  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '커뮤니티 큐레이션 팀', '7': '규칙 승격 제안' };
+  const PIPELINE_NAMES = { '1': '위키 작성 팀', '2': '제안 처리 팀', '3': '온톨로지 저작 팀', '4': '품질 검사 팀', '5': '위키 정비 팀', '6': '커뮤니티 큐레이션 팀', '7': '규칙 승격 제안', '8': 'AI 문체 제거 팀' };
   function pipelineName(key) { return PIPELINE_NAMES[String(key)] || ('파이프라인 ' + key); }
 
   // 팀별 사용자 지시 기본값(프리셋)은 서버의 presets.json에서 로드합니다.

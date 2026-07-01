@@ -12,12 +12,12 @@
 |---|---|---|
 | `wiki/` | 위키 마크다운 본문 (배포 대상) | tracked |
 | `docs/` | 설계·계획·저작권 검토 문서 | tracked |
-| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7 파이프라인 실행 래퍼 | tracked |
+| `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7/P8 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
 | `scripts/wiki_link_lint.py` | 내부 링크 결정적 검사·자동 교정 funnel(wiki-linker 강제 사용). `--file`/`--scan`, `--apply`, `--json`. ok/autofix/broken/suspicious/external 분류 | tracked |
-| `scripts/humanize_protect_quotes.py` | Humanize KR 후 전 스냅샷 기준으로 Markdown 인용 블록(`>`) 라인을 결정적 복원. quote-line 개수/순서 변경 시 exit 1 | tracked |
-| `scripts/humanize_fact_guard.py` | Humanize KR 전/후 숫자·인용 블록·frontmatter `spoiler` 불변식 검사. 위반 시 exit 1 | tracked |
-| `scripts/humanize_coverage.mjs` | P5 humanize 백필 완료 표식(`.admin/humanize-coverage.json`) 관리. `list`/`mark`/`unmark`/`stats` | tracked |
+| `scripts/humanize_protect_quotes.py` | legacy humanize 산출물 검증용 Markdown 인용 블록(`>`) 라인 복원. quote-line 개수/순서 변경 시 exit 1 | tracked |
+| `scripts/humanize_fact_guard.py` | legacy humanize 전/후 숫자·인용 블록·frontmatter `spoiler` 불변식 검사. 위반 시 exit 1 | tracked |
+| `scripts/humanize_coverage.mjs` | legacy humanize 백필 표식(`.admin/humanize-coverage.json`) 관리. `list`/`mark`/`unmark`/`stats` | tracked |
 | `scripts/p6_demand_queue.mjs` | P6 커뮤니티 큐레이션 후보 소비 큐 (`add-candidates`로 외부 후보 병합 지원) | tracked |
 | `scripts/p6_cluster_miner.mjs` | P6 클러스터 원천 마이닝 상태 큐 (`data/dc_gallery/segmentation/all_clusters_summary.csv` 소비, pending 후보 소진 시 fallback) | tracked |
 | `scripts/poll_suggestions.py` | R2 → `suggestions/inbox/` 제안 폴링 | tracked |
@@ -130,23 +130,20 @@ wiki/*.md 전체 → wiki-format-inspector(형식) → wiki-completeness-checker
 
 ### 파이프라인 5 (위키 정비)
 
-전체 `wiki/*.md` 대상 구조·문체 일관성 개선 전용. wiki-maintenance-lead가 조율:
+전체 `wiki/*.md` 대상 구조·용어·링크 정비 전용. wiki-maintenance-lead가 조율:
 
 ```
-wiki/*.md 전체 스캔 + humanize_coverage 미처리 우선
+wiki/*.md 전체 스캔 + registry active 제외
 → wiki-restructurer(섹션·헤더)
 → wiki-rewriter(위키 고유 교정: VOCAB_GUIDE 용어·한자/영한 혼동 정리·내부 식별자 스크럽)
-→ wiki-humanizer(`/humanize --strict`, AI-문체 제거)
 → source-sanitizer
-→ humanize_protect_quotes(인용 블록 결정적 복원)
-→ humanize_fact_guard(숫자·인용 블록·spoiler 불변)
 → wiki-linker(내부·외부 링크 검사·자동 교정·게이트)
-→ commit/push → humanize_coverage mark
+→ commit/push
 ```
 
 - **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
 - **P5 runaway 방지**: 1회 실행은 기본 최대 5개 파일(`ADMIN_P5_MAX_FILES_PER_RUN`)만 처리한다. admin watchdog은 registry 처리 파일 수가 예산을 초과하면 `p5_file_budget_exceeded`로 프로세스 그룹을 종료한다. `/running` 응답은 `p5_files_processed`/`p5_files_active`/`p5_files_total`/`p5_file_budget`을 노출한다.
-- **Humanize KR**: 컨테이너 부팅 시 `docker/holyclaude/scripts/humanize-bootstrap.sh`가 `humanize-korean@im-not-ai` 플러그인을 best-effort로 refresh한다. P5/P6 batch는 user settings를 로드하지 않으므로 `scripts/run_holyclaude_pipeline.mjs`가 `HUMANIZE_PLUGIN_DIR`을 SDK local plugin으로 주입해 `/humanize` slash command를 등록한다. `docker/holyclaude/data/claude/author-context.yaml`은 sg-wiki 보이스 계약이며, 실제 안전성은 `source-sanitizer`, `humanize_protect_quotes`, `humanize_fact_guard`가 강제한다. `humanize_protect_quotes.py`는 humanize가 건드린 인용 블록 라인을 전 스냅샷 기준으로 복원하고, 복원 불가 시 fail한다.
+- **AI 문체 제거 분리**: P5는 `wiki-humanizer`, `/humanize`, `humanize_coverage`, `humanize_fact_guard`, `humanize_protect_quotes`를 호출하지 않는다. AI 문체 제거는 파이프라인 8에서 detector→fact-auditor→style-editor 구조로만 처리한다.
 - **한자/영한 혼동 정리**: P5 `wiki-rewriter`는 `제0` → `제로` 같은 작품명 표기, 한자 혼입, 번역 누락형 영어/한글 혼동을 검사·교정한다. 작품명·고유 명사·세계관 로어에서 정착한 영어/약어와 한국어 혼용은 유지하되, 한자 자체는 공개 본문에 남기지 않는다.
 
 ### 파이프라인 6 (커뮤니티 큐레이션)
@@ -162,7 +159,7 @@ all_wiki_candidates.csv → p6_demand_queue normalize/next
 → wiki-demand-analyst(genre·evidence_grade 판정)
 → 팀장 APPROVED 판정 → p6_demand_queue reserve + wiki_work_registry reserve
 → create(fact): wiki-planner→wiki-writer / editorial: wiki-writer 사설 브리프
-  / content-update: wiki-writer 섹션 병합(rewriter 아님) / style-only: wiki-rewriter
+  / content-update: wiki-writer 섹션 병합(rewriter 아님) / style-only: P8 후보로 보류
 → source-sanitizer → wiki-linker → wiki-quality-lead(gate)
 → .admin/runs/p6-{run_id}-report.json 검증 → wiki/*.md commit/push
 ```
@@ -192,6 +189,25 @@ claude-mem mem-search(search→timeline→get_observations)
 - **stale guard**: proposal의 `before_sha256`과 현재 대상 파일 hash가 다르면 승인 적용을 409로 막는다. 파일이 바뀐 경우 P7을 다시 실행하거나 proposed 내용을 재검토한다.
 - **공개 금지 정보 유지**: source_filter 이름, chunk ID, 내부 RAG 경로, 원문 직접 인용은 proposal에도 넣지 않는다.
 
+### 파이프라인 8 (AI 문체 제거)
+
+기존 위키 페이지의 AI스러운 문장 리듬만 제한적으로 다루는 격리 파이프라인. admin UI의 `/trigger/p8`가 `run_holyclaude_pipeline.mjs p8`을 실행하고, wiki-style-lead가 조율한다.
+
+```
+wiki/*.md 전체 스캔 + registry active 제외
+→ wiki-style-detector(읽기 전용 후보 range 탐지)
+→ wiki-fact-auditor(읽기 전용 사실 민감도 감사, 불확실하면 거부)
+→ wiki-style-editor(승인된 작은 range만 문체 완화)
+→ source-sanitizer
+→ wiki-linker
+→ wiki-quality-lead(gate)
+→ 팀장 diff 검토
+→ commit/push
+```
+
+- **fail closed**: 출신·특징·관계·날짜·세계선 수치·표·frontmatter·인용·각주·링크 target 등 사실 민감 구역은 편집하지 않는다. 감사가 불충분하면 파일을 수정하지 않는다.
+- **Humanize 금지**: P8도 `/humanize`나 `wiki-humanizer`를 호출하지 않는다. 자동 플러그인 rewrite 대신 line range 승인 기반 제한 편집만 허용한다.
+
 ### 동시 실행과 중복 주제 방지
 
 - **전역 풀 동시 실행 cap 10** (`ADMIN_MAX_CONCURRENT_RUNS`). p1/p2 혼합 가능. 초과분은 단일 전역 FIFO 대기열에 적재, 슬롯 해제 시 자동 시작.
@@ -216,12 +232,12 @@ claude-mem mem-search(search→timeline→get_observations)
 
 - **볼륨 마운트 vs 베이크**: `scripts/`, `docker/holyclaude/data/claude/`(에이전트 정의·CLAUDE.md·settings.json)는 컨테이너에 마운트되어 **재빌드 없이 즉시 반영**. 반면 `docker/holyclaude/Dockerfile`이나 `docker/holyclaude/admin/`(admin 서버 코드)은 이미지에 베이크되어 **재빌드 + 컨테이너 재생성 필요**.
 - **Makefile Docker 타깃**: `restart`/`logs`/`shell`은 Compose 서비스명 `holyclaude`를 대상으로 한다. Docker API, `HOLYCLAUDE_CONTAINER`, 직접 `docker logs` 명령은 컨테이너명 `sg-wiki-holyclaude`를 사용한다.
-- **admin 서버**(FastAPI, `docker/holyclaude/admin/app/main.py`): 동시성/큐 로직은 `active_jobs_lock`(threading.RLock)로 보호. `_pop_active_job` 완료 시 stale registry 예약 회수를 비동기로 트리거하고 `_dispatch_next_job`가 FIFO에서 다음 job을 승격한다. 실행 중 작업은 `setsid` 프로세스 그룹으로 격리하고 `/tmp/sg-wiki-runs/{run_id}.pgid` marker를 기록한다. `/run/{run_id}` DELETE는 queued뿐 아니라 running도 `terminating`으로 바꾸고 프로세스 그룹에 TERM→KILL을 보낸다. 기본 watchdog은 P1/P3/P5/P6 wall 4h·idle 30m, P2/P4 wall 2h·idle 20m, P7 wall 45m·idle 15m이며 `ADMIN_P{N}_WALL_TIMEOUT_SECONDS`/`ADMIN_P{N}_IDLE_TIMEOUT_SECONDS`로 조정한다. P5는 추가로 `ADMIN_P5_MAX_FILES_PER_RUN`(기본 5)을 registry 기준으로 강제한다. active run 상태는 `.admin/active-runs.json`에 저장되고 admin 재시작 시 이전 active run을 실패 처리·정리한다.
+- **admin 서버**(FastAPI, `docker/holyclaude/admin/app/main.py`): 동시성/큐 로직은 `active_jobs_lock`(threading.RLock)로 보호. `_pop_active_job` 완료 시 stale registry 예약 회수를 비동기로 트리거하고 `_dispatch_next_job`가 FIFO에서 다음 job을 승격한다. 실행 중 작업은 `setsid` 프로세스 그룹으로 격리하고 `/tmp/sg-wiki-runs/{run_id}.pgid` marker를 기록한다. `/run/{run_id}` DELETE는 queued뿐 아니라 running도 `terminating`으로 바꾸고 프로세스 그룹에 TERM→KILL을 보낸다. 기본 watchdog은 P1/P3/P5/P6/P8 wall 4h·idle 30m, P2/P4 wall 2h·idle 20m, P7 wall 45m·idle 15m이며 `ADMIN_P{N}_WALL_TIMEOUT_SECONDS`/`ADMIN_P{N}_IDLE_TIMEOUT_SECONDS`로 조정한다. P5는 추가로 `ADMIN_P5_MAX_FILES_PER_RUN`(기본 5)을 registry 기준으로 강제한다. active run 상태는 `.admin/active-runs.json`에 저장되고 admin 재시작 시 이전 active run을 실패 처리·정리한다.
 - **사용자 지시(user instruction)**: 관리 UI 수동 실행은 팀 버튼 선택 → 사용자 지시 확인·수정 → `실행` 버튼 순서다. 팀별 기본 지시 프리셋은 `docker/holyclaude/admin/presets.json`에서 `/presets` API로 로드되며, `ADMIN_PRESETS_FILE`로 경로를 바꿀 수 있다. `(선택) 사용자 지시` 칸은 `POST /trigger/pN` 본문 `user_instruction` → `active_jobs[run_id]`에 저장(큐 대기→승격 경로도 보존, `_get_job_instruction`으로 회수) → `run_holyclaude_pipeline.mjs --instruction` → 팀장 프롬프트에 "추가 사용자 지시"로 주입. `_sanitize_instruction`(제어문자 제거·4000자 제한)과 `shlex.quote`로 안전 처리. **코드 강제 게이트(MCP 커버리지·source-sanitizer·검증)는 사용자 지시보다 우선**하며 프롬프트 텍스트로는 우회 불가.
 - **테스트**: FastAPI TestClient는 요청 사이에 `asyncio.create_task`로 만든 백그라운드 작업을 취소하므로, 동시성 로직 테스트 시 실제 실행 대신 task를 기록하는 방식으로 격리해야 함.
 - **동시 commit 경합**: cap 10 병렬 실행 시 `.git/index.lock` 충돌 가능. 드물게 발생하면 registry `committing` 상태 기반 직렬화 추가를 고려.
 - **세계선 맵 SPA**: `sg-worldline-map/src/data/*.json`은 tracked 배포 입력이고 `dist/`, `node_modules/`, `*.tsbuildinfo`는 로컬 산출물이다. 맵 경로는 `/maps/` 전제이므로 `vite.config.ts`의 `base`, `index.html`의 favicon 경로, SPA fallback route를 함께 확인한다.
-- **claude-mem 메모리 계층**: 에이전트 세션(도구 호출·편집·명령)을 자동 캡처·요약해 다음 세션에 맥락으로 주입. 뷰어 `http://localhost:37700`. 배치 파이프라인 P1~P6은 기본적으로 `settingSources: ['project','local']`만 로드해 user plugin hook 자동 발화를 차단하고, P7 또는 `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH=1`일 때만 user settings까지 로드한다. 능동 검색(`mem-search`)은 프롬프트 지시 시에만. 데이터는 named volume `sg-wiki-claude-mem`(`/home/claude/.claude-mem`, SQLite+Chroma) — drvfs bind mount가 아니라 재빌드에 보존·SQLite 락 안전. worker/install은 `claude-mem@13.9.1`로 고정하고 s6 longrun(`scripts/s6/claude-mem-worker`)이 `worker-service.cjs --daemon` 프로세스를 감시한다(daemon이 없을 때만 `npx -y claude-mem@${CLAUDE_MEM_VERSION:-13.9.1} start --daemon` 실행). 자동 context는 observation/session 수를 좁게 제한하고 `CLAUDE_MEM_SEMANTIC_INJECT=false`, `CLAUDE_MEM_SKIP_TOOLS=Read,LS,Grep,Glob,...`로 noisy 캡처를 줄인다. `Dockerfile`·s6 스크립트·`docker-compose.yaml`은 이미지 베이크(재빌드 필요); `enabledPlugins`(`data/claude/settings.json`)는 마운트돼 즉시 반영. claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로 `scripts/claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성 — 없으면 OAuth 폴백으로 관측·요약 생성이 "Not logged in" 루프로 전부 실패(0건). 529 과부하 오류를 방지하기 위해 LLM 요청은 `claude-mem-llm-proxy`가 가로채며, admin UI 진행 중/대기 중 작업 수(`running`+`queued`)가 임계값(`CLAUDE_MEM_PROXY_N`, 기본값 3) 이하일 때만 Z.AI 엔드포인트로 전송된다. proxy의 admin URL/timeout/fail-open/queue 제한은 `CLAUDE_MEM_ADMIN_URL`, `CLAUDE_MEM_PROXY_ADMIN_TIMEOUT_MS`, `CLAUDE_MEM_PROXY_FAIL_OPEN_AFTER_MS`, `CLAUDE_MEM_PROXY_MAX_QUEUE`, `CLAUDE_MEM_PROXY_MAX_QUEUED_AGE_MS`로 조정하며 `/health`를 제공한다.
+- **claude-mem 메모리 계층**: 에이전트 세션(도구 호출·편집·명령)을 자동 캡처·요약해 다음 세션에 맥락으로 주입. 뷰어 `http://localhost:37700`. 배치 파이프라인 P1~P6/P8은 기본적으로 `settingSources: ['project','local']`만 로드해 user plugin hook 자동 발화를 차단하고, P7 또는 `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH=1`일 때만 user settings까지 로드한다. 능동 검색(`mem-search`)은 프롬프트 지시 시에만. 데이터는 named volume `sg-wiki-claude-mem`(`/home/claude/.claude-mem`, SQLite+Chroma) — drvfs bind mount가 아니라 재빌드에 보존·SQLite 락 안전. worker/install은 `claude-mem@13.9.1`로 고정하고 s6 longrun(`scripts/s6/claude-mem-worker`)이 `worker-service.cjs --daemon` 프로세스를 감시한다(daemon이 없을 때만 `npx -y claude-mem@${CLAUDE_MEM_VERSION:-13.9.1} start --daemon` 실행). 자동 context는 observation/session 수를 좁게 제한하고 `CLAUDE_MEM_SEMANTIC_INJECT=false`, `CLAUDE_MEM_SKIP_TOOLS=Read,LS,Grep,Glob,...`로 noisy 캡처를 줄인다. `Dockerfile`·s6 스크립트·`docker-compose.yaml`은 이미지 베이크(재빌드 필요); `enabledPlugins`(`data/claude/settings.json`)는 마운트돼 즉시 반영. claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로 `scripts/claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성 — 없으면 OAuth 폴백으로 관측·요약 생성이 "Not logged in" 루프로 전부 실패(0건). 529 과부하 오류를 방지하기 위해 LLM 요청은 `claude-mem-llm-proxy`가 가로채며, admin UI 진행 중/대기 중 작업 수(`running`+`queued`)가 임계값(`CLAUDE_MEM_PROXY_N`, 기본값 3) 이하일 때만 Z.AI 엔드포인트로 전송된다. proxy의 admin URL/timeout/fail-open/queue 제한은 `CLAUDE_MEM_ADMIN_URL`, `CLAUDE_MEM_PROXY_ADMIN_TIMEOUT_MS`, `CLAUDE_MEM_PROXY_FAIL_OPEN_AFTER_MS`, `CLAUDE_MEM_PROXY_MAX_QUEUE`, `CLAUDE_MEM_PROXY_MAX_QUEUED_AGE_MS`로 조정하며 `/health`를 제공한다.
 
 ## 컨테이너 상태 확인
 

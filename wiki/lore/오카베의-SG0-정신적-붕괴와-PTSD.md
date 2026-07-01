@@ -1,4 +1,8 @@
 ---
+slug: okabe-sg0-mental-breakdown-ptsd
+date: 2026-06-30
+category: lore
+type: lore
 spoiler: endgame
 description: "이 문서는 오카베 린타로가 《Steins;Gate 0》 시점에서 겪는 외상후 스트레스 장애(PTSD)와"
 ---

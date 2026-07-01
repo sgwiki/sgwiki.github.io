@@ -60,6 +60,7 @@ PIPELINE_TIMEOUT_DEFAULTS = {
     "p5": (4 * 60 * 60, 30 * 60),
     "p6": (4 * 60 * 60, 30 * 60),
     "p7": (45 * 60, 15 * 60),
+    "p8": (4 * 60 * 60, 30 * 60),
 }
 ACTIVE_RUN_STATUSES = {"running", "terminating"}
 TERMINAL_REGISTRY_STATUSES = {
@@ -253,6 +254,17 @@ async def trigger_p7(body: TriggerBody | None = None):
         asyncio.create_task(_run_p7(run_id, started_at))
         return {"status": "started", "pipeline": "p7", "run_id": run_id}
     return {"status": "queued", "pipeline": "p7", "run_id": run_id, "queue_position": _queue_position(run_id)}
+
+
+@app.post("/trigger/p8")
+async def trigger_p8(body: TriggerBody | None = None):
+    run_id, started_at, status = _start_active_job(
+        "p8", "AI 문체 제거 파이프라인 실행 준비 중", body.user_instruction if body else None
+    )
+    if status == "running":
+        asyncio.create_task(_run_p8(run_id, started_at))
+        return {"status": "started", "pipeline": "p8", "run_id": run_id}
+    return {"status": "queued", "pipeline": "p8", "run_id": run_id, "queue_position": _queue_position(run_id)}
 
 
 @app.get("/running")
@@ -1984,6 +1996,15 @@ async def _run_p7(run_id: str, started_at: str) -> None:
         _pop_active_job(run_id)
 
 
+async def _run_p8(run_id: str, started_at: str) -> None:
+    user_instruction = _get_job_instruction(run_id)
+    try:
+        log = await asyncio.to_thread(_run_holyclaude_pipeline, "p8", run_id, started_at, user_instruction)
+        _save_run(log)
+    finally:
+        _pop_active_job(run_id)
+
+
 def _start_active_job(pipeline: str, last_line: str, user_instruction: str | None = None) -> tuple[str, str, str]:
     """Register a job. Returns (run_id, started_at, status).
 
@@ -2113,6 +2134,8 @@ def _dispatch_next_job() -> None:
             asyncio.create_task(_run_p6(rid, started_at))
         elif pipeline == "p7":
             asyncio.create_task(_run_p7(rid, started_at))
+        elif pipeline == "p8":
+            asyncio.create_task(_run_p8(rid, started_at))
 
 
 def _sanitize_instruction(value: str, limit: int = 4000) -> str:
