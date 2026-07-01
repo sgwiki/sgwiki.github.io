@@ -15,6 +15,7 @@
 | `scripts/run_holyclaude_pipeline.mjs` | P1/P2/P3/P4/P5/P6/P7 파이프라인 실행 래퍼 | tracked |
 | `scripts/wiki_work_registry.mjs` | 병렬 실행 중복 주제 방지 registry | tracked |
 | `scripts/wiki_link_lint.py` | 내부 링크 결정적 검사·자동 교정 funnel(wiki-linker 강제 사용). `--file`/`--scan`, `--apply`, `--json`. ok/autofix/broken/suspicious/external 분류 | tracked |
+| `scripts/humanize_protect_quotes.py` | Humanize KR 후 전 스냅샷 기준으로 Markdown 인용 블록(`>`) 라인을 결정적 복원. quote-line 개수/순서 변경 시 exit 1 | tracked |
 | `scripts/humanize_fact_guard.py` | Humanize KR 전/후 숫자·인용 블록·frontmatter `spoiler` 불변식 검사. 위반 시 exit 1 | tracked |
 | `scripts/humanize_coverage.mjs` | P5 humanize 백필 완료 표식(`.admin/humanize-coverage.json`) 관리. `list`/`mark`/`unmark`/`stats` | tracked |
 | `scripts/p6_demand_queue.mjs` | P6 커뮤니티 큐레이션 후보 소비 큐 (`add-candidates`로 외부 후보 병합 지원) | tracked |
@@ -56,10 +57,11 @@ node --check scripts/p6_demand_queue.mjs
 node --check scripts/p6_cluster_miner.mjs
 node --check scripts/humanize_coverage.mjs
 python3 scripts/test_humanize_fact_guard.py
+python3 scripts/test_humanize_protect_quotes.py
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --dry-run   # 부작용 없는 dry-run
 node scripts/run_holyclaude_pipeline.mjs p1 --run-id <id> --instruction "..." --dry-run   # 선택 사용자 지시(--instruction) 주입
 node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run   # claude-mem 규칙 승격 제안 dry-run
-make test                                             # scripts 단위 테스트 (wiki_link_lint, humanize_fact_guard)
+make test                                             # scripts 단위 테스트 (wiki_link_lint, humanize_fact_guard, humanize_protect_quotes)
 make wiki-lint                                        # 내부 링크 결정적 스캔 (전체 wiki/)
 python3 scripts/wiki_link_lint.py --file wiki/<cat>/<slug>.md --json   # 단일 파일 분류(교정 제안)
 ```
@@ -136,6 +138,7 @@ wiki/*.md 전체 스캔 + humanize_coverage 미처리 우선
 → wiki-rewriter(위키 고유 교정: VOCAB_GUIDE 용어·한자/영한 혼동 정리·내부 식별자 스크럽)
 → wiki-humanizer(`/humanize --strict`, AI-문체 제거)
 → source-sanitizer
+→ humanize_protect_quotes(인용 블록 결정적 복원)
 → humanize_fact_guard(숫자·인용 블록·spoiler 불변)
 → wiki-linker(내부·외부 링크 검사·자동 교정·게이트)
 → commit/push → humanize_coverage mark
@@ -143,7 +146,7 @@ wiki/*.md 전체 스캔 + humanize_coverage 미처리 우선
 
 - **읽기+쓰기**: 정비 결과는 commit/push됨. 대규모 수정이므로 관리 UI에서 검토 후 승인 권장.
 - **P5 runaway 방지**: 1회 실행은 기본 최대 5개 파일(`ADMIN_P5_MAX_FILES_PER_RUN`)만 처리한다. admin watchdog은 registry 처리 파일 수가 예산을 초과하면 `p5_file_budget_exceeded`로 프로세스 그룹을 종료한다. `/running` 응답은 `p5_files_processed`/`p5_files_active`/`p5_files_total`/`p5_file_budget`을 노출한다.
-- **Humanize KR**: 컨테이너 부팅 시 `docker/holyclaude/scripts/humanize-bootstrap.sh`가 `humanize-korean@im-not-ai` 플러그인을 best-effort로 refresh한다. P5/P6 batch는 user settings를 로드하지 않으므로 `scripts/run_holyclaude_pipeline.mjs`가 `HUMANIZE_PLUGIN_DIR`을 SDK local plugin으로 주입해 `/humanize` slash command를 등록한다. `docker/holyclaude/data/claude/author-context.yaml`은 sg-wiki 보이스 계약이며, 실제 안전성은 `source-sanitizer`와 `humanize_fact_guard`가 강제한다.
+- **Humanize KR**: 컨테이너 부팅 시 `docker/holyclaude/scripts/humanize-bootstrap.sh`가 `humanize-korean@im-not-ai` 플러그인을 best-effort로 refresh한다. P5/P6 batch는 user settings를 로드하지 않으므로 `scripts/run_holyclaude_pipeline.mjs`가 `HUMANIZE_PLUGIN_DIR`을 SDK local plugin으로 주입해 `/humanize` slash command를 등록한다. `docker/holyclaude/data/claude/author-context.yaml`은 sg-wiki 보이스 계약이며, 실제 안전성은 `source-sanitizer`, `humanize_protect_quotes`, `humanize_fact_guard`가 강제한다. `humanize_protect_quotes.py`는 humanize가 건드린 인용 블록 라인을 전 스냅샷 기준으로 복원하고, 복원 불가 시 fail한다.
 - **한자/영한 혼동 정리**: P5 `wiki-rewriter`는 `제0` → `제로` 같은 작품명 표기, 한자 혼입, 번역 누락형 영어/한글 혼동을 검사·교정한다. 작품명·고유 명사·세계관 로어에서 정착한 영어/약어와 한국어 혼용은 유지하되, 한자 자체는 공개 본문에 남기지 않는다.
 
 ### 파이프라인 6 (커뮤니티 큐레이션)

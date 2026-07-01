@@ -90,7 +90,18 @@ cp wiki/{category}/{slug}.md /tmp/humanize-before-{slug}.md
 
 - wiki-humanizer는 Humanize KR 플러그인의 `/humanize --strict`를 실행하고 카테고리별 변경 수를 JSON으로 보고한다.
 - 플러그인 미설치·실행 실패(`error`)이면 문체 제거 없이 다음 단계로 진행한다(파이프라인 중단 사유 아님).
-- wiki-humanizer가 `humanize changed protected blockquote; restored`를 보고하면 humanize 변경은 이미 원복된 상태다. restructurer/rewriter 변경은 유지한 채 source-sanitizer와 fact guard를 계속 진행하되, 해당 파일은 humanize_coverage에 mark하지 않는다.
+
+### ④-c protected quote restore
+
+wiki-humanizer 실행 직후, 인용 블록은 프롬프트 판단이 아니라 결정적 스크립트로 복원한다:
+
+```bash
+python3 /workspace/scripts/humanize_protect_quotes.py --before /tmp/humanize-before-{slug}.md --after wiki/{category}/{slug}.md --apply
+```
+
+- `status: pass`이면 계속 진행한다. `changed: true`는 humanize가 인용 블록을 건드렸고 스크립트가 원본 quote line으로 복원했다는 뜻이다.
+- `status: fail`이면 quote-line 개수/순서가 바뀐 것이므로 자동 복원이 불가능하다. 해당 파일 변경을 `git checkout -- wiki/{category}/{slug}.md`로 되돌리고 registry release(status rejected)한다.
+- quote restore가 `changed: true`였더라도, 이후 `humanize_fact_guard`까지 통과하면 humanize 성공으로 취급할 수 있다.
 
 ### ⑤ source-sanitizer
 
