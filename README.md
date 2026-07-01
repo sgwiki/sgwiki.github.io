@@ -29,7 +29,7 @@ wiki/
 - `SERN`, `D-RINE`, `D메일`, `IBN 5100`처럼 한국어 팬덤에서 원문·약어 표기가 통용되는 항목은 파일명에도 해당 표기를 유지합니다.
 - 문서 이름을 바꿀 때는 변경 전에 기존 내부 링크를 확인하고, 파일 이동과 함께 모든 Markdown 상대 링크를 새 경로로 갱신해야 합니다.
 - `The Mechanics of Steins;Gate v1.0.3` 인용은 GitHub PDF 원문 대신 로컬 번역본 `wiki/근거자료/비공식/mechanics-of-steins-gate/`의 구체적인 장 파일로 연결합니다. 절 번호가 `§3.1`이면 `ch3.md`, `§2.6.1`이면 `ch2.md`처럼 첫 자리 장 번호를 기준으로 매핑하고, 로컬 번역본에 대응 장이 없는 부록성 인용만 `index.md`를 사용합니다.
-- 내부 링크 점검은 `scripts/wiki_link_lint.py`(결정적 정규식 funnel)로 자동화합니다. `make wiki-lint`로 전체를 스캔하면 깨진 링크 중 동일 파일명이 유일하게 존재하는 경우는 `--apply`로 자동 교정되고, 애매한 케이스(`[[wikilink]]`·링크 잔해 등)는 `suspicious` 목록으로 추려집니다. P1/P2/P5/P6/P8의 `wiki-linker` 에이전트는 이 도구를 **강제로 1회 이상** 실행합니다.
+- 내부 링크 점검은 `scripts/wiki_link_lint.py`(결정적 정규식 funnel)로 자동화합니다. `make wiki-lint`로 전체를 스캔하면 깨진 링크 중 동일 파일명이 유일하게 존재하는 경우는 `--apply`로 자동 교정되고, 애매한 케이스(`[[wikilink]]`·링크 잔해 등)는 `suspicious` 목록으로 추려집니다. P1/P2/P5/P6/P8/P9의 `wiki-linker` 에이전트는 이 도구를 **강제로 1회 이상** 실행합니다.
 - 링크 정리 후에는 `make wiki-build`로 MkDocs strict 빌드를 통과시켜야 합니다.
 
 ## 디렉터리 구조
@@ -40,7 +40,7 @@ wiki/
 ├── docs/                 설계 문서 · 저작권 검토 · 계획
 ├── mkdocs.yml            MkDocs Material 설정
 ├── scripts/
-│   ├── run_holyclaude_pipeline.mjs   P1~P8 파이프라인 실행 래퍼
+│   ├── run_holyclaude_pipeline.mjs   P1~P9 파이프라인 실행 래퍼
 │   ├── wiki_work_registry.mjs        병렬 실행 중복 주제 방지용 작업 현황 registry
 │   ├── p6_demand_queue.mjs           P6 커뮤니티 큐레이션 후보 소비 큐 (add-candidates 병합 지원)
 │   ├── p6_cluster_miner.mjs          P6 클러스터 원천 마이닝 상태 큐 (pending 소진 시 fallback, + test)
@@ -123,7 +123,7 @@ make shell           # 컨테이너 bash 접속
 
 ### 관리 UI (`http://localhost:3002`)
 
-- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) / 파이프라인 6 (커뮤니티 큐레이션) / 파이프라인 7 (규칙 승격 제안) / 파이프라인 8 (AI 문체 제거) 수동 실행
+- 파이프라인 1 (콘텐츠 생성) / 파이프라인 2 (제안 처리) / 파이프라인 3 (온톨로지 저작) / 파이프라인 4 (품질 검사) / 파이프라인 5 (위키 정비) / 파이프라인 6 (커뮤니티 큐레이션) / 파이프라인 7 (규칙 승격 제안) / 파이프라인 8 (AI 문체 제거) / 파이프라인 9 (위키 심층 조사) 수동 실행
 - 수동 실행은 팀 버튼 선택 → 사용자 지시 확인·수정 → **실행** 버튼 순서로 시작합니다. 팀별 기본 지시 프리셋은 `docker/holyclaude/admin/presets.json`에서 로드되며, 파일을 수정하면 다음 페이지 새로고침부터 반영됩니다.
 - **(선택) 사용자 지시** 입력 칸: 텍스트를 넣으면 팀장(team-lead) 에이전트 프롬프트에 추가 지시로 전달 (`POST /trigger/pN` 본문 `user_instruction`). 비워도 되며, 보안·게이트 규칙은 지시보다 우선합니다.
 - Cron 스케줄 설정 (APScheduler, 기본값 `0 * * * *`)
@@ -142,7 +142,7 @@ make shell           # 컨테이너 bash 접속
 - **데이터**: named volume `sg-wiki-claude-mem` → `/home/claude/.claude-mem` (SQLite + Chroma). drvfs bind mount가 아닌 Docker 로컬 볼륨이라 SQLite 락이 안전하고 컨테이너 재빌드에도 보존됩니다.
 - **격리**: sg-wiki 전용 단일 볼륨·단일 worker — 다른 프로젝트 데이터는 섞이지 않습니다.
 - **요약 LLM·인증**: Z.AI `glm-4-flash` 사용 (`CLAUDE_MEM_MODEL`). claude-mem 워커는 컨테이너 env가 아닌 `~/.claude-mem/.env`에서 SDK 인증을 읽으므로, `claude-mem-bootstrap.sh`가 매 기동마다 `$ZAI_API_KEY`로 이 파일을 생성합니다(별도 키 불필요). 파일이 없으면 OAuth 키체인으로 폴백 → "Not logged in" 루프로 observation/summary가 0건이 됩니다.
-- **동작**: 배치 파이프라인 P1~P6/P8은 기본적으로 `settingSources: ['project','local']`만 로드해 user plugin hook 자동 발화를 차단합니다. P7 또는 `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH=1`일 때만 user settings까지 로드합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
+- **동작**: 배치 파이프라인 P1~P6/P8/P9는 기본적으로 `settingSources: ['project','local']`만 로드해 user plugin hook 자동 발화를 차단합니다. P7 또는 `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH=1`일 때만 user settings까지 로드합니다. 능동 검색은 에이전트 프롬프트에서 `mem-search` 사용을 지시할 때만 동작합니다.
 - **운영 기본값**: worker/install은 `claude-mem@13.9.1`로 고정합니다. s6 longrun은 `worker-service.cjs --daemon`을 감시하고 없을 때만 worker를 다시 시작합니다. 자동 context는 최근 observation/session만 좁게 주입하고 semantic inject는 끄며, `Read`/`LS`/`Grep` 같은 noisy tool은 캡처에서 제외합니다.
 - **LLM proxy**: claude-mem LLM 요청은 `claude-mem-llm-proxy`를 거쳐 admin의 실행/대기 작업 수가 임계값 이하일 때만 upstream으로 전달됩니다. proxy는 admin 조회 timeout, fail-open, queue cap, queue TTL, `/health`를 제공합니다.
 
@@ -212,6 +212,12 @@ node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run
 
 적용 대상은 `AGENTS.md`, `README.md`, `wiki/README.md`, `docker/holyclaude/data/claude/CLAUDE.md`, `docker/holyclaude/data/claude/agents/*.md`로 제한됩니다. admin UI의 “규칙 승격 검토”에서 파일별 전후 diff를 확인하고, 필요하면 제안문을 수정한 뒤 승인해야 실제 파일에 적용됩니다. 대상 파일이 제안 생성 후 바뀌면 `before_sha256` 검증으로 승인 적용이 막힙니다.
 
+### 파이프라인 9 — 위키 심층 조사
+
+P9는 기존 8개 파이프라인 중 **유일하게 `wiki/*.md`에 이미 적힌 사실을 근거 기반으로 직접 정정(correction)**할 수 있습니다(다른 파이프라인은 사실 변경이 절대 금지입니다). 발견(`wiki-deep-researcher`, 읽기 전용 — dataforge 6종·namuwiki·sg-ontology·`wiki/근거자료/` 로컬 자료 전수 조사) → 근거 판정(`wiki-research-auditor`, 읽기 전용 — addition/correction 이원 게이트, fail-closed) → 제한 편집(`wiki-research-editor`, 승인된 위치만) 3단계를 분리하고, `wiki-research-lead`가 correction 판정을 다시 검증한 뒤 팀장 diff 검토를 통과해야 commit/push합니다.
+
+대상 선정은 ① 사용자 지정 페이지/주제 → ② 최신 `.admin/quality-audit-*.json`의 warn/fail 페이지 → ③ `.admin/p9-research-log.json` 기준 가장 오래 전 조사된 파일 순차 선택 순서를 따릅니다. `correction`은 공식 자료 직접 근거 또는 서로 다른 소스 유형 2개 이상 일치를 요구하며, `addition`(누락 보강)보다 엄격한 기준입니다. 1회 실행은 최대 1개 파일만 처리합니다.
+
 ### 위키 페이지 검토
 
 검토 패널은 upstream 이후 변경된 `wiki/*.md`와 아직 커밋되지 않은 `wiki/*.md`를 표시합니다. 승인하면 현재 파일 해시가 `.admin/wiki_reviews.json`에 기록되고, 거부하면 해당 파일을 upstream 기준으로 되돌리거나 새 파일을 제거합니다.
@@ -231,12 +237,13 @@ node scripts/run_holyclaude_pipeline.mjs p7 --run-id <id> --dry-run
 - `ADMIN_TERMINATE_GRACE_SECONDS`: cancel/timeout 시 TERM 후 KILL까지 대기 시간, 기본값 `20`
 - `ADMIN_REAPER_INTERVAL_SECONDS`: stale 예약 회수/timeout 점검 주기, 기본값 `60`
 - `ADMIN_P5_MAX_FILES_PER_RUN`: P5 한 run에서 허용하는 최대 registry 파일 수, 기본값 `5`. 초과 시 watchdog이 `p5_file_budget_exceeded`로 실행을 종료한다.
+- `ADMIN_P9_MAX_FILES_PER_RUN`: P9 한 run에서 허용하는 최대 registry 파일 수, 기본값 `1`. 초과 시 watchdog이 `p9_file_budget_exceeded`로 실행을 종료한다.
 - `ADMIN_P{N}_WALL_TIMEOUT_SECONDS`, `ADMIN_P{N}_IDLE_TIMEOUT_SECONDS`: 파이프라인별 watchdog override
 - `ADMIN_RULE_PROMOTION_ROOT`: P7 규칙 승격 제안 manifest/proposed 파일 저장 위치, 기본값 `/workspace/.admin/rule-promotions`
 - `ADMIN_SUGGESTION_ACK_STATE`: 제안 "확인"(과거 제한 사항) 보관 상태 파일, 기본값 `/workspace/.admin/suggestion_ack.json`
 - `ADMIN_PRESETS_FILE`: 관리 UI 수동 실행 팀별 사용자 지시 프리셋 JSON, 기본값 `/workspace/docker/holyclaude/admin/presets.json`
 - `HOLYCLAUDE_PIPELINE_MODEL`: 파이프라인 실행 모델, 기본값 `glm-5.2`
-- `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH`: `1`이면 P1~P6/P8도 user settings hook을 로드, 기본값 `0`
+- `HOLYCLAUDE_PIPELINE_ENABLE_AUTO_HOOKS_FOR_BATCH`: `1`이면 P1~P6/P8/P9도 user settings hook을 로드, 기본값 `0`
 - `CLAUDE_MEM_ADMIN_URL`, `CLAUDE_MEM_PROXY_ADMIN_TIMEOUT_MS`, `CLAUDE_MEM_PROXY_FAIL_OPEN_AFTER_MS`, `CLAUDE_MEM_PROXY_MAX_QUEUE`, `CLAUDE_MEM_PROXY_MAX_QUEUED_AGE_MS`, `CLAUDE_MEM_PROXY_UPSTREAM_TIMEOUT_MS`: claude-mem LLM proxy 안정성/큐 제어
 - `R2_MOCK`: `0`이면 실제 Cloudflare R2에서 제안 폴링, `1`이면 `data/mock-r2/suggestions/` 사용 (기본값 `1`)
 - `R2_ENDPOINT`: R2 S3-compatible 엔드포인트 (`https://<account_id>.r2.cloudflarestorage.com`)
