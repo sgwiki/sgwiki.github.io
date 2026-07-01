@@ -462,6 +462,15 @@ async def approve_wiki_review(body: WikiReviewBody):
 
 def _approve_wiki_review(body: WikiReviewBody) -> dict:
     rel = _safe_wiki_relpath(body.path)
+    if _wiki_path_has_active_reservation(rel):
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "status": "active_run_in_progress",
+                "path": rel,
+                "message": "이 위키 파일은 현재 실행 중인 작업이 점유 중이라 검토 승인할 수 없습니다.",
+            },
+        )
     item = _wiki_review_item(rel)
     if item is None:
         return {"status": "not_found", "path": rel}
@@ -487,6 +496,15 @@ async def reject_wiki_review(body: WikiReviewBody):
 
 def _reject_wiki_review(body: WikiReviewBody) -> dict:
     rel = _safe_wiki_relpath(body.path)
+    if _wiki_path_has_active_reservation(rel):
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "status": "active_run_in_progress",
+                "path": rel,
+                "message": "이 위키 파일은 현재 실행 중인 작업이 점유 중이라 검토 거부할 수 없습니다.",
+            },
+        )
     item = _wiki_review_item(rel)
     if item is None:
         return {"status": "not_found", "path": rel}
@@ -1000,10 +1018,13 @@ def _pending_wiki_review_items() -> list[dict]:
     committed = _committed_wiki_changes()
     review_state = _load_review_state()
     auto_approve = _wiki_auto_approve_enabled()
+    active_registry_files = _active_registry_files()
     candidates = set(committed) | set(working)
     items = []
     auto_dirty = False
     for rel in sorted(candidates):
+        if rel in active_registry_files:
+            continue
         try:
             item = _wiki_review_item(
                 rel,
@@ -1605,6 +1626,19 @@ def _registry_progress_for_run(run_id: str) -> dict:
         "total": len(active) + len(terminal),
         "active_files": [entry.get("file") for entry in active if entry.get("file")],
     }
+
+
+def _active_registry_files() -> set[str]:
+    registry = _load_work_registry()
+    return {
+        str(entry.get("file"))
+        for entry in (registry.get("active") or {}).values()
+        if isinstance(entry, dict) and entry.get("file")
+    }
+
+
+def _wiki_path_has_active_reservation(rel: str) -> bool:
+    return rel in _active_registry_files()
 
 
 def _future_iso(seconds: int, *, base: float | None = None) -> str:
