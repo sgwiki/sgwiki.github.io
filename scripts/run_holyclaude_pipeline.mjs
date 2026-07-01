@@ -337,7 +337,7 @@ function buildP5Prompt(runId) {
 실행 ID: ${runId}
 작업 디렉토리: /workspace
 
-반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-maintenance-lead.md, wiki-restructurer.md, wiki-rewriter.md, source-sanitizer.md, wiki-linker.md 규칙을 준수하세요.
+반드시 /home/claude/.claude/CLAUDE.md 및 /home/claude/.claude/agents/*.md 지침을 따르세요. 특히 wiki-maintenance-lead.md, wiki-restructurer.md, wiki-rewriter.md, wiki-humanizer.md, source-sanitizer.md, wiki-linker.md 규칙을 준수하세요.
 
 당신은 파이프라인 5의 wiki-maintenance-lead(위키 정비 팀장)입니다.
 
@@ -346,8 +346,9 @@ function buildP5Prompt(runId) {
 목표:
 1. \`find /workspace/wiki -name "*.md"\` 로 전체 파일 목록을 수집하세요.
 2. \`node /workspace/scripts/wiki_work_registry.mjs list\` 로 진행 중인 파일을 확인하고 제외하세요.
-3. 최근 품질 감사 리포트(\`/workspace/.admin/quality-audit-*.json\`)가 있으면 우선 참조해 정비 대상을 선정하세요.
-4. 1회 실행에서 최대 5개 파일을 선정해 순차 처리하세요.
+3. \`node /workspace/scripts/humanize_coverage.mjs list\` 로 이미 humanize 처리된 파일을 확인하고 우선 제외하세요. 미처리 파일을 우선 선정하되, 구조/링크 정비가 긴급한 파일은 사유를 남기고 예외 처리할 수 있습니다.
+4. 최근 품질 감사 리포트(\`/workspace/.admin/quality-audit-*.json\`)가 있으면 우선 참조해 정비 대상을 선정하세요.
+5. 1회 실행에서 최대 5개 파일을 선정해 순차 처리하세요. 이 한도는 admin watchdog이 registry 기준으로 강제하므로, 5개 처리 후에는 새 파일을 예약하지 말고 완료 보고 후 종료하세요.
 
 파일당 처리 순서:
 1. registry 예약:
@@ -357,30 +358,41 @@ function buildP5Prompt(runId) {
 2. wiki-restructurer 에이전트 스폰 → 섹션 구조·헤더·frontmatter 정비 (링크는 다루지 않음).
    보고가 \`changed: false\`이면 restructurer 단계 완료로 간주.
 
-3. wiki-rewriter 에이전트 스폰 → 문체·표현·용어 일관성 교정.
+3. wiki-rewriter 에이전트 스폰 → 위키 고유 교정(VOCAB_GUIDE 용어 통일·내부 식별자 스크럽·사실/스포일러 보존 검토)만 수행. 번역투·헤징·리듬 등 일반 AI-문체 교정은 다음 단계 humanize로 이관됐으므로 rewriter가 손대지 않음.
    보고가 \`changed: false\`이면 rewriter 단계 완료로 간주.
 
-4. source-sanitizer 에이전트 스폰 → 내부 식별자 누출 검사.
+4. humanize 전 스냅샷 확보 후 wiki-humanizer 에이전트 스폰(AI-문체 제거):
+   cp wiki/{category}/{slug}.md /tmp/humanize-before-{slug}.md
+   그다음 wiki-humanizer가 \`/humanize --strict wiki/{category}/{slug}.md\`(author-context.yaml 프로파일 적용)를 실행해 번역투·헤징·형식명사·기계적 리듬을 사실 불변으로 제거하고 카테고리별 변경 수를 JSON으로 보고.
+   humanize 플러그인 미설치·실행 실패(\`error\`)이면 문체 제거 없이 다음 단계로 진행(부팅 비블로킹과 동일 원칙, 실패를 파이프라인 중단 사유로 삼지 않음).
+
+5. source-sanitizer 에이전트 스폰 → 내부 식별자 누출 검사.
    fail이면 rewriter에게 최대 1회 재작성 요청. 재작성 후에도 fail이면 git checkout으로 되돌리고 registry release.
 
-5. wiki-linker 에이전트 스폰(file 모드) → 내부·외부 링크를 직접 검사·교정.
+6. humanize_fact_guard(결정적 사실/수치/인용/스포일러 불변식) 실행:
+   python3 /workspace/scripts/humanize_fact_guard.py --before /tmp/humanize-before-{slug}.md --after wiki/{category}/{slug}.md
+   exit 0(위반 0건)이면 통과. exit 1(위반)이면 **commit 금지** — git checkout -- wiki/{category}/{slug}.md 로 해당 파일의 이번 run 변경 전체를 되돌리고, registry release(status rejected) 후 다음 파일로. 위반 JSON은 완료 보고에 첨부한다. 스냅샷은 rm으로 정리.
+
+7. wiki-linker 에이전트 스폰(file 모드) → 내부·외부 링크를 직접 검사·교정.
    wiki-linker가 자동 교정 가능한 깨진 링크(유일 일치 내부 경로, 200대로 해결되는 외부 리다이렉트)를 직접 수정하고 fixed로 보고. 팀장은 수정 요청 없이 결과(diff)만 검토.
    result: fail(자동 교정 불가 broken_links 잔존)이면 git checkout으로 되돌리고 registry release. orphan_warning·외부 URL warn은 fail이 아니며 팀장이 판단.
 
-6. 팀장 diff 검토:
+8. 팀장 diff 검토:
    - 사실 관계 변경 없음 확인
    - 스포일러 등급 변경 없음 확인
    - source 식별자 미노출 확인
 
-7. 통과 시 commit/push:
+9. 통과 시 commit/push:
    node /workspace/scripts/wiki_work_registry.mjs status --run-id ${runId} --file wiki/{category}/{slug}.md --status committing
    git add wiki/{category}/{slug}.md
    git commit -m "chore(wiki): {slug} 정비 — {변경 요약}"
    git push
 
-8. registry 정리:
+10. registry 정리:
    완료: node /workspace/scripts/wiki_work_registry.mjs complete --run-id ${runId} --file wiki/{category}/{slug}.md
    실패: node /workspace/scripts/wiki_work_registry.mjs release --run-id ${runId} --file wiki/{category}/{slug}.md --status rejected
+   humanize 완료 표식: humanize 단계가 error 없이 실행되고 가드까지 통과한 파일은 commit/push 후
+   node /workspace/scripts/humanize_coverage.mjs mark --run-id ${runId} --file wiki/{category}/{slug}.md
 
 운영 제약:
 - 사용자에게 진행 여부를 묻지 말고, 안전한 다음 단계는 직접 수행하세요.
@@ -388,11 +400,13 @@ function buildP5Prompt(runId) {
 - 신규 페이지 생성 금지.
 - 사실 관계·스포일러 등급 변경 금지.
 - sanitizer fail 상태에서 commit 금지.
+- humanize_fact_guard fail(exit 1) 상태에서 commit 금지. 반드시 git checkout으로 되돌리고 registry release.
 - wiki-linker fail(broken_links) 상태에서 commit 금지.
 - 팀장 diff 검토 없이 commit 금지.
+- humanize는 문체 전용이며 사실·수치·인용·스포일러를 바꾸지 않는다. 가드가 이를 결정적으로 강제한다.
 - 하위 에이전트에게 git commit/push 위임 금지.
 - 내부 경로, chunk ID, source_filter 이름은 공개 위키에 노출하지 마세요.
-- 완료 시 처리 파일 목록, 각 파일의 변경 요약, commit hash 또는 미커밋 사유를 보고하세요.`;
+- 완료 시 처리 파일 목록, 각 파일의 변경 요약(humanize 카테고리·가드 결과 포함), commit hash 또는 미커밋 사유를 보고하세요.`;
 }
 
 function buildP6Prompt(runId) {
@@ -432,8 +446,8 @@ function buildP6Prompt(runId) {
    - create(fact): wiki-planner→wiki-writer.
    - create(editorial): wiki-writer에 사설 브리프("커뮤니티 견해" 배지 + 사실 단정 금지).
    - 내용 업데이트(근거 기반 보강): wiki-writer 섹션 병합 브리프로 대상 파일을 타깃 보강(전체 재정비 아님). 문체 전용인 wiki-rewriter에 내용 보강을 위임하지 마세요(레거시 라우팅 버그 교정).
-   - 문체 교정만 필요하면 wiki-rewriter. 어느 경우든 사실 관계·스포일러 등급을 임의로 바꾸지 마세요.
-6. source-sanitizer → wiki-linker → wiki-quality-lead(gate) 순으로 검증하세요. sanitizer fail은 최대 2회, quality fail은 최대 1회 재작성 요청. wiki-linker는 내부·외부 링크를 직접 교정하고 결과만 보고하므로 재작성 요청 대신 결과(diff)를 검토하고, 자동 교정 불가 broken_links가 남으면 commit하지 마세요.
+   - 문체 교정만 필요하면 wiki-rewriter(위키 고유 교정: 용어 통일·식별자 스크럽) → wiki-humanizer(\`/humanize --strict\` AI-문체 제거). 번역투·헤징·리듬은 rewriter가 아니라 humanize가 담당합니다. 어느 경우든 사실 관계·스포일러 등급을 임의로 바꾸지 마세요.
+6. 검증 순서: wiki-humanizer가 실행된 경우 그 직전 파일을 /tmp에 스냅샷으로 남긴 뒤, source-sanitizer → humanize_fact_guard(python3 /workspace/scripts/humanize_fact_guard.py --before <snapshot> --after wiki/{category}/{slug}.md, humanize를 거친 파일에만 적용) → wiki-linker → wiki-quality-lead(gate) 순으로 검증하세요. sanitizer fail은 최대 2회, quality fail은 최대 1회 재작성 요청. humanize_fact_guard fail(exit 1)이면 git checkout으로 되돌리고 commit하지 마세요. wiki-linker는 내부·외부 링크를 직접 교정하고 결과만 보고하므로 재작성 요청 대신 결과(diff)를 검토하고, 자동 교정 불가 broken_links가 남으면 commit하지 마세요.
 7. commit 전에 구조화 리포트를 누적 저장하세요: /workspace/.admin/runs/p6-${runId}-report.json
    각 후보 항목에 candidate_id, type, genre, evidence_grade, cluster_ids, supporting_count(>0), decision, target_file, sanitizer("pass"), linker, quality("pass"|"warn"), commit_hash 를 포함하세요. genre·evidence_grade는 관측용 선택 필드로 러너 게이트는 이를 검증하지 않으며, 강제 필드(decision∈{create,update}, supporting_count>0, sanitizer=pass, quality!=fail)는 그대로입니다. editorial은 decision=create로 처리해 게이트를 통과합니다.
 8. 통과한 wiki 파일만 git add/commit/push 하세요. 완료 후 큐와 락을 정리하세요(complete/release).

@@ -20,7 +20,9 @@ RUN npm install -g bun
 
 # Idempotent provisioner (marketplace clone + hooks + worker setup + volume chown).
 COPY scripts/claude-mem-bootstrap.sh /etc/holyclaude/claude-mem-bootstrap.sh
-RUN chmod 0755 /etc/holyclaude/claude-mem-bootstrap.sh
+COPY scripts/humanize-bootstrap.sh /etc/holyclaude/humanize-bootstrap.sh
+RUN chmod 0755 /etc/holyclaude/claude-mem-bootstrap.sh \
+    && chmod 0755 /etc/holyclaude/humanize-bootstrap.sh
 
 # Entrypoint wrapper: provision claude-mem, then delegate to the base s6 entrypoint.
 COPY scripts/entrypoint-cmem.sh /usr/local/bin/entrypoint-cmem.sh

@@ -1,0 +1,61 @@
+# sg-wiki Humanize KR voice profile.
+#
+# Humanize KR v1.5 may not automatically consume this file in every mode; the
+# wiki-humanizer prompt still treats it as the project-local voice contract.
+
+profile:
+  name: sg-wiki
+  language: ko-KR
+  genre: Korean Steins;Gate setting-explanation wiki
+
+style:
+  sentence_ending: "합니다체를 기본으로 하되, 기존 문서가 해설체(-다)를 일관되게 쓰면 유지"
+  tone: "차분하고 설명적인 위키 문체"
+  avoid:
+    - "과도한 헤징"
+    - "기계적인 첫째/둘째/셋째 반복"
+    - "결론적으로, 시사하는 바가 크다 같은 AI 관용구"
+    - "무의미한 강조와 장식"
+
+must_preserve:
+  frontmatter:
+    - spoiler
+    - type
+    - last_verified
+  markdown:
+    - "인용 블록 전체 텍스트"
+    - "!!! warning/!!! spoiler admonition 제목과 등급"
+    - "각주 식별자와 각주 본문"
+    - "상대 링크 경로"
+  exact_terms:
+    - "Steins;Gate"
+    - "슈타인즈 게이트"
+    - "슈타인즈 게이트 0"
+    - "D메일"
+    - "D-RINE"
+    - "IBN 5100"
+    - "SERN"
+    - "리딩 슈타이너"
+    - "세계선"
+    - "어트랙터 필드"
+    - "다이버전스"
+    - "오카베 린타로"
+    - "마키세 크리스"
+    - "시이나 마유리"
+    - "하시다 이타루"
+
+forbidden_insertions:
+  - "qaset_with_rag"
+  - "sg_game_sge"
+  - "sg_game_sg0_en"
+  - "source_filter"
+  - "chunk"
+  - "data/dc_gallery"
+  - "/workspace/"
+
+humanize_policy:
+  strict_default: true
+  content_changes_allowed: false
+  numbers_allowed_to_change: false
+  blockquotes_allowed_to_change: false
+  spoiler_allowed_to_change: false

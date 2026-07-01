@@ -53,6 +53,7 @@ wiki-lint:
 
 test:
 	python3 scripts/test_wiki_link_lint.py
+	python3 scripts/test_humanize_fact_guard.py
 
 # ── 제안 관리 ────────────────────────────────────────────────────────────────
 

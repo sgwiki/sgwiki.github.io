@@ -50,6 +50,7 @@ ACTIVE_RUNS_STATE = Path(os.getenv("ADMIN_ACTIVE_RUNS_STATE", WORKSPACE / ".admi
 RUN_MARKER_DIR = os.getenv("ADMIN_RUN_MARKER_DIR", "/tmp/sg-wiki-runs")
 ADMIN_TERMINATE_GRACE_SECONDS = int(os.getenv("ADMIN_TERMINATE_GRACE_SECONDS", "20"))
 ADMIN_REAPER_INTERVAL_SECONDS = int(os.getenv("ADMIN_REAPER_INTERVAL_SECONDS", "60"))
+P5_MAX_FILES_PER_RUN = int(os.getenv("ADMIN_P5_MAX_FILES_PER_RUN", "5"))
 
 PIPELINE_TIMEOUT_DEFAULTS = {
     "p1": (4 * 60 * 60, 30 * 60),
@@ -61,6 +62,13 @@ PIPELINE_TIMEOUT_DEFAULTS = {
     "p7": (45 * 60, 15 * 60),
 }
 ACTIVE_RUN_STATUSES = {"running", "terminating"}
+TERMINAL_REGISTRY_STATUSES = {
+    "completed",
+    "released",
+    "rejected",
+    "stale_released",
+    "cancelled",
+}
 
 active_jobs: dict[str, dict] = {}
 active_jobs_lock = threading.RLock()
@@ -1564,6 +1572,41 @@ def _pipeline_limits(pipeline: str) -> tuple[int, int]:
     return wall, idle
 
 
+def _load_work_registry() -> dict:
+    path = WORKSPACE / ".admin/p1-work-registry.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"active": {}, "history": []}
+    except Exception as exc:
+        print(f"[admin] work registry load failed: {exc}", flush=True)
+        return {"active": {}, "history": []}
+
+
+def _registry_progress_for_run(run_id: str) -> dict:
+    registry = _load_work_registry()
+    active = [
+        entry
+        for entry in (registry.get("active") or {}).values()
+        if isinstance(entry, dict) and entry.get("run_id") == run_id
+    ]
+    terminal = [
+        entry
+        for entry in (registry.get("history") or [])
+        if (
+            isinstance(entry, dict)
+            and entry.get("run_id") == run_id
+            and entry.get("status") in TERMINAL_REGISTRY_STATUSES
+        )
+    ]
+    return {
+        "active": len(active),
+        "terminal": len(terminal),
+        "total": len(active) + len(terminal),
+        "active_files": [entry.get("file") for entry in active if entry.get("file")],
+    }
+
+
 def _future_iso(seconds: int, *, base: float | None = None) -> str:
     return datetime.fromtimestamp((base if base is not None else time.time()) + seconds).isoformat()
 
@@ -1608,6 +1651,13 @@ def _public_job(job: dict, queue_position: int | None = None) -> dict:
     item = dict(job)
     if queue_position is not None:
         item["queue_position"] = queue_position
+    if item.get("pipeline") == "p5" and item.get("run_id"):
+        progress = _registry_progress_for_run(item["run_id"])
+        item["p5_file_budget"] = P5_MAX_FILES_PER_RUN
+        item["p5_files_processed"] = progress["terminal"]
+        item["p5_files_active"] = progress["active"]
+        item["p5_files_total"] = progress["total"]
+        item["p5_active_files"] = progress["active_files"]
     item["duration_seconds"] = _seconds_since(item.get("started_at"))
     item["queued_seconds"] = _seconds_since(item.get("queued_at"))
     item["last_output_age_seconds"] = _seconds_since(item.get("last_output_at") or item.get("updated_at"))
@@ -1717,6 +1767,10 @@ def _watchdog_reason(run_id: str) -> str | None:
         idle_deadline = _parse_dt(job.get("idle_deadline_at"))
         if idle_deadline and now >= idle_deadline:
             return "idle_timeout"
+        if job.get("pipeline") == "p5":
+            progress = _registry_progress_for_run(run_id)
+            if progress["total"] > P5_MAX_FILES_PER_RUN:
+                return "p5_file_budget_exceeded"
     return None
 
 
@@ -1970,6 +2024,13 @@ def _pop_active_job(run_id: str) -> None:
     with active_jobs_lock:
         active_jobs.pop(run_id, None)
         _persist_active_jobs_locked()
+    active_ids = _active_run_ids()
+    threading.Thread(
+        target=_reclaim_stale_reservations,
+        args=(active_ids,),
+        name=f"registry-reclaim-{run_id}",
+        daemon=True,
+    ).start()
     _dispatch_next_job()
 
 
