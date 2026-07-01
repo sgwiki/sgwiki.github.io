@@ -32,7 +32,16 @@
     ]
   },
   "enabledPlugins": {
-    "claude-mem@thedotmack": true
+    "claude-mem@thedotmack": true,
+    "humanize-korean@im-not-ai": true
+  },
+  "extraKnownMarketplaces": {
+    "im-not-ai": {
+      "source": {
+        "source": "github",
+        "repo": "epoko77-ai/im-not-ai"
+      }
+    }
   },
   "mcpServers": {
     "dataforge": {

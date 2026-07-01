@@ -58,7 +58,7 @@ run_as_claude "claude plugin marketplace update ${MARKETPLACE_NAME}" \
 run_as_claude "claude plugin install ${PLUGIN_NAME}@${MARKETPLACE_NAME}" \
   || echo "[humanize] plugin install failed or already installed; continuing" >&2
 
-run_as_claude "claude plugin update ${PLUGIN_NAME}" \
+run_as_claude "claude plugin update ${PLUGIN_NAME}@${MARKETPLACE_NAME}" \
   || echo "[humanize] plugin update failed; continuing with installed version if present" >&2
 
 touch "${SENTINEL}" 2>/dev/null || true
