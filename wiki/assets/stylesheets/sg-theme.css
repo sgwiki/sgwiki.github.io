@@ -1,0 +1,498 @@
+/*
+  Steins;Gate 한국어 위키 — 커스텀 테마 「옥상(Rooftop)」
+  ------------------------------------------------------------------
+  두 스킴을 한 벌의 컴포넌트 규칙으로 운용한다.
+    · slate   = 야간(달빛 옥상)  — 미드나잇 네이비, 사진 fg_rooftop_night
+    · default = 주간(한낮 옥상)  — 하늘빛 밝은 종이, 사진 fg_rooftop_day
+  설계 원칙
+  - 유일한 강조색은 S;G 앰버(오렌지). 밤에는 창문 불빛·닉시관, 낮에는 표지판처럼
+    차가운 배경 위에서 보색으로 또렷하게 뜬다.
+  - 스킴별로 달라지는 표면색은 모두 --sg-* 시맨틱 변수로 뽑아 두고,
+    컴포넌트 규칙은 그 변수만 참조한다(두 테마가 항상 동기화됨).
+  - 사진은 홈 히어로에만 전면 배치, 본문은 불투명 바탕 위 고대비 텍스트.
+*/
+
+/* ── 폰트 로드 ───────────────────────────────────────────────── */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Share+Tech+Mono&display=swap");
+
+:root {
+  --md-text-font: "Pretendard Variable", Pretendard;
+  --md-code-font: "JetBrains Mono";
+  /* S;G 앰버 — 유일한 강조색(장식용). 텍스트/링크용 대비 색은 스킴별로 따로 둔다 */
+  --sg-amber:        #e07b3c;
+  --sg-amber-soft:   #e9954f;
+  --sg-amber-bright: #f4b878;
+}
+
+/* ══ 야간(slate) — 달빛 옥상 ══════════════════════════════════ */
+[data-md-color-scheme="slate"] {
+  --md-hue: 222;                          /* 파생 그레이 → 차가운 네이비 */
+  --md-default-bg-color:          #0b0f22;
+  --md-default-bg-color--light:   #141a30;
+  --md-default-bg-color--lighter: #1b2238;
+  --md-default-bg-color--lightest:#232c46;
+  --md-default-fg-color:          #e6eaf4;
+  --md-default-fg-color--light:   #c3cadd;
+  --md-default-fg-color--lighter: #8a93af;
+  --md-default-fg-color--lightest:#4a5372;
+  --md-typeset-color:             #e2e7f2;
+  --md-typeset-a-color:           var(--sg-link);
+
+  --md-primary-fg-color:        #c8602b;
+  --md-primary-fg-color--light: #d8743b;
+  --md-primary-fg-color--dark:  #090c1a;
+  --md-primary-bg-color:        #eef2fb;
+  --md-accent-fg-color:         var(--sg-amber-bright);
+
+  --md-code-bg-color:           #080b18;
+  --md-code-fg-color:           #d7def0;
+  --md-typeset-table-color:     #2b3450;
+
+  /* 시맨틱 표면 */
+  --sg-link:            #e9954f;
+  --sg-link-hover:      #f4b878;
+  --sg-border:          #242c46;
+  --sg-th-bg:           #141a34;
+  --sg-th-fg:           #e9954f;
+  --sg-row-hover:       #8ea6d610;
+  --sg-blockquote-bg:   #ffffff08;
+  --sg-code-border:     #1b2440;
+  --sg-tag-fan-border:  #45507a;
+  --sg-warning-bg:        #2a1d10;
+  --sg-warning-title-bg:  #3a2614;
+  --sg-warning-title-fg:  #f4b878;
+  --sg-nixie-color:     #ff8d3a;
+  --sg-nixie-shadow:    0 0 .35rem #ff8d3a66, 0 0 .9rem #ff8d3a33;
+
+  --sg-ambient:
+    radial-gradient(115% 55% at 80% -12%, rgba(142,166,214,.11), transparent 55%),
+    radial-gradient(90% 55% at 50% 118%, rgba(16,24,56,.55), transparent 60%);
+
+  /* 히어로 */
+  --sg-hero-scrim: linear-gradient(178deg, rgba(9,12,26,.28) 0%, rgba(9,12,26,.10) 26%,
+                                   rgba(11,15,34,.62) 70%, var(--md-default-bg-color) 100%);
+  --sg-hero-fallback:    url("../img/rooftop-night.jpg");
+  --sg-hero-image:       image-set(url("../img/rooftop-night.webp") type("image/webp"),
+                                   url("../img/rooftop-night.jpg")  type("image/jpeg"));
+  --sg-hero-fallback-sm: url("../img/rooftop-night-960.jpg");
+  --sg-hero-image-sm:    image-set(url("../img/rooftop-night-960.webp") type("image/webp"),
+                                   url("../img/rooftop-night-960.jpg")  type("image/jpeg"));
+  --sg-hero-pos:         center 30%;
+  --sg-hero-title:       #f3f5fb;
+  --sg-hero-accent:      var(--sg-amber);
+  --sg-hero-eyebrow:     #b7c6e6;
+  --sg-hero-tagline:     #cdd4e6;
+  --sg-hero-shadow:      0 2px 24px rgba(6,9,20,.7);
+  --sg-hero-glow:        radial-gradient(circle, rgba(183,198,230,.28) 0%,
+                                         rgba(142,166,214,.10) 38%, transparent 68%);
+  --sg-hero-meter-bg:     rgba(8,11,24,.5);
+  --sg-hero-meter-border: #2a3a5e;
+  --sg-hero-meter-label:  #8ea6d6;
+  --sg-hero-cue:          #b7c6e6;
+}
+
+/* ══ 주간(default) — 한낮 옥상 ════════════════════════════════ */
+[data-md-color-scheme="default"] {
+  --md-hue: 216;
+  --md-default-bg-color:          #eef2f7;   /* 하늘빛 도는 밝은 종이 */
+  --md-default-bg-color--light:   #f6f8fb;
+  --md-default-bg-color--lighter: #ffffff;
+  --md-default-bg-color--lightest:#ffffff;
+  --md-default-fg-color:          #22262d;   /* 다크 슬레이트(순흑 아님) */
+  --md-default-fg-color--light:   #454b56;
+  --md-default-fg-color--lighter: #6b7280;
+  --md-default-fg-color--lightest:#aab0bb;
+  --md-typeset-color:             #262a31;
+  --md-typeset-a-color:           var(--sg-link);
+
+  --md-primary-fg-color:        #3a6ea5;     /* 한낮 하늘색(헤더) */
+  --md-primary-fg-color--light: #4278b0;
+  --md-primary-fg-color--dark:  #2e5b8a;
+  --md-primary-bg-color:        #ffffff;
+  --md-accent-fg-color:         #8f3f12;
+
+  --md-code-bg-color:           #eceff4;
+  --md-code-fg-color:           #2a2f37;
+  --md-typeset-table-color:     #d5dae2;
+
+  /* 시맨틱 표면 */
+  --sg-link:            #b0521c;             /* 밝은 종이 위 대비 확보 앰버 잉크 */
+  --sg-link-hover:      #8f3f12;
+  --sg-border:          #d3d9e2;
+  --sg-th-bg:           #e6ebf2;
+  --sg-th-fg:           #b0521c;
+  --sg-row-hover:       #3a6ea50f;
+  --sg-blockquote-bg:   #5a9fd812;
+  --sg-code-border:     #dbe0e8;
+  --sg-tag-fan-border:  #b9c1cf;
+  --sg-warning-bg:        #fdf1e3;
+  --sg-warning-title-bg:  #f6e0c6;
+  --sg-warning-title-fg:  #8a4a12;
+  --sg-nixie-color:     #b4531f;
+  --sg-nixie-shadow:    none;
+
+  --sg-ambient:
+    radial-gradient(120% 55% at 82% -14%, rgba(120,172,223,.16), transparent 55%),
+    radial-gradient(90% 50% at 50% 120%, rgba(190,189,187,.28), transparent 62%);
+
+  /* 히어로 — 밝은 사진 위 다크 텍스트 + 하단 밝은 스크림 */
+  --sg-hero-scrim: linear-gradient(178deg, rgba(238,242,247,0) 0%, rgba(238,242,247,.12) 42%,
+                                   rgba(238,242,247,.80) 82%, var(--md-default-bg-color) 100%);
+  --sg-hero-fallback:    url("../img/rooftop-day.jpg");
+  --sg-hero-image:       image-set(url("../img/rooftop-day.webp") type("image/webp"),
+                                   url("../img/rooftop-day.jpg")  type("image/jpeg"));
+  --sg-hero-fallback-sm: url("../img/rooftop-day-960.jpg");
+  --sg-hero-image-sm:    image-set(url("../img/rooftop-day-960.webp") type("image/webp"),
+                                   url("../img/rooftop-day-960.jpg")  type("image/jpeg"));
+  --sg-hero-pos:         center 34%;
+  --sg-hero-title:       #16212e;
+  --sg-hero-accent:      #b4531f;
+  --sg-hero-eyebrow:     #234e78;
+  --sg-hero-tagline:     #2b3846;
+  --sg-hero-shadow:      0 1px 12px rgba(255,255,255,.55);
+  --sg-hero-glow:        radial-gradient(circle, rgba(255,246,218,.55) 0%,
+                                         rgba(255,232,170,.18) 40%, transparent 66%);
+  --sg-hero-meter-bg:     rgba(255,255,255,.62);
+  --sg-hero-meter-border: rgba(58,110,165,.4);
+  --sg-hero-meter-label:  #2f5d86;
+  --sg-hero-cue:          #2f5d86;
+}
+
+/* ── 사이트 전역 앰비언트: 창밖 하늘 미광(gutter에 주로 노출) ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--sg-ambient);
+}
+
+/* ── 헤더 ────────────────────────────────────────────────────── */
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #090c1a;
+  background-image: linear-gradient(180deg, #0b1024 0%, #090c1a 100%);
+  border-bottom: 1px solid #1c2440;
+}
+[data-md-color-scheme="slate"] .md-header { box-shadow: inset 0 -1px 0 #ffffff08; }
+[data-md-color-scheme="default"] .md-header,
+[data-md-color-scheme="default"] .md-tabs {
+  background-color: #3a6ea5;
+  background-image: linear-gradient(180deg, #4278b0 0%, #35639a 100%);
+  border-bottom: 1px solid #2c547e;
+}
+.md-header[data-md-state="shadow"] {
+  box-shadow: 0 0 .4rem #0000002e, 0 .25rem .8rem #0000001f;
+}
+.md-header__title {
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+/* ── 홈 히어로: 옥상 ─────────────────────────────────────────── */
+.sg-hero {
+  position: relative;
+  margin: 0 0 1.4rem;
+  min-height: min(76vh, 600px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background-color: var(--md-default-bg-color);
+  background-image: var(--sg-hero-scrim), var(--sg-hero-fallback);
+  background-image: var(--sg-hero-scrim), var(--sg-hero-image);
+  background-size: cover, cover;
+  background-position: var(--sg-hero-pos), var(--sg-hero-pos);
+  background-repeat: no-repeat;
+}
+.sg-hero__glow {   /* 달/해 주변 은은한 블룸 */
+  position: absolute;
+  top: -8%;
+  left: 26%;
+  width: 34vw;
+  max-width: 460px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sg-hero-glow);
+  filter: blur(4px);
+  pointer-events: none;
+  animation: sg-moon-breathe 9s ease-in-out infinite;
+}
+.sg-hero__inner {
+  position: relative;
+  width: 100%;
+  padding: 2.4rem 1.2rem 2.2rem;
+}
+.sg-hero__eyebrow {
+  margin: 0 0 .7rem;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .12em;   /* 한글은 Pretendard(본문 폰트)로 렌더 → tofu 방지 */
+  color: var(--sg-hero-eyebrow);
+  text-shadow: var(--sg-hero-shadow);   /* 밝은 하늘/야경 위 가독 확보용 후광 */
+}
+.sg-hero__mark {   /* 라틴 워드마크만 등폭 테크노 느낌 */
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  letter-spacing: .26em;
+  margin-right: .35em;
+}
+.sg-hero__title {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(2.1rem, 6.2vw, 3.7rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: var(--sg-hero-title);
+  text-shadow: var(--sg-hero-shadow);
+}
+.sg-hero__title span {
+  color: var(--sg-hero-accent);
+}
+.sg-hero__tagline {
+  margin: 1rem 0 0;
+  max-width: 34rem;
+  font-size: .86rem;
+  line-height: 1.75;
+  color: var(--sg-hero-tagline);
+  text-shadow: var(--sg-hero-shadow);
+  text-wrap: pretty;
+}
+.sg-hero__meter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .55rem;
+  margin-top: 1.5rem;
+  padding: .38rem .8rem;
+  border: 1px solid var(--sg-hero-meter-border);
+  border-radius: .25rem;
+  background: var(--sg-hero-meter-bg);
+  backdrop-filter: blur(2px);
+}
+.sg-hero__meter-label {
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .6rem;
+  letter-spacing: .3em;
+  color: var(--sg-hero-meter-label);
+}
+.sg-hero__meter .sg-divergence { font-size: 1.15rem; }
+.sg-hero__cue {   /* 스크롤 유도 셰브런(장식) */
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-right: 2px solid var(--sg-hero-cue);
+  border-bottom: 2px solid var(--sg-hero-cue);
+  transform: rotate(45deg);
+  opacity: .7;
+  animation: sg-cue-bounce 2.2s ease-in-out infinite;
+}
+/* 홈에서 히어로가 제목을 대신하므로, 렌더된 첫 H1은 스크린리더용으로만 유지
+   (.sg-hero 존재 여부로 홈을 판별 → 다른 문서에는 영향 없음) */
+.sg-hero ~ .md-main article.md-content__inner > h1:first-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* 좁은 화면: 가벼운 이미지로 교체 + 높이 축소 */
+@media screen and (max-width: 44rem) {
+  .sg-hero {
+    min-height: min(64vh, 440px);
+    background-image: var(--sg-hero-scrim), var(--sg-hero-fallback-sm);
+    background-image: var(--sg-hero-scrim), var(--sg-hero-image-sm);
+  }
+  .sg-hero__inner { padding: 1.8rem 1rem 1.8rem; }
+}
+
+@keyframes sg-moon-breathe {
+  0%, 100% { opacity: .85; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.05); }
+}
+@keyframes sg-cue-bounce {
+  0%, 100% { transform: rotate(45deg) translate(0, 0); opacity: .35; }
+  50%      { transform: rotate(45deg) translate(3px, 3px); opacity: .8; }
+}
+
+/* ── 본문 타이포그래피 ───────────────────────────────────────── */
+.md-typeset {
+  font-size: .78rem;
+  line-height: 1.85;
+  letter-spacing: -0.003em;
+}
+.md-typeset p,
+.md-typeset li { text-wrap: pretty; }
+
+.md-typeset h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--md-default-fg-color);
+  margin-bottom: .9em;
+}
+.md-typeset h2 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  padding-left: .6rem;
+  border-left: 3px solid var(--sg-amber);
+  margin-top: 2.2em;
+}
+.md-typeset h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .headerlink { color: var(--md-default-fg-color--lighter); }
+.md-typeset :hover > .headerlink { color: var(--sg-amber); }
+
+.md-grid { max-width: 64rem; }   /* 장문 한국어 가독성(약 70자) */
+
+.md-typeset a {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+.md-typeset a:hover {
+  color: var(--sg-link-hover);
+  border-bottom-color: currentColor;
+}
+
+/* ── 인용구: 캐릭터 대사/리드문 강조 ─────────────────────────── */
+.md-typeset blockquote {
+  border-left: .2rem solid var(--sg-amber);
+  background: var(--sg-blockquote-bg);
+  color: var(--md-default-fg-color--light);
+  border-radius: 0 .15rem .15rem 0;
+  padding-top: .4rem;
+  padding-bottom: .4rem;
+}
+
+/* ── 표: 다이버전스 미터 감성(닉시 숫자) ─────────────────────── */
+.md-typeset table:not([class]) {
+  border: 1px solid var(--sg-border);
+  border-radius: .2rem;
+  overflow: hidden;
+  font-size: .76rem;
+}
+.md-typeset table:not([class]) th {
+  background: var(--sg-th-bg);
+  color: var(--sg-th-fg);
+  font-weight: 600;
+  letter-spacing: .01em;
+  border-bottom: 1px solid var(--sg-border);
+}
+.md-typeset table:not([class]) td {
+  border-top: 1px solid var(--sg-border);
+  font-variant-numeric: tabular-nums;
+}
+.md-typeset table:not([class]) tr:hover td { background: var(--sg-row-hover); }
+
+/* ── 인라인 코드 / 코드블록 ─────────────────────────────────── */
+.md-typeset code {
+  font-variant-numeric: tabular-nums;
+  border-radius: .15rem;
+}
+.md-typeset pre > code {
+  border: 1px solid var(--sg-code-border);
+  border-radius: .2rem;
+}
+
+/* ── 인용 태그 칩: [공식] / [팬 분석] / [심층] ───────────────── */
+.sg-tag {
+  display: inline-block;
+  font-size: .82em;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: .05em .5em;
+  margin: 0 .1em;
+  border-radius: .2rem;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+.sg-tag--official {
+  color: #16130f;
+  background: var(--sg-amber);
+}
+.sg-tag--fan {
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border: 1px solid var(--sg-tag-fan-border);
+}
+.sg-tag--deep {
+  color: var(--sg-link);
+  background: transparent;
+  border: 1px dashed var(--sg-amber);
+}
+
+/* ── 스포일러 경고(admonition.warning) ──────────────────────── */
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-color: var(--sg-amber);
+  background: var(--sg-warning-bg);
+}
+.md-typeset .warning > .admonition-title,
+.md-typeset .warning > summary {
+  background: var(--sg-warning-title-bg);
+  color: var(--sg-warning-title-fg);
+}
+.md-typeset .warning > .admonition-title::before,
+.md-typeset .warning > summary::before {
+  background-color: var(--sg-amber);
+}
+
+/* ── 네비게이션: 현재 위치 강조 ─────────────────────────────── */
+.md-nav__link--active,
+.md-nav__item .md-nav__link--active {
+  color: var(--sg-link);
+  font-weight: 600;
+}
+.md-tabs__link--active {
+  color: var(--md-primary-bg-color);
+  font-weight: 700;
+}
+.md-nav--secondary .md-nav__link--active {
+  border-left: 2px solid var(--sg-amber);
+  padding-left: .5rem;
+  margin-left: -2px;
+}
+
+/* ── Worldline Map 헤더 버튼 hover(인라인 스타일 보완) ───────── */
+.worldline-map-btn { transition: opacity .15s ease, background-color .15s ease; }
+.worldline-map-btn:hover {
+  opacity: 1 !important;
+  background-color: #ffffff26;
+}
+
+/* ── 다이버전스 미터: .sg-divergence 유틸 ───────────────────── */
+.sg-divergence {
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .12em;
+  color: var(--sg-nixie-color);
+  text-shadow: var(--sg-nixie-shadow);
+}
+
+/* ── 접근성: 키보드 포커스 링 ───────────────────────────────── */
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-header__button:focus-visible {
+  outline: 2px solid var(--sg-amber);
+  outline-offset: 2px;
+  border-radius: .1rem;
+}
+
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+  .sg-hero__glow,
+  .sg-hero__cue { animation: none !important; }
+}

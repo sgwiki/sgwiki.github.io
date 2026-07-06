@@ -1,0 +1,70 @@
+site_name: Steins;Gate 한국어 위키
+site_url: https://sgwiki.github.io/
+site_description: 슈타인즈 게이트 공식·팬 분석 한국어 위키
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: ko
+  font: false  # Roboto 자동 로드 비활성화 — Pretendard를 sg-theme.css에서 직접 로드
+  features:
+    - content.code.copy
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+  palette:
+    # 야간(달빛 옥상) — 기본. 첫 방문 시 이 스킴으로 시작하고 선택은 브라우저에 저장됨.
+    - scheme: slate
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: 주간(한낮 옥상) 모드로 전환
+    # 주간(한낮 옥상) — 라이트 테마.
+    - scheme: default
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: 야간(달빛 옥상) 모드로 전환
+
+plugins:
+  - search:
+      lang:
+        - en
+        - ja  # 한국어 형태소 분석 미지원 — ja가 가장 유사한 동작
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes  # [^1] 인라인 각주 + [^1]: 내용 하단 정의 — demun.github.io/mkdocs-tuts 가이드 참고
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+docs_dir: wiki
+site_dir: site
+exclude_docs: |
+  _template/
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/sgwiki/sgwiki.github.io
+
+extra_css:
+  - assets/stylesheets/sg-theme.css
+
+extra_javascript:
+  - javascripts/worldline-map-btn.js
+  - javascripts/sg-enhance.js
