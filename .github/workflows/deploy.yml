@@ -1,0 +1,138 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wiki/**"
+      - "mkdocs.yml"
+      - "overrides/**"
+      - "sg-worldline-map/**"
+      - "scripts/generate-data.py"
+      - "docker/holyclaude/ontology/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # ─── Job 1: SPA 빌드 (React/Vite) ──────────────────────────────────
+  # 실패해도 wiki 배포는 진행됨 (if: always()). 맵만 누락된 채 위키 정상 서빙.
+  build-spa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python (for generate-data.py)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install rdflib
+        run: uv pip install --system rdflib
+
+      - name: Regenerate series JSON from ontology TTL (best-effort)
+        # 온톨로지 TTL(docker/holyclaude/ontology/)은 git 추적 대상이 아니라 CI에 없을 수 있음.
+        # src/data/*.json은 이미 커밋되어 있으므로 실패해도 빌드는 계속됨.
+        continue-on-error: true
+        run: python scripts/generate-data.py --out sg-worldline-map/src/data
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: sg-worldline-map/package-lock.json
+
+      - name: Install SPA deps
+        working-directory: sg-worldline-map
+        run: npm ci
+
+      - name: Build SPA
+        working-directory: sg-worldline-map
+        run: npm run build
+
+      - name: Package maps artifact
+        run: |
+          mkdir -p maps-artifact
+          cp -r sg-worldline-map/dist/* maps-artifact/
+          ls -la maps-artifact/
+
+      - name: Upload maps artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maps-spa
+          path: maps-artifact/
+          retention-days: 1
+
+  # ─── Job 2: 위키 빌드 (MkDocs) + SPA 머지 ─────────────────────────
+  # SPA 빌드 성공 시 artifact를 받아 site/maps/로 복사.
+  # SPA 실패 시에도 wiki은 정상 빌드/배포 (맵만 빠진 채).
+  build-wiki:
+    runs-on: ubuntu-latest
+    needs: build-spa
+    if: always()  # build-spa 실패해도 진행 — 운영 위키 무결성 보장 (PRD P1)
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: (Optional) Download SPA artifact
+        id: spa
+        uses: actions/download-artifact@v4
+        with:
+          name: maps-spa
+          path: maps-spa-dist
+        continue-on-error: true  # build-spa 실패 시 artifact 없음 — 무시하고 wiki만 배포
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install MkDocs Material
+        run: uv pip install --system mkdocs-material
+
+      - name: Build wiki site
+        run: mkdocs build
+
+      - name: Merge SPA into site/maps/ (if artifact available)
+        if: steps.spa.outcome == 'success'
+        run: |
+          mkdir -p site/maps
+          cp -r maps-spa-dist/* site/maps/
+          echo "SPA merged into site/maps/"
+          ls -la site/maps/
+
+      - name: Warn if SPA missing
+        if: steps.spa.outcome != 'success'
+        run: |
+          echo "::warning::SPA 빌드 실패로 맵 없이 위키만 배포합니다. sg-worldline-map/ 빌드를 확인하세요."
+
+      - name: Remove gzip-compressed sitemap (Google Search Console issue)
+        run: |
+          rm -f site/sitemap.xml.gz
+          echo "Removed site/sitemap.xml.gz to prevent Content-Encoding issues with Google"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

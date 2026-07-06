@@ -117,6 +117,9 @@ RUN_STEPS.md
 .env.example
 .gitattributes
 .github/
+# 예외: 배포 워크플로우는 필수
+!.github/workflows/
+!.github/workflows/deploy.yml
 .python-version
 makewiki_all_runs.sh
 makewiki_sample.sh
