@@ -102,12 +102,14 @@ progress.txt
 scripts/
 docker/
 docs/
-overrides/
 ideas/
 prompts/
 sources/
 package.json
 package-lock.json
+# 예외: SPA 빌드에 필수(package.json, package-lock.json). 루트 규칙 뒤에 두어 negation이 이기도록 배치.
+!sg-worldline-map/package.json
+!sg-worldline-map/package-lock.json
 pyproject.toml
 Makefile
 AGENTS.md
