@@ -100,7 +100,8 @@ progress.md
 progress.txt
 
 # Local development only — not deployed to GitHub Pages
-scripts/
+# 루트 고정(/scripts/): sg-worldline-map/scripts/ 까지 무시하지 않도록(SPA 빌드에 필수).
+/scripts/
 docker/
 docs/
 ideas/
