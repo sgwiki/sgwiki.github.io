@@ -112,7 +112,7 @@ pyproject.toml
 Makefile
 AGENTS.md
 PROJECT_ANALYSIS.md
-README.md
+DEVELOPMENT.md
 RUN_STEPS.md
 .env.example
 .gitattributes
