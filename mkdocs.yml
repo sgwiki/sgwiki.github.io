@@ -2,6 +2,8 @@ site_name: Steins;Gate 한국어 위키
 site_url: https://sgwiki.github.io/
 site_description: 슈타인즈 게이트 공식·팬 분석 한국어 위키
 
+# Built with MkDocs Material
+
 theme:
   name: material
   custom_dir: overrides
