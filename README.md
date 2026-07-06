@@ -17,7 +17,7 @@
 ## 🏗️ 구조
 
 ```
-├── wiki/                  # 위키 마크다운 본문 (배포 대상)
+├── wiki/                 # 위키
 │   ├── 캐릭터/           # 캐릭터 설명
 │   ├── lore/             # 핵심 설정·사건 해설  
 │   ├── setting/          # 세계관·배경 설정
@@ -32,17 +32,10 @@
 ├── worker/                # Cloudflare Worker
 │   └── suggest.ts        # 제안 폼 API
 │
-├── mkdocs.yml            # MkDocs Material 빌드 설정
-└── .gitignore            # Git 추적 규칙
+├── mkdocs.yml           
+└── .gitignore            
 ```
 
-## 🚀 배포
-
-이 저장소는 **GitHub Pages**로 자동 배포됩니다.
-
-- **위키**: MkDocs로 빌드된 정적 사이트 → `site/`
-- **인터랙티브 맵**: Vite로 빌드된 React SPA → `site/maps/`  
-- **제안 폼**: Cloudflare Workers에서 서빙
 
 > 🔗 **라이브 사이트**: https://sgwiki.github.io/
 
@@ -62,35 +55,6 @@
 
 자세한 위키 작성 규칙은 [`wiki/README.md`](wiki/README.md)를 참고하세요.
 
-## 🔍 로컬 개발
-
-### 필수 요구사항
-- Python 3.8+ (MkDocs 실행용)
-- Node.js 18+ (세계선 맵 빌드용)
-- Git
-
-### 위키 미리보기
-```bash
-# 로컬 개발 서버 시작
-python3 -m mkdocs serve
-```
-
-### 세계선 맵 빌드
-```bash
-cd sg-worldline-map
-npm install
-npm run build
-```
-
-## 📂 로컬 개발 파일
-
-개발 관련 파일은 `.gitignore`에 의해 원격 저장소에 업로드되지 않습니다:
-
-- `scripts/` - 에이전트 파이프라인 및 검증 스크립트
-- `docker/` - HolyClaude 컨테이너 정의
-- `docs/` - 설계 및 계획 문서
-
-자세한 개발 가이드는 **로컬에만 존재하는** `DEVELOPMENT.md`를 참고하세요.
 
 ## 📄 라이선스
 
@@ -101,9 +65,5 @@ npm run build
 
 ## 🤝 기여
 
-이 위키는 슈타인즈 게이트 팬덤을 위해 운영됩니다.  
-오류 발견 시 [제안 폼](https://sgwiki.github.io/)을 통해 제출해주세요.
-
----
-
-**Last Updated**: 2026-07-06
+이 위키는 슈타인즈 게이트 한국 유저들을 위해 운영됩니다. 
+오류 발견 시 [제안 폼](https://sgwiki.github.io/suggest/)을 통해 제출해주세요.
