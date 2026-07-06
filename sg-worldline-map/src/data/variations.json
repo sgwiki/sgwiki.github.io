@@ -1,0 +1,226 @@
+[
+  {
+    "id": "EV_Prologue_Beta_Discovery",
+    "uri": "EV_Prologue_Beta_Discovery",
+    "variationIdentity": "베타 세계선 시작 시나리오",
+    "branchCondition": "오카베가 라디오 회관에서 크리스의 시신을 발견하고 첫 D메일을 보낸다.",
+    "worldLineId": "WL_1_130426",
+    "macroEventId": "ME_Prologue_Beta"
+  },
+  {
+    "id": "EV_Alpha_IBN_Search",
+    "uri": "EV_Alpha_IBN_Search",
+    "variationIdentity": "IBN 5100 확보 시나리오",
+    "branchCondition": "크리스와 협력해 야나바야시 신사에서 IBN 5100을 찾는다.",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Loto6_Send",
+    "uri": "EV_Alpha_DMail_Loto6_Send",
+    "variationIdentity": "로또6 D메일 송신 시나리오",
+    "branchCondition": "오카베가 과거의 자신에게 로또6 번호를 보낸다.",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Moeka_Send",
+    "uri": "EV_Alpha_DMail_Moeka_Send",
+    "variationIdentity": "모에카 D메일 송신 시나리오",
+    "branchCondition": "모에카가 과거의 자신에게 IBN 5100 수색 중단 메시지를 보낸다.",
+    "worldLineId": "WL_0_571015",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Luka_Send",
+    "uri": "EV_Alpha_DMail_Luka_Send",
+    "variationIdentity": "루카 D메일 송신 시나리오",
+    "branchCondition": "루카의 성별에 영향을 주기 위한 호출기 메시지를 보낸다.",
+    "worldLineId": "WL_0_523299",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Faris_Send",
+    "uri": "EV_Alpha_DMail_Faris_Send",
+    "variationIdentity": "페이리스 D메일 송신 시나리오",
+    "branchCondition": "페이리스가 아버지에게 사고를 피하라는 메일을 보낸다.",
+    "worldLineId": "WL_0_456903",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "uri": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "variationIdentity": "스즈하 미행 중지 D메일 시나리오",
+    "branchCondition": "오카베가 과거의 자신에게 스즈하를 쫓지 말라고 보낸다.",
+    "worldLineId": "WL_0_409420",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Rescue_LabShot",
+    "uri": "EV_Rescue_LabShot",
+    "variationIdentity": "라보 내부 총격 수속 시나리오",
+    "branchCondition": "타임리프를 부정하거나 마유리에게 전화를 걸지 않는다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_CarAccident",
+    "uri": "EV_Rescue_CarAccident",
+    "variationIdentity": "탈출 도중 차량 사고 시나리오",
+    "branchCondition": "파티 취소 후 라보를 탈출해 야나바야시 신사 방면으로 도주한다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_NaePush",
+    "uri": "EV_Rescue_NaePush",
+    "variationIdentity": "신오차노미즈역 선로 추락 시나리오",
+    "branchCondition": "지하철 탈출을 시도하며 승강장에서 대기한다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_TaxiStab",
+    "uri": "EV_Rescue_TaxiStab",
+    "variationIdentity": "택시 내부 칼부림 시나리오",
+    "branchCondition": "택시를 타고 아키하바라를 완전히 벗어나려 한다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_YodobashiShot",
+    "uri": "EV_Rescue_YodobashiShot",
+    "variationIdentity": "요도바시 카메라 총격 오인 시나리오",
+    "branchCondition": "요도바시 건물 내부에 은신하던 중 폭발과 오인 사격이 발생한다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "uri": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "variationIdentity": "스즈하 D메일 취소 시나리오",
+    "branchCondition": "스즈하 미행 중지 D메일을 취소한다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Faris_Cancel",
+    "uri": "EV_Alpha_DMail_Faris_Cancel",
+    "variationIdentity": "페이리스 D메일 취소 시나리오",
+    "branchCondition": "페이리스의 아버지 생존 D메일을 무효화한다.",
+    "worldLineId": "WL_0_409431",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Luka_Cancel",
+    "uri": "EV_Alpha_DMail_Luka_Cancel",
+    "variationIdentity": "루카 D메일 취소 시나리오",
+    "branchCondition": "루카 관련 D메일을 취소해 성별을 되돌린다.",
+    "worldLineId": "WL_0_456914",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Moeka_Cancel",
+    "uri": "EV_Alpha_DMail_Moeka_Cancel",
+    "variationIdentity": "모에카 D메일 취소 시나리오",
+    "branchCondition": "모에카의 IBN 5100 관련 D메일을 취소한다.",
+    "worldLineId": "WL_0_523307",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Loto6_Cancel",
+    "uri": "EV_Alpha_DMail_Loto6_Cancel",
+    "variationIdentity": "로또6 D메일 취소 시나리오",
+    "branchCondition": "최초의 로또6 D메일을 무효화한다.",
+    "worldLineId": "WL_0_571046",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_Echelon_Delete",
+    "uri": "EV_Alpha_Echelon_Delete",
+    "variationIdentity": "에셜론 기록 삭제 시나리오",
+    "branchCondition": "첫 D메일이 SERN 에셜론에 포착된 기록을 삭제한다.",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Skuld_Fail",
+    "uri": "EV_Skuld_Fail",
+    "variationIdentity": "스쿨드 작전 1차 실패 시나리오",
+    "branchCondition": "미래의 영상 지시 없이 과거로 이동해 크리스를 구하려다 실수한다.",
+    "worldLineId": "WL_1_130205",
+    "macroEventId": "ME_OperationSkuld"
+  },
+  {
+    "id": "EV_Skuld_Success",
+    "uri": "EV_Skuld_Success",
+    "variationIdentity": "스쿨드 작전 최종 성공 시나리오",
+    "branchCondition": "미래 영상 메시지를 확인하고 세계를 속이는 연출을 완성한다.",
+    "worldLineId": "WL_1_048596",
+    "macroEventId": "ME_OperationSkuld"
+  },
+  {
+    "id": "EV_Alpha_TimeLeap_FirstUse",
+    "uri": "EV_Alpha_TimeLeap_FirstUse",
+    "variationIdentity": "타임리프 머신 첫 사용 시나리오",
+    "branchCondition": "마유리 사망 직후 오카베가 미실험 타임리프 머신으로 3시간 전으로 도약한다.",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_TimeLeap_Activation"
+  },
+  {
+    "id": "EV_SG0_Amadeus_Contact",
+    "uri": "EV_SG0_Amadeus_Contact",
+    "variationIdentity": "아마데우스 접촉 시나리오",
+    "branchCondition": "오카베가 아마데우스의 전화를 받아 제로의 베타 분기군에 본격 진입한다.",
+    "worldLineId": "WL_1_053649",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Promised_Rinascimento",
+    "uri": "EV_SG0_Promised_Rinascimento",
+    "variationIdentity": "맹세의 리나시멘토 시나리오",
+    "branchCondition": "오카베가 카가리에서 크리스 기억을 제거하고 자신에게 D메일을 보내는 분기.",
+    "worldLineId": "WL_1_055821",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Solitude",
+    "uri": "EV_SG0_Solitude",
+    "variationIdentity": "망실유전의 솔리튜드 시나리오",
+    "branchCondition": "오카베가 휴대전화를 꺼 아마데우스와의 연결이 끊긴다.",
+    "worldLineId": "WL_1_064750",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Twin_Automata",
+    "uri": "EV_SG0_Twin_Automata",
+    "variationIdentity": "존재증명의 오토마톤 시나리오",
+    "branchCondition": "오카베가 아마데우스 전화를 받지 않아 마호 중심 분기로 이동한다.",
+    "worldLineId": "WL_1_081163",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Amadeus_Deleted",
+    "uri": "EV_SG0_Amadeus_Deleted",
+    "variationIdentity": "아마데우스 삭제 후 β 시나리오",
+    "branchCondition": "아마데우스가 삭제되고 오카베가 호오인 쿄우마를 회복한다.",
+    "worldLineId": "WL_1_123581",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_NostalgiaDrive_Preparation",
+    "uri": "EV_NostalgiaDrive_Preparation",
+    "variationIdentity": "노스탤지어 드라이브 준비 시나리오",
+    "branchCondition": "2025년 오카베가 영상 D메일을 녹화하고 2010년 오카베가 이를 확인한다.",
+    "worldLineId": "WL_1_130209",
+    "macroEventId": "ME_NostalgiaDrive"
+  },
+  {
+    "id": "EV_SG0_Alpha_Excursion",
+    "uri": "EV_SG0_Alpha_Excursion",
+    "variationIdentity": "S;G0 α 세계선 일시 방문 시나리오",
+    "branchCondition": "베타 분기 도중 크리스의 구원 요청으로 리딩 슈타이너가 발동해 α로 일시 이동한다(Ep.08~09).",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  }
+]

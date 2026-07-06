@@ -1,0 +1,42 @@
+[
+  {
+    "id": "ME_Prologue_Beta",
+    "uri": "ME_Prologue_Beta",
+    "labelKo": "프롤로그: 시작과 끝의 1% (β)"
+  },
+  {
+    "id": "ME_Alpha_Exploration",
+    "uri": "ME_Alpha_Exploration",
+    "labelKo": "알파 세계선 탐색 및 실험"
+  },
+  {
+    "id": "ME_MayuriRescue_Loop",
+    "uri": "ME_MayuriRescue_Loop",
+    "labelKo": "마유리 구출 루프"
+  },
+  {
+    "id": "ME_Alpha_Escape",
+    "uri": "ME_Alpha_Escape",
+    "labelKo": "알파 탈출"
+  },
+  {
+    "id": "ME_OperationSkuld",
+    "uri": "ME_OperationSkuld",
+    "labelKo": "오퍼레이션 스쿨드"
+  },
+  {
+    "id": "ME_TimeLeap_Activation",
+    "uri": "ME_TimeLeap_Activation",
+    "labelKo": "타임리프 머신 가동"
+  },
+  {
+    "id": "ME_SG0_Beta_Branches",
+    "uri": "ME_SG0_Beta_Branches",
+    "labelKo": "Steins;Gate 0 베타 분기군"
+  },
+  {
+    "id": "ME_NostalgiaDrive",
+    "uri": "ME_NostalgiaDrive",
+    "labelKo": "노스탤지어 드라이브 준비"
+  }
+]

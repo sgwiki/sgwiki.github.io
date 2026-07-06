@@ -32,7 +32,8 @@ docs/대화로그_tmp.md
 artifacts/
 
 # Large local data (qaset JSON, archives, raw source collections, P6 inputs — not in git)
-data/
+# 루트 고정(/data/): sg-worldline-map/src/data/ 까지 무시하지 않도록.
+/data/
 # 예외: HolyClaude 에이전트/설정 소스는 tracked (런타임·시크릿 하위 디렉터리는 아래에서 다시 무시)
 !/docker/holyclaude/data/
 

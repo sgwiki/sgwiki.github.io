@@ -1,0 +1,52 @@
+[
+  {
+    "id": "CP_MayuriDies_Alpha",
+    "uri": "CP_MayuriDies_Alpha",
+    "labelKo": "알파에서 마유리 사망 수속",
+    "description": "알파 어트랙터 필드에서 2010-08-13 밤 마유리의 죽음이 다양한 방식으로 반복된다.",
+    "timeWindow": "2010-08-13 night",
+    "appliesToCharacter": "Mayuri",
+    "attractorField": "AF_Alpha",
+    "onTimeline": true
+  },
+  {
+    "id": "CP_KurisuDies_Beta",
+    "uri": "CP_KurisuDies_Beta",
+    "labelKo": "베타에서 크리스 사망 수속",
+    "description": "베타 어트랙터 필드에서 2010-07-28 크리스의 죽음이 반복된다.",
+    "timeWindow": "2010-07-28",
+    "appliesToCharacter": "Kurisu",
+    "attractorField": "AF_Beta",
+    "onTimeline": true
+  },
+  {
+    "id": "CP_SERNTimeMachineCompleted_Alpha",
+    "uri": "CP_SERNTimeMachineCompleted_Alpha",
+    "labelKo": "알파에서 2034년 SERN 타임머신 완성 수속",
+    "description": "알파 어트랙터 필드에서 SERN이 2034년에 타임머신을 완성하는 거시적 준비 단계.",
+    "timeWindow": "2034",
+    "appliesToCharacter": "None",
+    "attractorField": "AF_Alpha",
+    "onTimeline": false
+  },
+  {
+    "id": "CP_SERNDystopia_Alpha",
+    "uri": "CP_SERNDystopia_Alpha",
+    "labelKo": "알파에서 SERN 디스토피아 수속",
+    "description": "알파 어트랙터 필드에서 2036년 스즈하가 경험하는 완성형 SERN 디스토피아 미래.",
+    "timeWindow": "2036",
+    "appliesToCharacter": "None",
+    "attractorField": "AF_Alpha",
+    "onTimeline": false
+  },
+  {
+    "id": "CP_WW3_Beta",
+    "uri": "CP_WW3_Beta",
+    "labelKo": "베타에서 제3차 세계대전 수속",
+    "description": "베타 어트랙터 필드에서 나카바치 논문 유출로 발생하는 전쟁 수속 패턴.",
+    "timeWindow": "2025",
+    "appliesToCharacter": "None",
+    "attractorField": "AF_Beta",
+    "onTimeline": false
+  }
+]
