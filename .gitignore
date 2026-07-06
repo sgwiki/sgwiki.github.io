@@ -84,8 +84,11 @@ docker/holyclaude/data/claude/shell-snapshots/
 docker/holyclaude/data/claude/backups/
 
 # sg-worldline-map (인터랙티브 맵 SPA)
-# src/data/*.json은 generate-data.py 산출물이나 빌드 입력이라 tracked 허용.
-# dist/, node_modules/, TS 빌드 캐시는 무시.
+# CI 배포에 필요한 빌드 입력은 전부 tracked (run #622 계기로 정리):
+#   package.json / package-lock.json — npm ci + actions/setup-node 캐시 의존
+#   src/data/ (loader.ts + JSON) — generate-data.py 산출물이나 CI 빌드 입력
+#   scripts/ (create-spa-route-fallbacks.mjs) — npm run build 단계
+# dist/, node_modules/, TS 빌드 캐시만 무시(루트 /data/, /scripts/ 고정과 함께 유지).
 sg-worldline-map/node_modules/
 sg-worldline-map/dist/
 sg-worldline-map/dist-tsbuildinfo/
