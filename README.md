@@ -56,6 +56,14 @@
 자세한 위키 작성 규칙은 [`wiki/README.md`](wiki/README.md)를 참고하세요.
 
 
+## ⚖️ 면책 문구 (Disclaimer)
+
+> This is a non-profit fan wiki.
+> All characters and original works are the property of their respective copyright holders.
+> No copyright infringement intended.
+>
+> Contact: <flaglow72@gmail.com>
+
 ## 📄 라이선스
 
 이 프로젝트는 **CC BY-SA 4.0** 라이선스를 따릅니다.

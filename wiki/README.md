@@ -72,6 +72,12 @@ wiki/
 이 위키는 MAGES./5pb. 및 관련 권리자와 **무관한 팬 제작 비공식 사이트**입니다.
 모든 상표 및 저작권은 각 권리자에게 귀속됩니다. 공개 QA자료 및 팬 분석을 토대로 작성합니다.
 
+> This is a non-profit fan wiki.
+> All characters and original works are the property of their respective copyright holders.
+> No copyright infringement intended.
+>
+> Contact: <flaglow72@gmail.com>
+
 나무위키 파생 콘텐츠는 [CC BY-NC-SA 2.0 KR](https://creativecommons.org/licenses/by-nc-sa/2.0/kr/) 조건으로 이용합니다.
 
 ## 라이선스
