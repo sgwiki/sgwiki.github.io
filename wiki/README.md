@@ -57,13 +57,23 @@ wiki/
 
 ## 참고 자료
 
-이 위키의 근거로 사용된 주요 자료:
 
-- **공식 QA자료집** — 슈타인즈 게이트 공식 설정 Q&A (20문항)
-- **RE-BOOT 인터뷰** — 『STEINS;GATE RE-BOOT』 일본 매체 인터뷰 전문 번역
-- **WePlay Expo 2025 개발자 토크** 전문
-- **[The Mechanics of Steins;Gate v1.0.3](./근거자료/비공식/mechanics-of-steins-gate/index.md)** — 영문 팬 해설 (Mechanics, Theory, Misconceptions)
-- **어트랙터 필드 이론과 그 외 등등** — 한국어 팬 해설
+### 공식 자료
+
+개발팀이 직접 발표한 Q&A, 인터뷰, 행사 발언 등 1차 자료입니다.
+
+- [공식 자료 목록](./공식/index.md)
+  - [본편 공식 Q&A 자료집](./공식/qa-자료집.md)
+  - [WePlay Expo 2025 개발자 토크 전문](./공식/weplay-expo-2025.md)
+  - [『STEINS;GATE RE:BOOT』 일본 매체 인터뷰](./공식/reboot-인터뷰.md)
+
+### 비공식 자료
+
+팬이 작성한 체계적 분석 논문 등 2차 자료입니다. 출처·라이선스를 명시합니다.
+
+- [비공식 자료 목록](./비공식/index.md)
+  - [The Mechanics of Steins;Gate v1.0.3](./비공식/mechanics-of-steins-gate/index.md) — Votuko 저, Nira 번역 (MIT License)
+
 
 ---
 
