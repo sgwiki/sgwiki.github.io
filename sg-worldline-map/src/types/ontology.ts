@@ -169,6 +169,100 @@ export interface PlaybackRoute {
   channelId: string   // 이 루트가 가리키는 channel
 }
 
+// ─── 온톨로지 그래프 (전체 엔티티 뷰 — graph_*.json) ─────────────────
+export type NodeClass =
+  | 'WorldLine'
+  | 'Event'
+  | 'EventVariation'
+  | 'MacroEvent'
+  | 'WorldLineShift'
+  | 'ConvergencePattern'
+  | 'AttractorField'
+  | 'MediaSource'
+  | 'ScienceTopic'
+  | 'EvidenceSource'
+
+/** generate-data.py CANONICAL_RELATIONS와 1:1 — 역관계 쌍은 정준 방향만 존재 */
+export type RelationType =
+  | 'causes'
+  | 'enables'
+  | 'prevents'
+  | 'appearsIn'
+  | 'participatesInShift'
+  | 'triggeredByEvent'
+  | 'fromWorldLine'
+  | 'toWorldLine'
+  | 'belongsToAttractorField'
+  | 'belongsToWorldLine'
+  | 'partOfMacroEvent'
+  | 'partOfVariation'
+  | 'hasConvergencePattern'
+  | 'hasVariantVariation'
+  | 'explainsEntity'
+  | 'supportedByEvidence'
+  | 'relatedTopic'
+
+/** 클래스 공통 코어 + 클래스별 선택 필드 (graph_nodes.json 레코드) */
+export interface GraphNode {
+  id: string
+  class: NodeClass
+  /** Shift는 labelKo 없음(null) — 표시 시 id로 폴백 */
+  labelKo: string | null
+  summary?: string | null
+  // Event
+  eventType?: string | null
+  mechanismType?: string | null
+  localDateTime?: string | null
+  actor?: string | null
+  target?: string | null
+  /** causal-chain fail-closed 산출물 — "인과 고립: <사유>" (고립 Event 5건) */
+  isolationNote?: string | null
+  // WorldLine
+  divergence?: number
+  attractorField?: string | null
+  isActive?: boolean
+  wikiSlug?: string | null
+  // EventVariation
+  worldLineId?: string | null
+  macroEventId?: string | null
+  // WorldLineShift
+  shiftType?: string | null
+  shiftMoment?: string | null
+  fromWorldLineId?: string | null
+  toWorldLineId?: string | null
+  // ConvergencePattern
+  timeWindow?: string | null
+  // MediaSource
+  mediaType?: string | null
+  mediaTitle?: string | null
+  mediaUnit?: string | null
+  // ScienceTopic
+  answerLabel?: string | null
+  // EvidenceSource
+  evidenceTier?: string | null
+  sourcePath?: string | null
+}
+
+export interface GraphEdge {
+  source: string
+  target: string
+  relation: RelationType
+  /** relatedTopic만 false (무향) */
+  directed: boolean
+}
+
+/** node_wiki_refs.json 항목 — path는 wiki/ 기준 상대경로(확장자 없음) */
+export interface WikiRef {
+  path: string
+  count: number
+}
+
+export interface GraphDataset {
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  wikiRefs: Record<string, WikiRef[]>
+}
+
 // ─── 렌더링 계산 타입 ─────────────────────────────────────────────────
 export interface MapScales {
   /** localDateTime "YYYY-MM-DD HH:MM" → X 픽셀 */

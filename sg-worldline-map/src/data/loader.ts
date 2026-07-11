@@ -12,7 +12,7 @@
  *   3. (필요 시) playbackScript.ts에 재생 스크립트 추가
  */
 
-import type { SeriesDataset, SeriesId } from '@/types/ontology'
+import type { GraphDataset, SeriesDataset, SeriesId } from '@/types/ontology'
 
 // anime 시리즈 JSON (Phase 0 산출)
 import animeWorldlines from '@/data/worldlines.json'
@@ -23,6 +23,17 @@ import animeMacroEvents from '@/data/macro_events.json'
 import animeConvergence from '@/data/convergence.json'
 import animeBands from '@/data/bands.json'
 import { animePlaybackScript } from '@/playback/anime'
+
+// 온톨로지 그래프 뷰 JSON (시리즈 무관 — TTL 전체 엔티티)
+import graphNodes from '@/data/graph_nodes.json'
+import graphEdges from '@/data/graph_edges.json'
+import nodeWikiRefs from '@/data/node_wiki_refs.json'
+
+export const graphDataset: GraphDataset = {
+  nodes: graphNodes as never,
+  edges: graphEdges as never,
+  wikiRefs: nodeWikiRefs as never,
+}
 
 export const SERIES_ORDER: SeriesId[] = ['anime']
 

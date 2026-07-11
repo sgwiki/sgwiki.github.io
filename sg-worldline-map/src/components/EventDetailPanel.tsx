@@ -10,9 +10,11 @@ interface Props {
   event: SGEvent | null
   dataset: SeriesDataset
   onClose: () => void
+  /** "인과 그래프에서 보기" (P1-5 크로스링크) — 미지정 시 버튼 비표시 */
+  onShowInGraph?: (eventUri: string) => void
 }
 
-export function EventDetailPanel({ event, dataset, onClose }: Props) {
+export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Props) {
   if (!event) return null
 
   const wl = dataset.worldlines.find((w) => w.uri === event.worldLineId || w.id === event.worldLineId)
@@ -90,6 +92,17 @@ export function EventDetailPanel({ event, dataset, onClose }: Props) {
             <span className="text-[#4A6A8A]"> · {wl.attractorField.replace('AF_', '')}</span>
           </div>
         </div>
+      )}
+
+      {/* 인과 그래프 크로스링크 (P1-5, 연동 방향 6) */}
+      {onShowInGraph && (
+        <button
+          onClick={() => onShowInGraph(event.uri)}
+          className="block w-full text-center text-white py-2 px-4 rounded transition-colors hover:brightness-110 mb-2"
+          style={{ background: '#1d4ed8' }}
+        >
+          🕸 인과 그래프에서 보기
+        </button>
       )}
 
       {wl && (
