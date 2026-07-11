@@ -128,6 +128,11 @@ jobs:
           rm -f site/sitemap.xml.gz
           echo "Removed site/sitemap.xml.gz to prevent Content-Encoding issues with Google"
 
+      # GSC가 기존 sitemap.xml에 "가져올 수 없음" 실패 기록을 캐시한 경우,
+      # 새 URL로 제출하면 신규 fetch가 일어남 (John Mueller 권장 우회책)
+      - name: Create sitemap alias for GSC refetch
+        run: cp site/sitemap.xml site/sitemap-pages.xml
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
