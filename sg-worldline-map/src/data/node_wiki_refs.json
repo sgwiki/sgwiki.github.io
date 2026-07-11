@@ -1,0 +1,590 @@
+{
+  "AF_Alpha": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 14
+    },
+    {
+      "path": "세계선/알파-어트랙터-필드",
+      "count": 3
+    },
+    {
+      "path": "세계선/0.409420-세계선-페이리스-아버지",
+      "count": 2
+    },
+    {
+      "path": "세계선/0.456914-세계선-페이리스-D메일-취소",
+      "count": 2
+    },
+    {
+      "path": "lore/다이버전스-표시값-정밀도",
+      "count": 1
+    },
+    {
+      "path": "lore/크리스의-SERN-강제-협력",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.523299-세계선-모에카",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.523307-세계선-루카-D메일-취소",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.571015-세계선-로또6",
+      "count": 1
+    }
+  ],
+  "AF_Beta": [
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 13
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 2
+    },
+    {
+      "path": "세계선/베타-어트랙터-필드",
+      "count": 2
+    },
+    {
+      "path": "lore/다이버전스-표시값-정밀도",
+      "count": 1
+    },
+    {
+      "path": "lore/슈타인즈-게이트-신작",
+      "count": 1
+    }
+  ],
+  "AF_Omega": [
+    {
+      "path": "lore/다이버전스-표시값-정밀도",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "AF_SteinsGate": [
+    {
+      "path": "lore/다이버전스-표시값-정밀도",
+      "count": 1
+    },
+    {
+      "path": "lore/슈타인즈-게이트-신작",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "CP_KurisuDies_Beta": [
+    {
+      "path": "lore/마유리-사망-수속",
+      "count": 1
+    }
+  ],
+  "CP_MayuriDies_Alpha": [
+    {
+      "path": "lore/마유리-사망-수속",
+      "count": 2
+    }
+  ],
+  "CP_SERNDystopia_Alpha": [
+    {
+      "path": "lore/2036년-미래",
+      "count": 1
+    },
+    {
+      "path": "lore/과학어드벤처-시리즈-연표",
+      "count": 1
+    },
+    {
+      "path": "lore/마유리-사망-수속",
+      "count": 1
+    }
+  ],
+  "CP_SERNTimeMachineCompleted_Alpha": [
+    {
+      "path": "lore/마유리-사망-수속",
+      "count": 1
+    },
+    {
+      "path": "lore/타임머신-모델",
+      "count": 1
+    }
+  ],
+  "CP_WW3_Beta": [
+    {
+      "path": "lore/2036년-미래",
+      "count": 1
+    },
+    {
+      "path": "lore/과학어드벤처-시리즈-연표",
+      "count": 1
+    }
+  ],
+  "EV_NostalgiaDrive_Preparation": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 2
+    },
+    {
+      "path": "lore/노스탤지어-드라이브",
+      "count": 1
+    }
+  ],
+  "EV_Skuld_Fail": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 3
+    }
+  ],
+  "EV_Skuld_Success": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Event_DMail_Cancel_Luka": [
+    {
+      "path": "lore/오카베와-루카의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.456914-세계선-페이리스-D메일-취소",
+      "count": 1
+    }
+  ],
+  "Event_DMail_Cancel_Moeka": [
+    {
+      "path": "lore/오카베와-모에카의-관계",
+      "count": 1
+    }
+  ],
+  "Event_DMail_Luka": [
+    {
+      "path": "lore/오카베와-루카의-관계",
+      "count": 1
+    }
+  ],
+  "Event_DMail_Moeka": [
+    {
+      "path": "lore/오카베와-모에카의-관계",
+      "count": 1
+    }
+  ],
+  "Event_EchelonCracking": [
+    {
+      "path": "커뮤니티-큐레이션/슈타인즈-게이트-설정-논란-설정오류-토론",
+      "count": 2
+    }
+  ],
+  "Event_FirstDMail": [
+    {
+      "path": "커뮤니티-큐레이션/슈타인즈-게이트-설정-논란-설정오류-토론",
+      "count": 3
+    },
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_KurisuAppearsDeadToPastOkabe": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Event_KurisuDies_Beta_Actual": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_KurisuSurvives_SG": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 2
+    },
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_NostalgiaDrive_Record": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Event_NostalgiaDrive_View": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 2
+    }
+  ],
+  "Event_OperationSkuldTravel": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 3
+    },
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_Rescue_LabShot_Attack": [
+    {
+      "path": "lore/오카베와-모에카의-관계",
+      "count": 1
+    },
+    {
+      "path": "커뮤니티-큐레이션/슈타인즈-게이트-설정-논란-설정오류-토론",
+      "count": 1
+    }
+  ],
+  "Event_SG0_AmadeusCall": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_SG0_AmadeusDeleted": [
+    {
+      "path": "lore/슈타인즈-게이트-0-베타-분기군",
+      "count": 1
+    },
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_SG0_IgnoreAmadeusCall": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 1
+    }
+  ],
+  "Event_SG0_PhonePowerOff": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_SG0_RemoveKurisuMemory": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Event_SG0_SelfDMail": [
+    {
+      "path": "lore/슈타인즈-게이트-0-베타-분기군",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 1
+    }
+  ],
+  "Event_Skuld_Fail_KurisuDeath": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 2
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 2
+    }
+  ],
+  "Event_Skuld_Success_SelfStab": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Event_Skuld_Success_UpaSwap": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Evidence_SGTimeline_Alpha337187Variations": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "ME_MayuriRescue_Loop": [
+    {
+      "path": "lore/다이버전스-표시값-정밀도",
+      "count": 1
+    }
+  ],
+  "ME_NostalgiaDrive": [
+    {
+      "path": "lore/노스탤지어-드라이브",
+      "count": 2
+    },
+    {
+      "path": "lore/슈타인즈-게이트-0",
+      "count": 1
+    }
+  ],
+  "ME_OperationSkuld": [
+    {
+      "path": "lore/슈타인즈-게이트-0",
+      "count": 1
+    }
+  ],
+  "ME_SG0_Beta_Branches": [
+    {
+      "path": "lore/슈타인즈-게이트-0",
+      "count": 2
+    }
+  ],
+  "Shift_AlphaInternal_02": [
+    {
+      "path": "lore/오카베와-모에카의-관계",
+      "count": 1
+    }
+  ],
+  "Shift_AlphaInternal_03": [
+    {
+      "path": "lore/오카베와-루카의-관계",
+      "count": 1
+    }
+  ],
+  "Shift_AlphaInternal_04": [
+    {
+      "path": "세계선/0.409420-세계선-페이리스-아버지",
+      "count": 1
+    }
+  ],
+  "Shift_AlphaInternal_05": [
+    {
+      "path": "세계선/0.409420-세계선-페이리스-아버지",
+      "count": 1
+    }
+  ],
+  "Shift_AlphaToBeta": [
+    {
+      "path": "커뮤니티-큐레이션/슈타인즈-게이트-설정-논란-설정오류-토론",
+      "count": 2
+    },
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 1
+    }
+  ],
+  "Shift_Alpha_409431_to_456914": [
+    {
+      "path": "세계선/0.456914-세계선-페이리스-D메일-취소",
+      "count": 1
+    }
+  ],
+  "Shift_Alpha_456914_to_523307": [
+    {
+      "path": "세계선/0.456914-세계선-페이리스-D메일-취소",
+      "count": 2
+    },
+    {
+      "path": "lore/오카베와-루카의-관계",
+      "count": 1
+    }
+  ],
+  "Shift_BetaToAlpha": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    }
+  ],
+  "Shift_BetaToSteinsGate": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 3
+    },
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 2
+    }
+  ],
+  "Shift_SG0_053649_to_055821": [
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 2
+    }
+  ],
+  "Shift_SG0_055821_to_123581": [
+    {
+      "path": "lore/슈타인즈-게이트-0-베타-분기군",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 1
+    }
+  ],
+  "Shift_SG0_064750_to_081163": [
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 1
+    }
+  ],
+  "Topic_Bootstrap_KurisuDeath": [
+    {
+      "path": "lore/오카베와-크리스의-관계",
+      "count": 1
+    },
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Topic_EchelonDeletion_WorldLineShift": [
+    {
+      "path": "커뮤니티-큐레이션/슈타인즈-게이트-설정-논란-설정오류-토론",
+      "count": 3
+    }
+  ],
+  "Topic_PhysicalTimeTravel_MicroShift": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "Topic_SERNSurveillanceRounderRaid": [
+    {
+      "path": "커뮤니티-큐레이션/슈타인즈-게이트-설정-논란-설정오류-토론",
+      "count": 2
+    }
+  ],
+  "WL_0_337187": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 2
+    }
+  ],
+  "WL_0_409420": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.409420-세계선-페이리스-아버지",
+      "count": 1
+    }
+  ],
+  "WL_0_409431": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_0_456903": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_0_456914": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    },
+    {
+      "path": "세계선/0.456914-세계선-페이리스-D메일-취소",
+      "count": 1
+    }
+  ],
+  "WL_0_523299": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_0_523307": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_0_571015": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_0_571024": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_0_571046": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ],
+  "WL_1_048596": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "WL_1_053649": [
+    {
+      "path": "세계선/1.053649-세계선-아마데우스-접촉",
+      "count": 2
+    }
+  ],
+  "WL_1_130205": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 1
+    }
+  ],
+  "WL_1_130209": [
+    {
+      "path": "세계선/1.130209-세계선-스쿨드-작전-직전",
+      "count": 2
+    }
+  ],
+  "WL_Neg_0_275349": [
+    {
+      "path": "세계선/0.337187-세계선",
+      "count": 1
+    }
+  ]
+}

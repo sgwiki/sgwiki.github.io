@@ -1,0 +1,2960 @@
+[
+  {
+    "source": "Event_DMail_Cancel_Faris",
+    "target": "MS_SG_Anime_Ep17",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Loto6",
+    "target": "MS_SG_Anime_Ep22",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Luka",
+    "target": "MS_SG_Anime_Ep18",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Moeka",
+    "target": "MS_SG_Anime_Ep20",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Moeka",
+    "target": "MS_SG_VN_Ch09",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_SuzuhaChase",
+    "target": "MS_SG_Anime_Ep16",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Faris",
+    "target": "MS_SG_Anime_Ep09",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Loto6",
+    "target": "MS_SG_Anime_Ep07",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Luka",
+    "target": "MS_SG_Anime_Ep08",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Moeka",
+    "target": "MS_SG_Anime_Ep08",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Daru_Is_Suzuha_Father",
+    "target": "MS_SG_Anime_Ep16",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_DivergenceMeter_Introduced",
+    "target": "MS_SG_Anime_Ep14",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_EchelonCracking",
+    "target": "MS_SG_Anime_Ep22",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_EchelonCracking",
+    "target": "MS_SG_VN_Ch10A",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_EchelonCracking",
+    "target": "MS_SG_VN_Ch10B",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_FB_Is_MrBraun",
+    "target": "MS_SG_Anime_Ep20",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "MS_SG_Anime_Ep01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "MS_SG_VN_Ch01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_IBN_Discovery",
+    "target": "MS_SG_Anime_Ep04",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuAppearsDeadToPastOkabe",
+    "target": "MS_SG_Anime_Ep24",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuAppearsDeadToPastOkabe",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuDies_Beta_Actual",
+    "target": "MS_SG_Anime_Ep01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuDies_Beta_Actual",
+    "target": "MS_SG_VN_Ch01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuSurvives_SG",
+    "target": "MS_SG_Anime_Ep24",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuSurvives_SG",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Kurisu_HououinKyouma_2005",
+    "target": "MS_Movie_Debu",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Lifter_Discovered",
+    "target": "MS_SG_Anime_Ep11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Moeka_Death",
+    "target": "MS_SG_Anime_Ep20",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Moeka_FB_FirstMessage",
+    "target": "MS_SG_Anime_Ep06",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_NakabachiPaper_Russia",
+    "target": "MS_SG_Anime_Ep23",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_NostalgiaDrive_View",
+    "target": "MS_SG_Anime_Ep23",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_OperationSkuldTravel",
+    "target": "MS_SG_Anime_Ep24",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_OperationSkuldTravel",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Prologue_MetalUpa",
+    "target": "MS_SG_Anime_Ep01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Prologue_MetalUpa",
+    "target": "MS_SG_VN_Ch01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_ReadingSteiner_Manifestation",
+    "target": "MS_SG_Anime_Ep10",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_ReadingSteiner_Named",
+    "target": "MS_SG_Anime_Ep08",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_CarAccident_Escape",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_CarAccident_MayuriDeath",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_LabShot_Attack",
+    "target": "MS_SG_Anime_Ep12",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_LabShot_MayuriDeath",
+    "target": "MS_SG_Anime_Ep12",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_NaePush_MayuriDeath",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_NaePush_Wait",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_TaxiStab_Escape",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_TaxiStab_MayuriDeath",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_YodobashiShot_Hide",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_YodobashiShot_MayuriDeath",
+    "target": "MS_SG_Anime_Ep13",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SERN_Hacked",
+    "target": "MS_SG_Anime_Ep05",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_3000TimeLeaps",
+    "target": "MS_SG0_Anime_Ep21",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AlphaShift",
+    "target": "MS_SG0_Anime_Ep08",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusCall",
+    "target": "MS_SG0_Anime_Ep02",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusDeleted",
+    "target": "MS_SG0_Anime_Ep23",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusPatch_Maho",
+    "target": "MS_SG0_Anime_Ep22",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_ChristmasParty",
+    "target": "MS_SG0_Anime_Ep03",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_DRine",
+    "target": "MS_SG0_Anime_Ep22",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_IgnoreAmadeusCall",
+    "target": "MS_SG0_Anime_Ep11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KagariTimeTravel",
+    "target": "MS_SG0_Anime_Ep04",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KurisuLaptop",
+    "target": "MS_SG0_Anime_Ep10",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_LeskinenSeminar",
+    "target": "MS_SG0_Anime_Ep01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_LeskinenStratfoReveal",
+    "target": "MS_SG0_Anime_Ep18",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_Okabe2036",
+    "target": "MS_SG0_Anime_Ep20",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_PhonePowerOff",
+    "target": "MS_SG0_Anime_Ep04",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_ReadingSteinerReactivates",
+    "target": "MS_SG0_Anime_Ep04",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_RemoveKurisuMemory",
+    "target": "MS_SG0_Anime_Ep22",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_SelfDMail",
+    "target": "MS_SG0_Anime_Ep23",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_TimeMachineDestroyed",
+    "target": "MS_SG0_Anime_Ep18",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_SatelliteCrash",
+    "target": "MS_SG_Anime_Ep01",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_KurisuDeath",
+    "target": "MS_SG_Anime_Ep23",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_KurisuDeath",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_Travel",
+    "target": "MS_SG_Anime_Ep23",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_Travel",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_SelfStab",
+    "target": "MS_SG_Anime_Ep24",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_SelfStab",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_UpaSwap",
+    "target": "MS_SG_Anime_Ep24",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_UpaSwap",
+    "target": "MS_SG_VN_Ch11",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Suzuha_Departure_1975",
+    "target": "MS_SG_Anime_Ep16",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_Suzuha_Identity_Titor",
+    "target": "MS_SG_Anime_Ep14",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeapMachine_Complete",
+    "target": "MS_SG_Anime_Ep12",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeap_FirstUse",
+    "target": "MS_SG_Anime_Ep12",
+    "relation": "appearsIn",
+    "directed": true
+  },
+  {
+    "source": "WL_0_337187",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_409420",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_409431",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_456903",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_456914",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_523299",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_523307",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_571015",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_571024",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_0_571046",
+    "target": "AF_Alpha",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_048596",
+    "target": "AF_SteinsGate",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_053649",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_055821",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_064750",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_081163",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_123581",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_130205",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_130209",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_1_130426",
+    "target": "AF_Beta",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "WL_Neg_0_275349",
+    "target": "AF_Omega",
+    "relation": "belongsToAttractorField",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Faris_Cancel",
+    "target": "WL_0_409431",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Faris_Send",
+    "target": "WL_0_456903",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Loto6_Cancel",
+    "target": "WL_0_571046",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Loto6_Send",
+    "target": "WL_0_571024",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Luka_Cancel",
+    "target": "WL_0_456914",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Luka_Send",
+    "target": "WL_0_523299",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Moeka_Cancel",
+    "target": "WL_0_523307",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Moeka_Send",
+    "target": "WL_0_571015",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "target": "WL_0_409420",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_Echelon_Delete",
+    "target": "WL_0_571024",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_IBN_Search",
+    "target": "WL_0_571024",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_TimeLeap_FirstUse",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_NostalgiaDrive_Preparation",
+    "target": "WL_1_130209",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Prologue_Beta_Discovery",
+    "target": "WL_1_130426",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_CarAccident",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_LabShot",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_NaePush",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_TaxiStab",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_YodobashiShot",
+    "target": "WL_0_337187",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Alpha_Excursion",
+    "target": "WL_0_571024",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Amadeus_Contact",
+    "target": "WL_1_053649",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Amadeus_Deleted",
+    "target": "WL_1_123581",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Promised_Rinascimento",
+    "target": "WL_1_055821",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Solitude",
+    "target": "WL_1_064750",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Twin_Automata",
+    "target": "WL_1_081163",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Skuld_Fail",
+    "target": "WL_1_130205",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "EV_Skuld_Success",
+    "target": "WL_1_048596",
+    "relation": "belongsToWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Event_DMail_Loto6",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Event_EchelonCracking",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuAppearsDeadToPastOkabe",
+    "target": "Event_KurisuSurvives_SG",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuDies_Beta_Actual",
+    "target": "Event_FirstDMail",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_OperationSkuldTravel",
+    "target": "Event_Skuld_Success_SelfStab",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_CarAccident_Escape",
+    "target": "Event_Rescue_CarAccident_MayuriDeath",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_LabShot_Attack",
+    "target": "Event_Rescue_LabShot_MayuriDeath",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_LabShot_MayuriDeath",
+    "target": "Event_TimeLeap_FirstUse",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_NaePush_Wait",
+    "target": "Event_Rescue_NaePush_MayuriDeath",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_TaxiStab_Escape",
+    "target": "Event_Rescue_TaxiStab_MayuriDeath",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_YodobashiShot_Hide",
+    "target": "Event_Rescue_YodobashiShot_MayuriDeath",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusPatch_Maho",
+    "target": "Event_SG0_AmadeusDeleted",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_RemoveKurisuMemory",
+    "target": "Event_SG0_SelfDMail",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_SelfDMail",
+    "target": "Event_SG0_AmadeusDeleted",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_Travel",
+    "target": "Event_Skuld_Fail_KurisuDeath",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_SelfStab",
+    "target": "Event_KurisuAppearsDeadToPastOkabe",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_UpaSwap",
+    "target": "Event_KurisuAppearsDeadToPastOkabe",
+    "relation": "causes",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Faris",
+    "target": "Event_DMail_Cancel_Faris",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Loto6",
+    "target": "Event_DMail_Cancel_Loto6",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Luka",
+    "target": "Event_DMail_Cancel_Luka",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Moeka",
+    "target": "Event_DMail_Cancel_Moeka",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_SuzuhaChase",
+    "target": "Event_DMail_Cancel_SuzuhaChase",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Daru_Is_Suzuha_Father",
+    "target": "Event_Suzuha_Departure_1975",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_FB_Is_MrBraun",
+    "target": "Event_Moeka_Death",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Event_DMail_Faris",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Event_DMail_Luka",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Event_DMail_Moeka",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Event_DMail_SuzuhaChase",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_IBN_Discovery",
+    "target": "Event_EchelonCracking",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuAppearsDeadToPastOkabe",
+    "target": "Event_FirstDMail",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuDies_Beta_Actual",
+    "target": "Event_NakabachiPaper_Russia",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Moeka_Death",
+    "target": "Event_DMail_Cancel_Moeka",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Moeka_FB_FirstMessage",
+    "target": "Event_Rescue_LabShot_Attack",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_NostalgiaDrive_Record",
+    "target": "Event_NostalgiaDrive_View",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_NostalgiaDrive_View",
+    "target": "Event_OperationSkuldTravel",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Prologue_MetalUpa",
+    "target": "Event_NakabachiPaper_Russia",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_ReadingSteiner_Manifestation",
+    "target": "Event_ReadingSteiner_Named",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_ReadingSteiner_Manifestation",
+    "target": "Event_SG0_ReadingSteinerReactivates",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SERN_Hacked",
+    "target": "Event_EchelonCracking",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_3000TimeLeaps",
+    "target": "Event_SG0_RemoveKurisuMemory",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusCall",
+    "target": "Event_SG0_AlphaShift",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusCall",
+    "target": "Event_SG0_IgnoreAmadeusCall",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusCall",
+    "target": "Event_SG0_PhonePowerOff",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusCall",
+    "target": "Event_SG0_RemoveKurisuMemory",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_DRine",
+    "target": "Event_SG0_SelfDMail",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KagariTimeTravel",
+    "target": "Event_SG0_LeskinenStratfoReveal",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KagariTimeTravel",
+    "target": "Event_SG0_RemoveKurisuMemory",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KagariTimeTravel",
+    "target": "Event_SG0_TimeMachineDestroyed",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_LeskinenSeminar",
+    "target": "Event_SG0_AmadeusCall",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_Okabe2036",
+    "target": "Event_SG0_3000TimeLeaps",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_SatelliteCrash",
+    "target": "Event_Suzuha_Identity_Titor",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_UpaSwap",
+    "target": "Event_KurisuSurvives_SG",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Suzuha_Departure_1975",
+    "target": "Event_IBN_Discovery",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_Suzuha_Identity_Titor",
+    "target": "Event_Suzuha_Departure_1975",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeapMachine_Complete",
+    "target": "Event_Rescue_LabShot_Attack",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeapMachine_Complete",
+    "target": "Event_TimeLeap_FirstUse",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeap_FirstUse",
+    "target": "Event_Rescue_CarAccident_Escape",
+    "relation": "enables",
+    "directed": true
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "AF_Alpha",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "CP_MayuriDies_Alpha",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "CP_SERNDystopia_Alpha",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "CP_SERNTimeMachineCompleted_Alpha",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "EV_Alpha_DMail_Luka_Send",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_Bootstrap_KurisuDeath",
+    "target": "CP_KurisuDies_Beta",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_Bootstrap_KurisuDeath",
+    "target": "Event_Skuld_Fail_KurisuDeath",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "EV_Rescue_LabShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "EV_Rescue_NaePush",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "WL_0_337187",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DivergenceMeterSignalSource",
+    "target": "WL_0_337187",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_DivergenceMeterSignalSource",
+    "target": "WL_1_048596",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EchelonDeletion_WorldLineShift",
+    "target": "Event_EchelonCracking",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EchelonDeletion_WorldLineShift",
+    "target": "Shift_AlphaToBeta",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Alpha_TimeLeap_FirstUse",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Rescue_LabShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Rescue_NaePush",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_IBN5100CustodyChain",
+    "target": "EV_Alpha_IBN_Search",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_IBN5100CustodyChain",
+    "target": "Event_IBN_Discovery",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_AlphaInternal_01",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_AlphaInternal_02",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_AlphaInternal_03",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_AlphaInternal_04",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_AlphaInternal_05",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_AlphaToBeta",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_Alpha_337187_to_409431",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_Alpha_409431_to_456914",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_Alpha_456914_to_523307",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_Alpha_523307_to_571046",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_Alpha_571046_to_571024",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_BetaToAlpha",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_BetaToSteinsGate",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_SG0_053649_to_055821",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_SG0_055821_to_123581",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Shift_SG0_064750_to_081163",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "EV_Rescue_LabShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "EV_Rescue_NaePush",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_NakabachiPaper_SGCondition",
+    "target": "Shift_BetaToSteinsGate",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_NakabachiPaper_SGCondition",
+    "target": "WL_1_048596",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "WL_0_337187",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "WL_0_571024",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "WL_1_048596",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "WL_1_130426",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_OmegaNegativeDivergence",
+    "target": "AF_Omega",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_OmegaNegativeDivergence",
+    "target": "WL_Neg_0_275349",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_PhysicalTimeTravel_MicroShift",
+    "target": "Event_OperationSkuldTravel",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_PhysicalTimeTravel_MicroShift",
+    "target": "Event_Skuld_Fail_Travel",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_PhysicalTimeTravel_MicroShift",
+    "target": "Shift_BetaToSteinsGate",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SERNSurveillanceRounderRaid",
+    "target": "Event_DMail_Moeka",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SERNSurveillanceRounderRaid",
+    "target": "Event_FirstDMail",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SERNSurveillanceRounderRaid",
+    "target": "Event_Rescue_LabShot_Attack",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SERNSurveillanceRounderRaid",
+    "target": "Event_TimeLeap_FirstUse",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "EV_Alpha_TimeLeap_FirstUse",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "EV_Rescue_LabShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "EV_Rescue_NaePush",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_TimeLeapMemoryAccumulation",
+    "target": "EV_Alpha_TimeLeap_FirstUse",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Topic_TimeLeapMemoryAccumulation",
+    "target": "Event_TimeLeap_FirstUse",
+    "relation": "explainsEntity",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_01",
+    "target": "WL_0_571024",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_02",
+    "target": "WL_0_571015",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_03",
+    "target": "WL_0_523299",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_04",
+    "target": "WL_0_456903",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_05",
+    "target": "WL_0_409420",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaToBeta",
+    "target": "WL_0_571024",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_337187_to_409431",
+    "target": "WL_0_337187",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_409431_to_456914",
+    "target": "WL_0_409431",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_456914_to_523307",
+    "target": "WL_0_456914",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_523307_to_571046",
+    "target": "WL_0_523307",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_571046_to_571024",
+    "target": "WL_0_571046",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_BetaToAlpha",
+    "target": "WL_1_130426",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_BetaToSteinsGate",
+    "target": "WL_1_130209",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_053649_to_055821",
+    "target": "WL_1_053649",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_055821_to_123581",
+    "target": "WL_1_055821",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_064750_to_081163",
+    "target": "WL_1_064750",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_Alpha_to_Beta",
+    "target": "WL_0_571024",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_Beta_to_Alpha",
+    "target": "WL_1_064750",
+    "relation": "fromWorldLine",
+    "directed": true
+  },
+  {
+    "source": "AF_Alpha",
+    "target": "CP_MayuriDies_Alpha",
+    "relation": "hasConvergencePattern",
+    "directed": true
+  },
+  {
+    "source": "AF_Alpha",
+    "target": "CP_SERNDystopia_Alpha",
+    "relation": "hasConvergencePattern",
+    "directed": true
+  },
+  {
+    "source": "AF_Alpha",
+    "target": "CP_SERNTimeMachineCompleted_Alpha",
+    "relation": "hasConvergencePattern",
+    "directed": true
+  },
+  {
+    "source": "AF_Beta",
+    "target": "CP_KurisuDies_Beta",
+    "relation": "hasConvergencePattern",
+    "directed": true
+  },
+  {
+    "source": "AF_Beta",
+    "target": "CP_WW3_Beta",
+    "relation": "hasConvergencePattern",
+    "directed": true
+  },
+  {
+    "source": "CP_KurisuDies_Beta",
+    "target": "EV_Prologue_Beta_Discovery",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "CP_KurisuDies_Beta",
+    "target": "EV_Skuld_Fail",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "CP_MayuriDies_Alpha",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "CP_MayuriDies_Alpha",
+    "target": "EV_Rescue_LabShot",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "CP_MayuriDies_Alpha",
+    "target": "EV_Rescue_NaePush",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "CP_MayuriDies_Alpha",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "CP_MayuriDies_Alpha",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "hasVariantVariation",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Faris_Cancel",
+    "target": "ME_Alpha_Escape",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Faris_Send",
+    "target": "ME_Alpha_Exploration",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Loto6_Cancel",
+    "target": "ME_Alpha_Escape",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Loto6_Send",
+    "target": "ME_Alpha_Exploration",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Luka_Cancel",
+    "target": "ME_Alpha_Escape",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Luka_Send",
+    "target": "ME_Alpha_Exploration",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Moeka_Cancel",
+    "target": "ME_Alpha_Escape",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_Moeka_Send",
+    "target": "ME_Alpha_Exploration",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "target": "ME_Alpha_Escape",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "target": "ME_Alpha_Exploration",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_Echelon_Delete",
+    "target": "ME_Alpha_Escape",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_IBN_Search",
+    "target": "ME_Alpha_Exploration",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Alpha_TimeLeap_FirstUse",
+    "target": "ME_TimeLeap_Activation",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_NostalgiaDrive_Preparation",
+    "target": "ME_NostalgiaDrive",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Prologue_Beta_Discovery",
+    "target": "ME_Prologue_Beta",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_CarAccident",
+    "target": "ME_MayuriRescue_Loop",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_LabShot",
+    "target": "ME_MayuriRescue_Loop",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_NaePush",
+    "target": "ME_MayuriRescue_Loop",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_TaxiStab",
+    "target": "ME_MayuriRescue_Loop",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Rescue_YodobashiShot",
+    "target": "ME_MayuriRescue_Loop",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Alpha_Excursion",
+    "target": "ME_SG0_Beta_Branches",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Amadeus_Contact",
+    "target": "ME_SG0_Beta_Branches",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Amadeus_Deleted",
+    "target": "ME_SG0_Beta_Branches",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Promised_Rinascimento",
+    "target": "ME_SG0_Beta_Branches",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Solitude",
+    "target": "ME_SG0_Beta_Branches",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_SG0_Twin_Automata",
+    "target": "ME_SG0_Beta_Branches",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Skuld_Fail",
+    "target": "ME_OperationSkuld",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "EV_Skuld_Success",
+    "target": "ME_OperationSkuld",
+    "relation": "partOfMacroEvent",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Faris",
+    "target": "EV_Alpha_DMail_Faris_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Loto6",
+    "target": "EV_Alpha_DMail_Loto6_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Luka",
+    "target": "EV_Alpha_DMail_Luka_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Moeka",
+    "target": "EV_Alpha_DMail_Moeka_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_SuzuhaChase",
+    "target": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Faris",
+    "target": "EV_Alpha_DMail_Faris_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Loto6",
+    "target": "EV_Alpha_DMail_Loto6_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Luka",
+    "target": "EV_Alpha_DMail_Luka_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Moeka",
+    "target": "EV_Alpha_DMail_Moeka_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_SuzuhaChase",
+    "target": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Daru_Is_Suzuha_Father",
+    "target": "EV_Rescue_LabShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DivergenceMeter_Introduced",
+    "target": "EV_Rescue_LabShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_EchelonCracking",
+    "target": "EV_Alpha_Echelon_Delete",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_FB_Is_MrBraun",
+    "target": "EV_Alpha_DMail_Moeka_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "EV_Prologue_Beta_Discovery",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_IBN_Discovery",
+    "target": "EV_Alpha_IBN_Search",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuAppearsDeadToPastOkabe",
+    "target": "EV_Skuld_Success",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuDies_Beta_Actual",
+    "target": "EV_Prologue_Beta_Discovery",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuSurvives_SG",
+    "target": "EV_Skuld_Success",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Kurisu_HououinKyouma_2005",
+    "target": "EV_NostalgiaDrive_Preparation",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Lifter_Discovered",
+    "target": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Moeka_Death",
+    "target": "EV_Alpha_DMail_Moeka_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Moeka_FB_FirstMessage",
+    "target": "EV_Alpha_IBN_Search",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_NakabachiPaper_Russia",
+    "target": "EV_Skuld_Fail",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_NostalgiaDrive_Record",
+    "target": "EV_NostalgiaDrive_Preparation",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_NostalgiaDrive_View",
+    "target": "EV_NostalgiaDrive_Preparation",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_OperationSkuldTravel",
+    "target": "EV_Skuld_Success",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Prologue_MetalUpa",
+    "target": "EV_Prologue_Beta_Discovery",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_ReadingSteiner_Manifestation",
+    "target": "EV_Prologue_Beta_Discovery",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_ReadingSteiner_Named",
+    "target": "EV_Alpha_DMail_Loto6_Send",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_CarAccident_Escape",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_CarAccident_MayuriDeath",
+    "target": "EV_Rescue_CarAccident",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_LabShot_Attack",
+    "target": "EV_Rescue_LabShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_LabShot_MayuriDeath",
+    "target": "EV_Rescue_LabShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_NaePush_MayuriDeath",
+    "target": "EV_Rescue_NaePush",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_NaePush_Wait",
+    "target": "EV_Rescue_NaePush",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_TaxiStab_Escape",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_TaxiStab_MayuriDeath",
+    "target": "EV_Rescue_TaxiStab",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_YodobashiShot_Hide",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Rescue_YodobashiShot_MayuriDeath",
+    "target": "EV_Rescue_YodobashiShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SERN_Hacked",
+    "target": "EV_Alpha_IBN_Search",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_3000TimeLeaps",
+    "target": "EV_SG0_Promised_Rinascimento",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AlphaShift",
+    "target": "EV_SG0_Alpha_Excursion",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusCall",
+    "target": "EV_SG0_Amadeus_Contact",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusDeleted",
+    "target": "EV_SG0_Amadeus_Deleted",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_AmadeusPatch_Maho",
+    "target": "EV_SG0_Amadeus_Deleted",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_ChristmasParty",
+    "target": "EV_SG0_Amadeus_Contact",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_DRine",
+    "target": "EV_SG0_Amadeus_Deleted",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_IgnoreAmadeusCall",
+    "target": "EV_SG0_Twin_Automata",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KagariTimeTravel",
+    "target": "EV_SG0_Solitude",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_KurisuLaptop",
+    "target": "EV_SG0_Twin_Automata",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_LeskinenSeminar",
+    "target": "EV_SG0_Amadeus_Contact",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_LeskinenStratfoReveal",
+    "target": "EV_SG0_Solitude",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_Okabe2036",
+    "target": "EV_SG0_Promised_Rinascimento",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_PhonePowerOff",
+    "target": "EV_SG0_Solitude",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_ReadingSteinerReactivates",
+    "target": "EV_SG0_Amadeus_Contact",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_RemoveKurisuMemory",
+    "target": "EV_SG0_Promised_Rinascimento",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_SelfDMail",
+    "target": "EV_SG0_Promised_Rinascimento",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_TimeMachineDestroyed",
+    "target": "EV_SG0_Solitude",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_SatelliteCrash",
+    "target": "EV_Prologue_Beta_Discovery",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_KurisuDeath",
+    "target": "EV_Skuld_Fail",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Fail_Travel",
+    "target": "EV_Skuld_Fail",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_SelfStab",
+    "target": "EV_Skuld_Success",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_UpaSwap",
+    "target": "EV_Skuld_Success",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Suzuha_Departure_1975",
+    "target": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_Suzuha_Identity_Titor",
+    "target": "EV_Rescue_LabShot",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeapMachine_Complete",
+    "target": "EV_Alpha_TimeLeap_FirstUse",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_TimeLeap_FirstUse",
+    "target": "EV_Alpha_TimeLeap_FirstUse",
+    "relation": "partOfVariation",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Faris",
+    "target": "Shift_Alpha_409431_to_456914",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Loto6",
+    "target": "Shift_Alpha_571046_to_571024",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Luka",
+    "target": "Shift_Alpha_456914_to_523307",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_Moeka",
+    "target": "Shift_Alpha_523307_to_571046",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Cancel_SuzuhaChase",
+    "target": "Shift_Alpha_337187_to_409431",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Faris",
+    "target": "Shift_AlphaInternal_04",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Loto6",
+    "target": "Shift_AlphaInternal_01",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Luka",
+    "target": "Shift_AlphaInternal_03",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_Moeka",
+    "target": "Shift_AlphaInternal_02",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_DMail_SuzuhaChase",
+    "target": "Shift_AlphaInternal_05",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_EchelonCracking",
+    "target": "Shift_AlphaToBeta",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_FirstDMail",
+    "target": "Shift_BetaToAlpha",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_OperationSkuldTravel",
+    "target": "Shift_BetaToSteinsGate",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_IgnoreAmadeusCall",
+    "target": "Shift_SG0_064750_to_081163",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_RemoveKurisuMemory",
+    "target": "Shift_SG0_053649_to_055821",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_SG0_SelfDMail",
+    "target": "Shift_SG0_055821_to_123581",
+    "relation": "participatesInShift",
+    "directed": true
+  },
+  {
+    "source": "Event_KurisuSurvives_SG",
+    "target": "Event_Skuld_Fail_KurisuDeath",
+    "relation": "prevents",
+    "directed": true
+  },
+  {
+    "source": "Event_Skuld_Success_UpaSwap",
+    "target": "Event_NakabachiPaper_Russia",
+    "relation": "prevents",
+    "directed": true
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "Topic_EventVariationBranching",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "Topic_SERNSurveillanceRounderRaid",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_Bootstrap_KurisuDeath",
+    "target": "Topic_PhysicalTimeTravel_MicroShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_DivergenceMeterSignalSource",
+    "target": "Topic_DisplayPrecisionLimit",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_EchelonDeletion_WorldLineShift",
+    "target": "Topic_MeasurableWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_EchelonDeletion_WorldLineShift",
+    "target": "Topic_SERNSurveillanceRounderRaid",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "Topic_MicroWorldLineDifference",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "Topic_SubDisplayWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_IBN5100CustodyChain",
+    "target": "Topic_EchelonDeletion_WorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_IBN5100CustodyChain",
+    "target": "Topic_SERNSurveillanceRounderRaid",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "Topic_DisplayPrecisionLimit",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_NakabachiPaper_SGCondition",
+    "target": "Topic_Bootstrap_KurisuDeath",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_NakabachiPaper_SGCondition",
+    "target": "Topic_PhysicalTimeTravel_MicroShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "Topic_DisplayPrecisionLimit",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "Topic_DivergenceMeterSignalSource",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "Topic_MeasurableWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_OmegaNegativeDivergence",
+    "target": "Topic_DisplayPrecisionLimit",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_OmegaNegativeDivergence",
+    "target": "Topic_ObservedWorldLineCoordinate",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_PhysicalTimeTravel_MicroShift",
+    "target": "Topic_MicroWorldLineDifference",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_PhysicalTimeTravel_MicroShift",
+    "target": "Topic_SubDisplayWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_ReadingSteiner2000Branch",
+    "target": "Topic_SubDisplayWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_ReadingSteiner2000Branch",
+    "target": "Topic_TimeLeapMemoryAccumulation",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Topic_DisplayPrecisionLimit",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Topic_MeasurableWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Topic_MicroWorldLineDifference",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_TimeLeapMemoryAccumulation",
+    "target": "Topic_SubDisplayWorldLineShift",
+    "relation": "relatedTopic",
+    "directed": false
+  },
+  {
+    "source": "Topic_AlphaDystopiaVariantFutures",
+    "target": "Evidence_OfficialQnA_AlphaFutureConvergence",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_Bootstrap_KurisuDeath",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "Evidence_CurrentTTL_WorldLineModel",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "Evidence_Famitsu_ShikuraDisplayPrecision",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "Evidence_Famitsu_ShikuraWorldLayerSync",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DisplayPrecisionLimit",
+    "target": "Evidence_SGWorldLine_DivergenceMeter",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DivergenceMeterSignalSource",
+    "target": "Evidence_Famitsu_ShikuraDisplayPrecision",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_DivergenceMeterSignalSource",
+    "target": "Evidence_Famitsu_ShikuraWorldLayerSync",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_EchelonDeletion_WorldLineShift",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "Evidence_CurrentTTL_WorldLineModel",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_EventVariationBranching",
+    "target": "Evidence_SGTimeline_Alpha337187Variations",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_IBN5100CustodyChain",
+    "target": "Evidence_OfficialQnA_IBN5100Chain",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Evidence_CurrentTTL_WorldLineModel",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MeasurableWorldLineShift",
+    "target": "Evidence_SGTimeline_ShiftMechanisms",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "Evidence_CurrentTTL_WorldLineModel",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "Evidence_Famitsu_ShikuraDisplayPrecision",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_MicroWorldLineDifference",
+    "target": "Evidence_SGTimeline_Alpha337187Variations",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_NakabachiPaper_SGCondition",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "Evidence_CurrentTTL_WorldLineModel",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "Evidence_Famitsu_ShikuraWorldLayerSync",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_ObservedWorldLineCoordinate",
+    "target": "Evidence_SGWorldLine_DivergenceMeter",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_OmegaNegativeDivergence",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_PhysicalTimeTravel_MicroShift",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_ReadingSteiner2000Branch",
+    "target": "Evidence_OfficialQnA_ReadingSteiner",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_SERNSurveillanceRounderRaid",
+    "target": "Evidence_OfficialQnA_SERNSurveillance",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Evidence_CurrentTTL_WorldLineModel",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Evidence_Famitsu_ShikuraDisplayPrecision",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Evidence_OfficialQnA_WorldLineMechanics",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_SubDisplayWorldLineShift",
+    "target": "Evidence_SGTimeline_ShiftMechanisms",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Topic_TimeLeapMemoryAccumulation",
+    "target": "Evidence_OfficialQnA_ReadingSteiner",
+    "relation": "supportedByEvidence",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_01",
+    "target": "WL_0_571015",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_02",
+    "target": "WL_0_523299",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_03",
+    "target": "WL_0_456903",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_04",
+    "target": "WL_0_409420",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_05",
+    "target": "WL_0_337187",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaToBeta",
+    "target": "WL_1_130205",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_337187_to_409431",
+    "target": "WL_0_409431",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_409431_to_456914",
+    "target": "WL_0_456914",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_456914_to_523307",
+    "target": "WL_0_523307",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_523307_to_571046",
+    "target": "WL_0_571046",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_571046_to_571024",
+    "target": "WL_0_571024",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_BetaToAlpha",
+    "target": "WL_0_571024",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_BetaToSteinsGate",
+    "target": "WL_1_048596",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_053649_to_055821",
+    "target": "WL_1_055821",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_055821_to_123581",
+    "target": "WL_1_123581",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_064750_to_081163",
+    "target": "WL_1_081163",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_Alpha_to_Beta",
+    "target": "WL_1_064750",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_Beta_to_Alpha",
+    "target": "WL_0_571024",
+    "relation": "toWorldLine",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_01",
+    "target": "Event_DMail_Loto6",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_02",
+    "target": "Event_DMail_Moeka",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_03",
+    "target": "Event_DMail_Luka",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_04",
+    "target": "Event_DMail_Faris",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaInternal_05",
+    "target": "Event_DMail_SuzuhaChase",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_AlphaToBeta",
+    "target": "Event_EchelonCracking",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_337187_to_409431",
+    "target": "Event_DMail_Cancel_SuzuhaChase",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_409431_to_456914",
+    "target": "Event_DMail_Cancel_Faris",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_456914_to_523307",
+    "target": "Event_DMail_Cancel_Luka",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_523307_to_571046",
+    "target": "Event_DMail_Cancel_Moeka",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_Alpha_571046_to_571024",
+    "target": "Event_DMail_Cancel_Loto6",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_BetaToAlpha",
+    "target": "Event_FirstDMail",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_BetaToSteinsGate",
+    "target": "Event_OperationSkuldTravel",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_053649_to_055821",
+    "target": "Event_SG0_RemoveKurisuMemory",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_055821_to_123581",
+    "target": "Event_SG0_SelfDMail",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_064750_to_081163",
+    "target": "Event_SG0_IgnoreAmadeusCall",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_Alpha_to_Beta",
+    "target": "Event_SG0_AlphaShift",
+    "relation": "triggeredByEvent",
+    "directed": true
+  },
+  {
+    "source": "Shift_SG0_Beta_to_Alpha",
+    "target": "Event_SG0_AlphaShift",
+    "relation": "triggeredByEvent",
+    "directed": true
+  }
+]

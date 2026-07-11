@@ -1,0 +1,2133 @@
+[
+  {
+    "id": "AF_Alpha",
+    "class": "AttractorField",
+    "labelKo": "어트랙터 필드 알파",
+    "summary": "SERN 디스토피아가 거시적 미래로 수속하는 세계선 묶음."
+  },
+  {
+    "id": "AF_Beta",
+    "class": "AttractorField",
+    "labelKo": "어트랙터 필드 베타",
+    "summary": "크리스의 죽음과 제3차 세계대전 위험이 결부되는 세계선 묶음."
+  },
+  {
+    "id": "AF_Omega",
+    "class": "AttractorField",
+    "labelKo": "오메가",
+    "summary": "페이리스 엔딩에서 확인되는 음수 다이버전스의 특수 세계선 영역."
+  },
+  {
+    "id": "AF_SteinsGate",
+    "class": "AttractorField",
+    "labelKo": "슈타인즈 게이트",
+    "summary": "알파와 베타의 거시적 수속 미래에서 모두 벗어나는 특수 세계선 영역."
+  },
+  {
+    "id": "CP_KurisuDies_Beta",
+    "class": "ConvergencePattern",
+    "labelKo": "베타에서 크리스 사망 수속",
+    "summary": "베타 어트랙터 필드에서 2010-07-28 크리스의 죽음이 반복된다.",
+    "timeWindow": "2010-07-28",
+    "attractorField": "AF_Beta"
+  },
+  {
+    "id": "CP_MayuriDies_Alpha",
+    "class": "ConvergencePattern",
+    "labelKo": "알파에서 마유리 사망 수속",
+    "summary": "알파 어트랙터 필드에서 2010-08-13 밤 마유리의 죽음이 다양한 방식으로 반복된다.",
+    "timeWindow": "2010-08-13 night",
+    "attractorField": "AF_Alpha"
+  },
+  {
+    "id": "CP_SERNDystopia_Alpha",
+    "class": "ConvergencePattern",
+    "labelKo": "알파에서 SERN 디스토피아 수속",
+    "summary": "알파 어트랙터 필드에서 2036년 스즈하가 경험하는 완성형 SERN 디스토피아 미래.",
+    "timeWindow": "2036",
+    "attractorField": "AF_Alpha"
+  },
+  {
+    "id": "CP_SERNTimeMachineCompleted_Alpha",
+    "class": "ConvergencePattern",
+    "labelKo": "알파에서 2034년 SERN 타임머신 완성 수속",
+    "summary": "알파 어트랙터 필드에서 SERN이 2034년에 타임머신을 완성하는 거시적 준비 단계.",
+    "timeWindow": "2034",
+    "attractorField": "AF_Alpha"
+  },
+  {
+    "id": "CP_WW3_Beta",
+    "class": "ConvergencePattern",
+    "labelKo": "베타에서 제3차 세계대전 수속",
+    "summary": "베타 어트랙터 필드에서 나카바치 논문 유출로 발생하는 전쟁 수속 패턴.",
+    "timeWindow": "2025",
+    "attractorField": "AF_Beta"
+  },
+  {
+    "id": "Event_DMail_Cancel_Faris",
+    "class": "Event",
+    "labelKo": "D메일 취소: 페이리스 아버지 사건 복구",
+    "summary": "페이리스의 D메일을 무효화해 원래 사고 흐름을 복구한다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-16 14:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Faris_Father",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Cancel_Loto6",
+    "class": "Event",
+    "labelKo": "D메일 취소: 로또6 당첨 취소",
+    "summary": "로또6 D메일을 무효화해 원래 알파 시작점으로 되돌린다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-17 15:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Cancel_Luka",
+    "class": "Event",
+    "labelKo": "D메일 취소: 루카 성별 복구",
+    "summary": "루카 관련 D메일을 무효화해 남성으로 되돌린다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-16 18:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Luka_Mother",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Cancel_Moeka",
+    "class": "Event",
+    "labelKo": "D메일 취소: 모에카 IBN 5100 회수 복구",
+    "summary": "모에카 관련 D메일을 무효화해 원래 IBN 5100 회수 흐름을 복구한다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-17 13:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Moeka_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Cancel_SuzuhaChase",
+    "class": "Event",
+    "labelKo": "D메일 취소: 스즈하 미행 재개",
+    "summary": "스즈하 미행 중지 D메일을 무효화한다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-15 13:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Faris",
+    "class": "Event",
+    "labelKo": "D메일: 페이리스 아버지 생존 지시",
+    "summary": "페이리스가 아버지에게 비행기를 타지 말라는 메시지를 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-06 18:00",
+    "actor": "Char_Faris",
+    "target": "Char_Faris_Father",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Loto6",
+    "class": "Event",
+    "labelKo": "D메일: 로또6 번호 송신",
+    "summary": "오카베가 과거의 자신에게 로또6 번호를 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-03 12:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Luka",
+    "class": "Event",
+    "labelKo": "D메일: 루카 어머니에게 호출기 메시지",
+    "summary": "루카의 성별에 영향을 주기 위한 메시지를 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-05 16:00",
+    "actor": "Char_Luka",
+    "target": "Char_Luka_Mother",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_Moeka",
+    "class": "Event",
+    "labelKo": "D메일: 모에카 기종 변경 지시",
+    "summary": "모에카가 과거의 자신에게 IBN 5100 수색 중단 명령을 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-04 14:00",
+    "actor": "Char_Moeka",
+    "target": "Char_Moeka_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DMail_SuzuhaChase",
+    "class": "Event",
+    "labelKo": "D메일: 스즈하 미행 중지",
+    "summary": "오카베가 과거의 자신에게 스즈하를 쫓지 말라고 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-08-08 11:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Daru_Is_Suzuha_Father",
+    "class": "Event",
+    "labelKo": "다루=스즈하 아버지 공개",
+    "summary": "스즈하의 친아버지가 하시다 이타루(다루)임이 밝혀진다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 15:07",
+    "actor": "Char_Mayuri",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_DivergenceMeter_Introduced",
+    "class": "Event",
+    "labelKo": "분기계(다이버전스 미터) 도입",
+    "summary": "미래 오카베가 만든 분기계가 현재 세계선 수치를 시각화한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 00:00",
+    "actor": "Char_Suzuha",
+    "target": "분기계",
+    "isolationNote": "인과 고립: 계측 도구 도입 이벤트. 1% 장벽 인식의 배경(Ep.14)이지만 개별 사건의 직접 원인/전제로 소스가 특정하지 않는다."
+  },
+  {
+    "id": "Event_EchelonCracking",
+    "class": "Event",
+    "labelKo": "에셜론 포착 기록 삭제",
+    "summary": "다루가 첫 D메일의 에셜론 포착 기록을 삭제해 알파를 탈출한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-17 17:00",
+    "actor": "Char_Daru",
+    "target": "First D-Mail Echelon Record",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_FB_Is_MrBraun",
+    "class": "Event",
+    "labelKo": "FB 정체(미스터 브라운) 공개",
+    "summary": "라운더의 지휘자 FB가 텐노지 유고(미스터 브라운)임이 드러난다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 00:00",
+    "actor": "Char_MrBraun",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_FirstDMail",
+    "class": "Event",
+    "labelKo": "첫 D메일 전송",
+    "summary": "오카베가 다루에게 첫 D메일을 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2010-07-28 12:41",
+    "actor": "Char_Okabe",
+    "target": "Char_Daru",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_IBN_Discovery",
+    "class": "Event",
+    "labelKo": "신사 창고에서 IBN 5100 발견",
+    "summary": "오카베 일행이 야나바야시 신사 창고에서 IBN 5100을 확보한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-01 15:00",
+    "actor": "Char_Okabe",
+    "target": "IBN 5100",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_KurisuAppearsDeadToPastOkabe",
+    "class": "Event",
+    "labelKo": "크리스가 죽은 것처럼 보이게 연출",
+    "summary": "과거 오카베가 크리스의 죽음으로 오인하도록 현장을 조성한다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:39",
+    "actor": "Char_Okabe_Future",
+    "target": "Char_Kurisu",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_KurisuDies_Beta_Actual",
+    "class": "Event",
+    "labelKo": "베타 수속: 크리스 사망",
+    "summary": "베타 세계선에서 라디오 회관의 크리스가 사망한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:39",
+    "actor": "Char_Nakabachi",
+    "target": "Char_Kurisu",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_KurisuSurvives_SG",
+    "class": "Event",
+    "labelKo": "슈타인즈 게이트에서 크리스 생존",
+    "summary": "실제 결과로서 크리스는 살아남는다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:40",
+    "actor": "None",
+    "target": "Char_Kurisu",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Kurisu_HououinKyouma_2005",
+    "class": "Event",
+    "labelKo": "크리스 2005년 호오인 쿄우마 관념 심음(영화, SG 한정)",
+    "summary": "극장판에서 크리스가 타임머신으로 2005년으로 돌아가 어린 오카베에게 호오인 쿄우마 관념을 심는다.",
+    "eventType": "intervention",
+    "mechanismType": "physicaltravel",
+    "localDateTime": "2005-06-30 00:00",
+    "actor": "Char_Kurisu",
+    "target": "Char_Okabe",
+    "isolationNote": "인과 고립: 극장판 한정 사건으로 본편 인과 그래프의 노드와 접속하지 않는다."
+  },
+  {
+    "id": "Event_Lifter_Discovered",
+    "class": "Event",
+    "labelKo": "리프터 정체 발견",
+    "summary": "미스터 브라운의 대형 브라운관 TV가 D메일 전송의 리프터였음이 밝혀진다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-10 15:00",
+    "actor": "Char_Okabe",
+    "target": "42형 CRT TV",
+    "isolationNote": "인과 고립: D메일 작동 원리 규명(정보 공개) 이벤트로, 모델링된 노드와의 직접 인과가 소스에서 확인되지 않는다."
+  },
+  {
+    "id": "Event_Moeka_Death",
+    "class": "Event",
+    "labelKo": "모에카 사망(미스터 브라운 사살)",
+    "summary": "미스터 브라운이 모에카를 사살한 뒤 자살한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 00:00",
+    "actor": "Char_MrBraun",
+    "target": "Char_Moeka",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Moeka_FB_FirstMessage",
+    "class": "Event",
+    "labelKo": "모에카 FB 첫 문자 수신",
+    "summary": "모에카가 FB로부터 첫 지령 문자를 수신한다.",
+    "eventType": "communication",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-02 11:52",
+    "actor": "Char_FB",
+    "target": "Char_Moeka",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_NakabachiPaper_Russia",
+    "class": "Event",
+    "labelKo": "나카바치 논문 러시아 유출",
+    "summary": "나카바치가 타임머신 논문을 들고 러시아로 망명해 3차대전 위험이 현실화한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-21 00:00",
+    "actor": "Char_Nakabachi",
+    "target": "타임머신 논문",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_NostalgiaDrive_Record",
+    "class": "Event",
+    "labelKo": "노스탤지어 드라이브 녹화",
+    "summary": "2025년의 오카베가 스쿨드 작전 지시를 담은 영상 D메일을 준비한다.",
+    "eventType": "communication",
+    "mechanismType": "videodmail",
+    "localDateTime": "2025-08-21 18:00",
+    "actor": "Char_Okabe_2025",
+    "target": "Char_Okabe_2010",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_NostalgiaDrive_View",
+    "class": "Event",
+    "labelKo": "노스탤지어 드라이브 확인",
+    "summary": "2010년의 오카베가 미래의 자신이 보낸 영상 D메일을 확인한다.",
+    "eventType": "communication",
+    "mechanismType": "videodmail",
+    "localDateTime": "2010-08-21 17:30",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_OperationSkuldTravel",
+    "class": "Event",
+    "labelKo": "스쿨드 작전: 과거 이동",
+    "summary": "오카베가 최종 구출을 위해 과거로 물리 이동한다.",
+    "eventType": "travel",
+    "mechanismType": "physicaltravel",
+    "localDateTime": "2010-07-28 12:10",
+    "actor": "Char_Okabe",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Prologue_MetalUpa",
+    "class": "Event",
+    "labelKo": "메탈 우파 획득",
+    "summary": "오카베가 메탈 우파를 확보한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:00",
+    "actor": "Char_Okabe",
+    "target": "Metal Upa",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_ReadingSteiner_Manifestation",
+    "class": "Event",
+    "labelKo": "리딩 슈타이너 발현(본편, Y2K 무렵)",
+    "summary": "오카베가 Y2K 소동 무렵 중병 중 리딩 슈타이너 능력을 얻은 것으로 회상된다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2000-07-01 00:00",
+    "actor": "Char_Okabe",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_ReadingSteiner_Named",
+    "class": "Event",
+    "labelKo": "리딩 슈타이너 명명",
+    "summary": "오카베가 세계선 이동 시 기억을 유지하는 능력을 리딩 슈타이너라 명명한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-03 16:25",
+    "actor": "Char_Okabe",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_CarAccident_Escape",
+    "class": "Event",
+    "labelKo": "라보 탈출 및 도주",
+    "summary": "오카베 일행이 마유리를 데리고 라보를 빠져나온다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 18:30",
+    "actor": "Char_Okabe",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_CarAccident_MayuriDeath",
+    "class": "Event",
+    "labelKo": "마유리 차량 사고 사망",
+    "summary": "도주 중이던 마유리가 차량과 충돌해 사망한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:00",
+    "actor": "Char_Rounder",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_LabShot_Attack",
+    "class": "Event",
+    "labelKo": "라운더의 라보 습격",
+    "summary": "모에카 일당이 연구소에 진입한다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 19:56",
+    "actor": "Char_Moeka",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_LabShot_MayuriDeath",
+    "class": "Event",
+    "labelKo": "마유리 총격 사망",
+    "summary": "라보 습격 직후 마유리가 총에 맞아 사망한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 19:56",
+    "actor": "Char_Moeka",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_NaePush_MayuriDeath",
+    "class": "Event",
+    "labelKo": "마유리 선로 추락 사망",
+    "summary": "나에의 돌발 행동으로 마유리가 선로로 떨어져 사망한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:20",
+    "actor": "Char_Nae",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_NaePush_Wait",
+    "class": "Event",
+    "labelKo": "승강장 대기",
+    "summary": "오카베와 마유리가 신오차노미즈역 승강장에서 열차를 기다린다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:17",
+    "actor": "Char_Okabe",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_TaxiStab_Escape",
+    "class": "Event",
+    "labelKo": "택시를 이용한 탈출 시도",
+    "summary": "오카베 일행이 택시로 아키하바라를 벗어나려 한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:10",
+    "actor": "Char_Okabe",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_TaxiStab_MayuriDeath",
+    "class": "Event",
+    "labelKo": "마유리 택시 내 피습 사망",
+    "summary": "택시 내부에 침입한 라운더에게 마유리가 찔려 사망한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:15",
+    "actor": "Char_Rounder",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_YodobashiShot_Hide",
+    "class": "Event",
+    "labelKo": "요도바시 카메라 은신",
+    "summary": "오카베 일행이 요도바시 건물 내부에 몸을 숨긴다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:05",
+    "actor": "Char_Okabe",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Rescue_YodobashiShot_MayuriDeath",
+    "class": "Event",
+    "labelKo": "마유리 오인 사격 사망",
+    "summary": "폭발 이후 경찰이 마유리를 오인 사격해 사망한다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 20:06",
+    "actor": "Char_Rounder",
+    "target": "Char_Mayuri",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SERN_Hacked",
+    "class": "Event",
+    "labelKo": "SERN 데이터 침입 및 인체실험 발견",
+    "summary": "다루가 SERN 메일박스를 해킹해 인체실험 기록을 발견한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-31 23:00",
+    "actor": "Char_Daru",
+    "target": "SERN DB",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_3000TimeLeaps",
+    "class": "Event",
+    "labelKo": "2036→2011 3000회 타임리프",
+    "summary": "오카베가 2036년에서 2011년까지 2주 단위로 약 3000회 타임리프를 반복한다.",
+    "eventType": "travel",
+    "mechanismType": "timeleap",
+    "localDateTime": "2036-08-01 00:00",
+    "actor": "Char_Okabe",
+    "target": "2011년",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_AlphaShift",
+    "class": "Event",
+    "labelKo": "SG0 α 세계선 일시 이동",
+    "summary": "크리스의 구원 요청으로 리딩 슈타이너가 발동해 α 세계선으로 일시 이동한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2011-01-06 00:00",
+    "actor": "Char_Okabe",
+    "target": "α 어트랙터",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_AmadeusCall",
+    "class": "Event",
+    "labelKo": "아마데우스 첫 통화",
+    "summary": "오카베가 아키하바라역 인근에서 아마데우스 크리스와 통화한다.",
+    "eventType": "communication",
+    "mechanismType": "none",
+    "localDateTime": "2010-11-29 18:00",
+    "actor": "Amadeus_Kurisu",
+    "target": "Char_Okabe",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_AmadeusDeleted",
+    "class": "Event",
+    "labelKo": "아마데우스 삭제",
+    "summary": "아마데우스 크리스가 삭제되어 β 세계선의 상태가 다시 재구성된다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2011-01-23 20:10",
+    "actor": "Char_Okabe",
+    "target": "Amadeus_Kurisu",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_AmadeusPatch_Maho",
+    "class": "Event",
+    "labelKo": "마호 아마데우스 제어코드·자폭",
+    "summary": "마호가 최고 관리 권한으로 제어 코드를 입력해 이머전시 모드로 전환 후 자폭 처리를 지시한다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2011-08-20 00:00",
+    "actor": "Char_Maho",
+    "target": "Amadeus",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_ChristmasParty",
+    "class": "Event",
+    "labelKo": "크리스마스 이브 연구소 파티",
+    "summary": "크리스마스 이브에 미래 가젯 연구소에서 파티가 열린다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-12-24 00:00",
+    "actor": "Char_Okabe",
+    "target": "None",
+    "isolationNote": "인과 고립: 일상(파티) 이벤트로 직접 인과가 없다."
+  },
+  {
+    "id": "Event_SG0_DRine",
+    "class": "Event",
+    "labelKo": "다루 D-RINE 송신",
+    "summary": "다루가 에셜론 회피 목적의 D-RINE으로 크리스 기억 보호 지령을 과거의 자신에게 보낸다.",
+    "eventType": "communication",
+    "mechanismType": "drine",
+    "localDateTime": "2011-08-20 00:00",
+    "actor": "Char_Daru",
+    "target": "과거",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_IgnoreAmadeusCall",
+    "class": "Event",
+    "labelKo": "아마데우스 전화 미수신",
+    "summary": "오카베가 라보에서 걸려온 아마데우스의 전화를 받지 않는다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2011-01-02 18:00",
+    "actor": "Char_Okabe",
+    "target": "Amadeus_Kurisu",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_KagariTimeTravel",
+    "class": "Event",
+    "labelKo": "카가리 시간 이동(1975→1998→2010)",
+    "summary": "스즈하와 카가리가 1975년을 거쳐 1998년, 2010년으로 이동한다.",
+    "eventType": "travel",
+    "mechanismType": "physicaltravel",
+    "localDateTime": "1975-08-01 00:00",
+    "actor": "Char_Kagari",
+    "target": "2010년",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_KurisuLaptop",
+    "class": "Event",
+    "labelKo": "크리스 노트북 발견",
+    "summary": "마호가 보존 중이던 크리스의 노트북(타임머신 이론)을 공개한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2011-01-10 00:00",
+    "actor": "Char_Maho",
+    "target": "크리스 노트북",
+    "isolationNote": "인과 고립: 발견·분석 의뢰(SG0 Ep.10–11)까지만 확인되며 모델링된 후속 이벤트와의 직접 인과가 소스에서 확인되지 않는다."
+  },
+  {
+    "id": "Event_SG0_LeskinenSeminar",
+    "class": "Event",
+    "labelKo": "레스키넨 세미나 및 아마데우스 발표",
+    "summary": "레스키넨과 마호가 크리스 연구를 기반으로 한 기억 디지털화 AI 아마데우스를 발표한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-11-15 00:00",
+    "actor": "Char_Leskinen",
+    "target": "Amadeus",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_LeskinenStratfoReveal",
+    "class": "Event",
+    "labelKo": "레스키넌 Stratfo 배후 폭로",
+    "summary": "레스키넌이 민간 정보기관 Stratfo의 일원임을 드러낸다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2011-08-15 00:00",
+    "actor": "Char_Leskinen",
+    "target": "Stratfo",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_Okabe2036",
+    "class": "Event",
+    "labelKo": "오카베 2036년 각성",
+    "summary": "오카베가 2036년 시설에서 눈을 뜬다(2011년 기억을 덮어쓴 상태).",
+    "eventType": "travel",
+    "mechanismType": "timeleap",
+    "localDateTime": "2036-07-07 00:00",
+    "actor": "Char_Okabe",
+    "target": "2011년",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_PhonePowerOff",
+    "class": "Event",
+    "labelKo": "휴대전화 전원 종료",
+    "summary": "오카베가 휴대전화를 꺼 아마데우스와의 접촉을 차단한다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2010-12-15 18:00",
+    "actor": "Char_Okabe",
+    "target": "Smartphone",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_ReadingSteinerReactivates",
+    "class": "Event",
+    "labelKo": "리딩 슈타이너 비정상 재발동",
+    "summary": "리딩 슈타이너가 비정상적으로 발동하며 1.382733β 세계선의 비전을 체험한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-12-28 00:00",
+    "actor": "Char_Okabe",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_RemoveKurisuMemory",
+    "class": "Event",
+    "labelKo": "카가리에서 크리스 기억 제거",
+    "summary": "오카베가 카가리에게 이식된 크리스 기억을 제거하는 선택을 한다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2011-01-15 20:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Kagari",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_SelfDMail",
+    "class": "Event",
+    "labelKo": "자기 자신에게 보내는 D메일",
+    "summary": "오카베가 자신에게 D메일을 보내 1.123581β로의 이동을 유발한다.",
+    "eventType": "communication",
+    "mechanismType": "dmail",
+    "localDateTime": "2011-01-23 20:00",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SG0_TimeMachineDestroyed",
+    "class": "Event",
+    "labelKo": "타임머신 파괴(수속점)",
+    "summary": "특수부대 공격으로 마유리·스즈하 타임머신이 반복적으로 파괴된다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2011-08-17 00:00",
+    "actor": "Char_Rounder",
+    "target": "타임머신",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_SatelliteCrash",
+    "class": "Event",
+    "labelKo": "위성 추락(스즈하 타임머신)",
+    "summary": "라디오 회관 옥상에 추락한 위성은 사실 2036년에서 온 스즈하의 타임머신이다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:00",
+    "actor": "Char_Suzuha",
+    "target": "C204 타임머신",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Skuld_Fail_KurisuDeath",
+    "class": "Event",
+    "labelKo": "스쿨드 1차 실패: 오카베 손에 의한 크리스 사망",
+    "summary": "구출 시도 중 오카베의 실수로 크리스가 죽는다.",
+    "eventType": "death",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:39",
+    "actor": "Char_Okabe",
+    "target": "Char_Kurisu",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Skuld_Fail_Travel",
+    "class": "Event",
+    "labelKo": "스쿨드 1차: 과거 이동",
+    "summary": "오카베가 크리스를 구하기 위해 과거로 물리 이동한다.",
+    "eventType": "travel",
+    "mechanismType": "physicaltravel",
+    "localDateTime": "2010-07-28 12:10",
+    "actor": "Char_Okabe",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Skuld_Success_SelfStab",
+    "class": "Event",
+    "labelKo": "자해를 통한 피웅덩이 생성",
+    "summary": "오카베가 스스로를 찔러 피를 흘리고 연출 조건을 만든다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 12:35",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Skuld_Success_UpaSwap",
+    "class": "Event",
+    "labelKo": "메탈 우파 사전 확보",
+    "summary": "스쿨드 성공 조건을 맞추기 위해 메탈 우파를 확보한다.",
+    "eventType": "intervention",
+    "mechanismType": "none",
+    "localDateTime": "2010-07-28 11:50",
+    "actor": "Char_Okabe",
+    "target": "Metal Upa",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Suzuha_Departure_1975",
+    "class": "Event",
+    "labelKo": "스즈하 1975년 출발",
+    "summary": "스즈하가 IBN 5100을 회수하기 위해 1975년으로 출발한다.",
+    "eventType": "travel",
+    "mechanismType": "physicaltravel",
+    "localDateTime": "2010-08-13 15:07",
+    "actor": "Char_Suzuha",
+    "target": "1975년",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_Suzuha_Identity_Titor",
+    "class": "Event",
+    "labelKo": "스즈하 정체(존 티토) 공개",
+    "summary": "스즈하가 자신이 2036년에서 온 시간여행자 존 티토 본인임을 밝힌다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 00:00",
+    "actor": "Char_Suzuha",
+    "target": "None",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_TimeLeapMachine_Complete",
+    "class": "Event",
+    "labelKo": "타임리프 머신 완성",
+    "summary": "크리스가 기억을 과거로 보내는 타임리프 머신을 완성하고 공개를 선언한다.",
+    "eventType": "actual",
+    "mechanismType": "none",
+    "localDateTime": "2010-08-13 14:00",
+    "actor": "Char_Kurisu",
+    "target": "타임리프 머신",
+    "isolationNote": null
+  },
+  {
+    "id": "Event_TimeLeap_FirstUse",
+    "class": "Event",
+    "labelKo": "타임리프 머신 첫 사용",
+    "summary": "오카베가 총상을 입은 상태에서 타임리프 머신으로 약 3시간 전으로 도약한다.",
+    "eventType": "travel",
+    "mechanismType": "timeleap",
+    "localDateTime": "2010-08-13 19:57",
+    "actor": "Char_Okabe",
+    "target": "Char_Okabe_Past",
+    "isolationNote": null
+  },
+  {
+    "id": "EV_Alpha_DMail_Faris_Cancel",
+    "class": "EventVariation",
+    "labelKo": "페이리스 D메일 취소 시나리오",
+    "worldLineId": "WL_0_409431",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Faris_Send",
+    "class": "EventVariation",
+    "labelKo": "페이리스 D메일 송신 시나리오",
+    "worldLineId": "WL_0_456903",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Loto6_Cancel",
+    "class": "EventVariation",
+    "labelKo": "로또6 D메일 취소 시나리오",
+    "worldLineId": "WL_0_571046",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Loto6_Send",
+    "class": "EventVariation",
+    "labelKo": "로또6 D메일 송신 시나리오",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Luka_Cancel",
+    "class": "EventVariation",
+    "labelKo": "루카 D메일 취소 시나리오",
+    "worldLineId": "WL_0_456914",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Luka_Send",
+    "class": "EventVariation",
+    "labelKo": "루카 D메일 송신 시나리오",
+    "worldLineId": "WL_0_523299",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_Moeka_Cancel",
+    "class": "EventVariation",
+    "labelKo": "모에카 D메일 취소 시나리오",
+    "worldLineId": "WL_0_523307",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_Moeka_Send",
+    "class": "EventVariation",
+    "labelKo": "모에카 D메일 송신 시나리오",
+    "worldLineId": "WL_0_571015",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_DMail_SuzuhaChase_Cancel",
+    "class": "EventVariation",
+    "labelKo": "스즈하 D메일 취소 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_DMail_SuzuhaChase_Send",
+    "class": "EventVariation",
+    "labelKo": "스즈하 미행 중지 D메일 시나리오",
+    "worldLineId": "WL_0_409420",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_Echelon_Delete",
+    "class": "EventVariation",
+    "labelKo": "에셜론 기록 삭제 시나리오",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_Alpha_Escape"
+  },
+  {
+    "id": "EV_Alpha_IBN_Search",
+    "class": "EventVariation",
+    "labelKo": "IBN 5100 확보 시나리오",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_Alpha_Exploration"
+  },
+  {
+    "id": "EV_Alpha_TimeLeap_FirstUse",
+    "class": "EventVariation",
+    "labelKo": "타임리프 머신 첫 사용 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_TimeLeap_Activation"
+  },
+  {
+    "id": "EV_NostalgiaDrive_Preparation",
+    "class": "EventVariation",
+    "labelKo": "노스탤지어 드라이브 준비 시나리오",
+    "worldLineId": "WL_1_130209",
+    "macroEventId": "ME_NostalgiaDrive"
+  },
+  {
+    "id": "EV_Prologue_Beta_Discovery",
+    "class": "EventVariation",
+    "labelKo": "베타 세계선 시작 시나리오",
+    "worldLineId": "WL_1_130426",
+    "macroEventId": "ME_Prologue_Beta"
+  },
+  {
+    "id": "EV_Rescue_CarAccident",
+    "class": "EventVariation",
+    "labelKo": "탈출 도중 차량 사고 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_LabShot",
+    "class": "EventVariation",
+    "labelKo": "라보 내부 총격 수속 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_NaePush",
+    "class": "EventVariation",
+    "labelKo": "신오차노미즈역 선로 추락 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_TaxiStab",
+    "class": "EventVariation",
+    "labelKo": "택시 내부 칼부림 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_Rescue_YodobashiShot",
+    "class": "EventVariation",
+    "labelKo": "요도바시 카메라 총격 오인 시나리오",
+    "worldLineId": "WL_0_337187",
+    "macroEventId": "ME_MayuriRescue_Loop"
+  },
+  {
+    "id": "EV_SG0_Alpha_Excursion",
+    "class": "EventVariation",
+    "labelKo": "S;G0 α 세계선 일시 방문 시나리오",
+    "worldLineId": "WL_0_571024",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Amadeus_Contact",
+    "class": "EventVariation",
+    "labelKo": "아마데우스 접촉 시나리오",
+    "worldLineId": "WL_1_053649",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Amadeus_Deleted",
+    "class": "EventVariation",
+    "labelKo": "아마데우스 삭제 후 β 시나리오",
+    "worldLineId": "WL_1_123581",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Promised_Rinascimento",
+    "class": "EventVariation",
+    "labelKo": "맹세의 리나시멘토 시나리오",
+    "worldLineId": "WL_1_055821",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Solitude",
+    "class": "EventVariation",
+    "labelKo": "망실유전의 솔리튜드 시나리오",
+    "worldLineId": "WL_1_064750",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_SG0_Twin_Automata",
+    "class": "EventVariation",
+    "labelKo": "존재증명의 오토마톤 시나리오",
+    "worldLineId": "WL_1_081163",
+    "macroEventId": "ME_SG0_Beta_Branches"
+  },
+  {
+    "id": "EV_Skuld_Fail",
+    "class": "EventVariation",
+    "labelKo": "스쿨드 작전 1차 실패 시나리오",
+    "worldLineId": "WL_1_130205",
+    "macroEventId": "ME_OperationSkuld"
+  },
+  {
+    "id": "EV_Skuld_Success",
+    "class": "EventVariation",
+    "labelKo": "스쿨드 작전 최종 성공 시나리오",
+    "worldLineId": "WL_1_048596",
+    "macroEventId": "ME_OperationSkuld"
+  },
+  {
+    "id": "Evidence_CurrentTTL_WorldLineModel",
+    "class": "EvidenceSource",
+    "labelKo": "현재 TTL의 WorldLine/EventVariation 모델",
+    "summary": "현재 TTL은 WorldLine을 6자리 관측 좌표로 두고, 같은 표시값 아래의 세부 시나리오 차이를 EventVariation으로 접어 표현한다.",
+    "evidenceTier": "canonical_structured",
+    "sourcePath": "슈타인즈게이트_온톨로지.ttl"
+  },
+  {
+    "id": "Evidence_Famitsu_ShikuraDisplayPrecision",
+    "class": "EvidenceSource",
+    "labelKo": "치요마루 인터뷰의 하위 자리 수속 근거",
+    "summary": "제작진 인터뷰는 매우 작은 변동률 차이에서는 세계선이 거의 같은 결과로 수속하고, 표시되는 자리 수준의 차이는 큰 변화로 드러난다는 해설 근거로 사용한다.",
+    "evidenceTier": "creator_interview",
+    "sourcePath": "data/공식 자료집/인터뷰-'아노니마스 코드' 시쿠라 치요마루 씨 인터뷰. 본작은 빈약한 오타쿠들에게의 도전장!? 「슈타게」등 과학 어드벤처 시리즈와의 연결도 분명히!.md"
+  },
+  {
+    "id": "Evidence_Famitsu_ShikuraWorldLayerSync",
+    "class": "EvidenceSource",
+    "labelKo": "치요마루 인터뷰의 세계선-세계층 동기화 근거",
+    "summary": "시쿠라 인터뷰는 슈타인즈 게이트의 세계선과 아노니마스 코드의 세계층이 동기화될 수밖에 없다고 설명하고, 다이버전스 미터에 표시되는 숫자가 D메일과 같은 구조로 과거에 송신된 값이라는 해설을 제공한다.",
+    "evidenceTier": "creator_interview",
+    "sourcePath": "data/공식 자료집/인터뷰-'아노니마스 코드' 시쿠라 치요마루 씨 인터뷰. 본작은 빈약한 오타쿠들에게의 도전장!? 「슈타게」등 과학 어드벤처 시리즈와의 연결도 분명히!.md"
+  },
+  {
+    "id": "Evidence_OfficialQnA_AlphaFutureConvergence",
+    "class": "EvidenceSource",
+    "labelKo": "본편 공식 자료집 Q&A: 알파 미래와 인물 수속",
+    "summary": "공식 Q&A는 루카 엔딩 이후에도 SERN 디스토피아가 구축되는 점, 알파 세계선에서 다루가 레지스탕스 활동으로 잠복하는 점, 마유리 죽음과 달리 페이리스 아버지의 죽음은 2000년 분기 영향으로 확정되지 않는 점을 설명한다.",
+    "evidenceTier": "official_material_translation",
+    "sourcePath": "data/공식 자료집/본편공식자료집QnA번역.md"
+  },
+  {
+    "id": "Evidence_OfficialQnA_IBN5100Chain",
+    "class": "EvidenceSource",
+    "labelKo": "본편 공식 자료집 Q&A: IBN 5100 보관 경로",
+    "summary": "공식 Q&A는 스즈하가 1975년으로 가기 전에 2010년에 들른 경위, 1975년의 IBN 5100 관리 이유, 스즈하 사후 페이리스 아버지와 페이리스 측을 거쳐 야나바야시 신사에 봉납되는 흐름을 설명한다.",
+    "evidenceTier": "official_material_translation",
+    "sourcePath": "data/공식 자료집/본편공식자료집QnA번역.md"
+  },
+  {
+    "id": "Evidence_OfficialQnA_ReadingSteiner",
+    "class": "EvidenceSource",
+    "labelKo": "본편 공식 자료집 Q&A: 리딩 슈타이너와 기억 모델",
+    "summary": "공식 Q&A는 1999년 고열과 2000년 문제의 거대 분기가 오카베의 리딩 슈타이너 각성과 관련된 점, 물리적 타임트래블 중 발동을 인지하지 못했을 가능성, 타임리프 기억이 덮어쓰기보다 복수 미래 가능성의 병존으로 설명되는 점을 제공한다.",
+    "evidenceTier": "official_material_translation",
+    "sourcePath": "data/공식 자료집/본편공식자료집QnA번역.md"
+  },
+  {
+    "id": "Evidence_OfficialQnA_SERNSurveillance",
+    "class": "EvidenceSource",
+    "labelKo": "본편 공식 자료집 Q&A: SERN 감시와 라운더 습격",
+    "summary": "공식 Q&A는 알파 세계선에서 다루의 해킹이 들켰을 가능성, 모에카가 8월 3일 오카베에게 D메일을 듣고 FB에게 보고했을 가능성, 타임리프 머신 완성과 공표 의사가 라운더 습격의 결정타가 된 흐름을 설명한다.",
+    "evidenceTier": "official_material_translation",
+    "sourcePath": "data/공식 자료집/본편공식자료집QnA번역.md"
+  },
+  {
+    "id": "Evidence_OfficialQnA_WorldLineMechanics",
+    "class": "EvidenceSource",
+    "labelKo": "본편 공식 자료집 Q&A: 세계선과 다이버전스 규칙",
+    "summary": "공식 Q&A는 Ω 세계선의 음수 다이버전스, 에셜론 기록 삭제에 따른 알파-베타 재구성, 슈타인즈 게이트 도달 조건, 타임리프 기억 모델, 물리적 타임트래블의 미세 변동, 크리스 사망 수속의 패러독스 해소를 설명한다.",
+    "evidenceTier": "official_material_translation",
+    "sourcePath": "data/공식 자료집/본편공식자료집QnA번역.md"
+  },
+  {
+    "id": "Evidence_SGTimeline_Alpha337187Variations",
+    "class": "EvidenceSource",
+    "labelKo": "0.337187 알파 시나리오 변형 근거",
+    "summary": "0.337187로 표시되는 구간 안에서 타임리프와 마유리 사망 회피 시도가 반복되며, 마유리 사망 방식이 여러 형태로 나타난다.",
+    "evidenceTier": "official_material",
+    "sourcePath": "data/슈타게관련자료/Steins;Gate_애니메이션_연표.md"
+  },
+  {
+    "id": "Evidence_SGTimeline_ShiftMechanisms",
+    "class": "EvidenceSource",
+    "labelKo": "세계선 변동 사건 목록",
+    "summary": "D메일처럼 과거가 개변되는 경우 세계선이 변동되고, 타임리프처럼 자신의 의지로 과거 행동을 바꾸는 경우에는 변동 폭이 작다고 정리한다.",
+    "evidenceTier": "official_material",
+    "sourcePath": "data/슈타게관련자료/Steins;Gate_애니메이션_연표.md"
+  },
+  {
+    "id": "Evidence_SGWorldLine_DivergenceMeter",
+    "class": "EvidenceSource",
+    "labelKo": "세계선 자료의 다이버전스 미터 설명",
+    "summary": "다이버전스 미터는 세계선 변동률을 수치로 표시하며, 세계선 변동률은 세계선 이동 후 세계 차이를 나타내는 상대값으로 설명된다.",
+    "evidenceTier": "official_material",
+    "sourcePath": "data/슈타게관련자료/슈타인즈게이트_세계선.md"
+  },
+  {
+    "id": "ME_Alpha_Escape",
+    "class": "MacroEvent",
+    "labelKo": "알파 탈출"
+  },
+  {
+    "id": "ME_Alpha_Exploration",
+    "class": "MacroEvent",
+    "labelKo": "알파 세계선 탐색 및 실험"
+  },
+  {
+    "id": "ME_MayuriRescue_Loop",
+    "class": "MacroEvent",
+    "labelKo": "마유리 구출 루프"
+  },
+  {
+    "id": "ME_NostalgiaDrive",
+    "class": "MacroEvent",
+    "labelKo": "노스탤지어 드라이브 준비"
+  },
+  {
+    "id": "ME_OperationSkuld",
+    "class": "MacroEvent",
+    "labelKo": "오퍼레이션 스쿨드"
+  },
+  {
+    "id": "ME_Prologue_Beta",
+    "class": "MacroEvent",
+    "labelKo": "프롤로그: 시작과 끝의 1% (β)"
+  },
+  {
+    "id": "ME_SG0_Beta_Branches",
+    "class": "MacroEvent",
+    "labelKo": "Steins;Gate 0 베타 분기군"
+  },
+  {
+    "id": "ME_TimeLeap_Activation",
+    "class": "MacroEvent",
+    "labelKo": "타임리프 머신 가동"
+  },
+  {
+    "id": "MS_Movie_Debu",
+    "class": "MediaSource",
+    "labelKo": "극장판 부하영역의 데자뷰",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate: The Movie - Load Region of Déjà Vu",
+    "mediaUnit": "극장판"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep01",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 1화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "1화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep02",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 2화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "2화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep03",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 3화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "3화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep04",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 4화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "4화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep05",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 5화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "5화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep06",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 6화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "6화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep07",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 7화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "7화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep08",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 8화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "8화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep09",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 9화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "9화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep10",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 10화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "10화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep11",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 11화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "11화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep12",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 12화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "12화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep13",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 13화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "13화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep14",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 14화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "14화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep15",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 15화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "15화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep16",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 16화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "16화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep17",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 17화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "17화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep18",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 18화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "18화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep19",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 19화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "19화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep20",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 20화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "20화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep21",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 21화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "21화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep22",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 22화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "22화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep23",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 23화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "23화"
+  },
+  {
+    "id": "MS_SG0_Anime_Ep24SP",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 0 애니 24화 SP(발렌티누스)",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate 0",
+    "mediaUnit": "24화 SP"
+  },
+  {
+    "id": "MS_SG_Anime_Ep01",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 1화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "1화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep02",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 2화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "2화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep03",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 3화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "3화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep04",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 4화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "4화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep05",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 5화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "5화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep06",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 6화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "6화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep07",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 7화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "7화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep08",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 8화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "8화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep09",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 9화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "9화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep10",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 10화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "10화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep11",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 11화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "11화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep12",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 12화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "12화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep13",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 13화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "13화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep14",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 14화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "14화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep15",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 15화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "15화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep16",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 16화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "16화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep17",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 17화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "17화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep18",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 18화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "18화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep19",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 19화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "19화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep20",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 20화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "20화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep21",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 21화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "21화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep22",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 22화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "22화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep23",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 23화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "23화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep23Beta",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 23화 β(미싱 링크)",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "23화 β"
+  },
+  {
+    "id": "MS_SG_Anime_Ep24",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 24화",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "24화"
+  },
+  {
+    "id": "MS_SG_Anime_Ep25SP",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 애니 25화 SP(이기적 방황병)",
+    "mediaType": "anime",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "25화 SP"
+  },
+  {
+    "id": "MS_SG_VN_Ch01",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 VN Chapter 1",
+    "mediaType": "game",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "Chapter 1"
+  },
+  {
+    "id": "MS_SG_VN_Ch09",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 VN Chapter 9",
+    "mediaType": "game",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "Chapter 9"
+  },
+  {
+    "id": "MS_SG_VN_Ch10A",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 VN Chapter 10A",
+    "mediaType": "game",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "Chapter 10A"
+  },
+  {
+    "id": "MS_SG_VN_Ch10B",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 VN Chapter 10B",
+    "mediaType": "game",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "Chapter 10B"
+  },
+  {
+    "id": "MS_SG_VN_Ch11",
+    "class": "MediaSource",
+    "labelKo": "슈타인즈 게이트 VN Chapter 11",
+    "mediaType": "game",
+    "mediaTitle": "Steins;Gate",
+    "mediaUnit": "Chapter 11"
+  },
+  {
+    "id": "Topic_AlphaDystopiaVariantFutures",
+    "class": "ScienceTopic",
+    "labelKo": "알파 디스토피아와 인물별 미래 차이",
+    "summary": "루카 엔딩 계열에서도 SERN 디스토피아 구축은 확정되지만, 오카베가 타임리프 머신을 파기하면 감시를 받더라도 즉시 죽지는 않는 등 개인의 미래 양상은 달라질 수 있다. 마유리 죽음은 알파 수속 결과지만, 페이리스 아버지의 죽음은 2000년 어트랙터 필드 분기 영향으로 확정되지 않는다. (공식 자료집 Q18, Q21-Q23)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_Bootstrap_KurisuDeath",
+    "class": "ScienceTopic",
+    "labelKo": "크리스 사망의 부트스트랩 패러독스 해소",
+    "summary": "스쿨드 1차 이동에서 오카베가 크리스를 죽인 것은 '가능성의 하나'일 뿐이다. 오카베가 죽이지 않았더라도 마유시 구출 루프처럼 같은 결과(크리스 사망)로 수속된다. 크리스를 한 번 죽인 것이 타임머신 개발의 필요조건이 아니라 가능성 중 하나. 끊임없이 저항한 끝에 최종 성공한 과정만이 본편에 묘사된 것. (공식 자료집 Q30)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_DisplayPrecisionLimit",
+    "class": "ScienceTopic",
+    "labelKo": "다이버전스 표시 정밀도 한계",
+    "summary": "6자리 표시값은 관측 좌표이고, 그 아래 하위 자리 차이는 hidden divergence 값 없이 해설 계층에서만 다룬다는 주제.",
+    "answerLabel": "[추론]"
+  },
+  {
+    "id": "Topic_DivergenceMeterSignalSource",
+    "class": "ScienceTopic",
+    "labelKo": "다이버전스 미터 숫자의 송신원",
+    "summary": "시쿠라 인터뷰는 다이버전스 미터에 표시되는 숫자가 D메일과 같은 구조로 과거에 송신된 값이라고 설명한다. D메일의 6문자 제한은 전화레인지(임시)의 제한이면서 다이버전스 미터의 소수점 이하 6자리 표시와도 대응하며, 소수점 아래 20자리 수준의 작은 차이에서는 세계선이 거의 수속한다고 설명된다.",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_EchelonDeletion_WorldLineShift",
+    "class": "ScienceTopic",
+    "labelKo": "에셜론 기록 삭제와 세계선 재구성",
+    "summary": "현재 시점에서 에셜론의 D메일 포착 기록을 삭제하는 행위가 알파→베타 세계선 재구성을 유발하는 원리. 존 타이타의 '다이버전스가 변할 만한 큰 사건이 발생하면 과거와 인과율에 따라 모순 없도록 재구성된다'는 원칙에 해당. 시간 여행이 아닌 현재 행위도 인과에 큰 영향을 미치면 세계선 변동을 일으킨다. (공식 자료집 Q25)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_EventVariationBranching",
+    "class": "ScienceTopic",
+    "labelKo": "EventVariation 기반 시나리오 분기",
+    "summary": "작품이 구분하는 시나리오 차이를 EventVariation으로 묶고 질의하는 모델링 주제.",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_IBN5100CustodyChain",
+    "class": "ScienceTopic",
+    "labelKo": "IBN 5100 보관 경로",
+    "summary": "스즈하는 2010년에 IBN 5100이 야나바야시 신사에 있어야 한다는 정보를 알고 있었지만, 라운더의 방해와 장기 보관 문제 때문에 직접 봉납하지 않고 가까운 곳에서 관리하려 했다. 스즈하 사후에는 페이리스의 아버지에게 남긴 유언이 페이리스와 집사에게 이어져 신사 봉납으로 연결된다. (공식 자료집 Q14)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_MeasurableWorldLineShift",
+    "class": "ScienceTopic",
+    "labelKo": "측정 가능한 세계선 이동",
+    "summary": "메인 TTL의 명시적 WorldLineShift 인스턴스로 기록된 표시 가능한 좌표 간 이동을 설명하는 주제.",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_MicroWorldLineDifference",
+    "class": "ScienceTopic",
+    "labelKo": "미세 세계선 차이",
+    "summary": "같은 6자리 좌표 아래의 여러 EventVariation을 실제로는 근접한 미세 세계선 차이의 표현으로 설명하는 주제.",
+    "answerLabel": "[추론]"
+  },
+  {
+    "id": "Topic_NakabachiPaper_SGCondition",
+    "class": "ScienceTopic",
+    "labelKo": "나카바치 논문 소각과 슈타인즈 게이트 세계선 진입 조건",
+    "summary": "슈타인즈 게이트 세계선 진입의 결정적 요인은 나카바치 논문의 소실. 논문이 탄 것은 8월 21일 타임머신을 타고 돌아오기 직전으로, 이 시점에서 슈타인즈 게이트 도달 조건이 충족된다. 스즈하와 타임머신이 사라져야 오카베는 슈타인즈 게이트에 도달한 것이 된다. (공식 자료집 Q27 노트)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_ObservedWorldLineCoordinate",
+    "class": "ScienceTopic",
+    "labelKo": "관측 세계선 좌표",
+    "summary": "다이버전스 미터에 표시되는 6자리 좌표로 WorldLine을 식별하는 해설 주제.",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_OmegaNegativeDivergence",
+    "class": "ScienceTopic",
+    "labelKo": "Ω 세계선의 음수 다이버전스",
+    "summary": "페이리스 엔딩의 세계선 변동률은 -0.275349%의 Ω 세계선이다. 세계선 변동률은 상대 수치라서 음수도 존재하며, 오카베가 만든 다이버전스 미터에는 음수 기호 표시부가 없어 오류처럼 보이는 표시가 발생한다. (공식 자료집 Q16)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_PhysicalTimeTravel_MicroShift",
+    "class": "ScienceTopic",
+    "labelKo": "물리적 타임트래블의 미세 세계선 변동",
+    "summary": "물리적 타임트래블은 도약 전후 사이에 0.000001~0.000003% 정도의 세계선 변동을 유발한다. 도약 시간이 길수록 오차가 커진다. 스쿨드 작전 왕복 2회 결과: 출발 1.130205% → 도달 1.130212% (오차 0.000007%). 이 때문에 1차·2차 이동 오카베는 미세하게 다른 세계선에 도착해 동일 시공간에서 마주치지 않는다. (공식 자료집 Q29)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_ReadingSteiner2000Branch",
+    "class": "ScienceTopic",
+    "labelKo": "2000년 분기와 리딩 슈타이너 각성",
+    "summary": "오카베가 1999년에 고열로 한 달간 쓰러졌던 사건은 리딩 슈타이너 각성과 관련되지만, 각성 이유 자체는 불명이다. 공식 Q&A는 이를 2000년 문제와 관련된 어트랙터 필드의 거대한 분기와 연결해 설명한다. (공식 자료집 Q24)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_SERNSurveillanceRounderRaid",
+    "class": "ScienceTopic",
+    "labelKo": "SERN 감시와 라운더 습격 조건",
+    "summary": "알파 세계선에서 SERN 측이 라보를 주시하게 된 직접 계기는 모에카가 D메일과 타임머신 개발 정보를 알고 FB에게 보고한 흐름이다. 첫 D메일은 에셜론에 이미 포착되어 있었지만 감시의 직접 원인은 아니며, 타임리프 머신 완성과 공표 의사가 라운더 습격의 결정타가 된다. (공식 자료집 Q5-Q10)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "Topic_SubDisplayWorldLineShift",
+    "class": "ScienceTopic",
+    "labelKo": "표시값 아래 세계선 이동",
+    "summary": "다이버전스 미터에 새 6자리 좌표로 표시되지 않는 작은 이동을 hidden WorldLine/WorldLineShift 없이 EventVariation 해설 링크로 답변하는 주제.",
+    "answerLabel": "[추론]"
+  },
+  {
+    "id": "Topic_TimeLeapMemoryAccumulation",
+    "class": "ScienceTopic",
+    "labelKo": "타임리프 기억의 병존 모델",
+    "summary": "타임리프는 과거 오카베의 기억을 단순히 덮어쓰는 것이 아니라 미래의 기억을 떠올리는 방식으로 설명된다. 여러 번의 타임리프 기억은 A와 B처럼 서로 다른 미래 가능성으로 별도 보관되며, 그래서 반복 착신에도 의식이 날아가거나 혼란으로 붕괴하지 않는다. (공식 자료집 Q28)",
+    "answerLabel": "[공식]"
+  },
+  {
+    "id": "WL_0_337187",
+    "class": "WorldLine",
+    "labelKo": "0.337187% 세계선",
+    "divergence": 0.337187,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.337187-세계선"
+  },
+  {
+    "id": "WL_0_409420",
+    "class": "WorldLine",
+    "labelKo": "0.409420% 세계선 (페이리스 아버지)",
+    "divergence": 0.40942,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.409420-세계선-페이리스-아버지"
+  },
+  {
+    "id": "WL_0_409431",
+    "class": "WorldLine",
+    "labelKo": "0.409431% 세계선 (스즈하 D메일 취소 후)",
+    "divergence": 0.409431,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": null
+  },
+  {
+    "id": "WL_0_456903",
+    "class": "WorldLine",
+    "labelKo": "0.456903% 세계선 (루카 성별)",
+    "divergence": 0.456903,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.456903-세계선-루카-성별"
+  },
+  {
+    "id": "WL_0_456914",
+    "class": "WorldLine",
+    "labelKo": "0.456914% 세계선 (페이리스 D메일 취소 후)",
+    "divergence": 0.456914,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.456914-세계선-페이리스-D메일-취소"
+  },
+  {
+    "id": "WL_0_523299",
+    "class": "WorldLine",
+    "labelKo": "0.523299% 세계선 (모에카)",
+    "divergence": 0.523299,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.523299-세계선-모에카"
+  },
+  {
+    "id": "WL_0_523307",
+    "class": "WorldLine",
+    "labelKo": "0.523307% 세계선 (루카 D메일 취소 후)",
+    "divergence": 0.523307,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.523307-세계선-루카-D메일-취소"
+  },
+  {
+    "id": "WL_0_571015",
+    "class": "WorldLine",
+    "labelKo": "0.571015% 세계선 (로또6)",
+    "divergence": 0.571015,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.571015-세계선-로또6"
+  },
+  {
+    "id": "WL_0_571024",
+    "class": "WorldLine",
+    "labelKo": "0.571024% 세계선",
+    "divergence": 0.571024,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": null
+  },
+  {
+    "id": "WL_0_571046",
+    "class": "WorldLine",
+    "labelKo": "0.571046% 세계선 (모에카 D메일 취소 후)",
+    "divergence": 0.571046,
+    "attractorField": "AF_Alpha",
+    "isActive": false,
+    "wikiSlug": "0.571046-세계선-모에카-D메일-취소"
+  },
+  {
+    "id": "WL_1_048596",
+    "class": "WorldLine",
+    "labelKo": "1.048596% 세계선 (슈타인즈 게이트)",
+    "divergence": 1.048596,
+    "attractorField": "AF_SteinsGate",
+    "isActive": true,
+    "wikiSlug": "1.048596-세계선-슈타인즈게이트"
+  },
+  {
+    "id": "WL_1_053649",
+    "class": "WorldLine",
+    "labelKo": "1.053649% 세계선 (S;G 0 아마데우스 접촉)",
+    "divergence": 1.053649,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.053649-세계선-아마데우스-접촉"
+  },
+  {
+    "id": "WL_1_055821",
+    "class": "WorldLine",
+    "labelKo": "1.055821% 세계선 (맹세의 리나시멘토)",
+    "divergence": 1.055821,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.055821-세계선-리나시멘토"
+  },
+  {
+    "id": "WL_1_064750",
+    "class": "WorldLine",
+    "labelKo": "1.064750% 세계선 (망실유전의 솔리튜드)",
+    "divergence": 1.06475,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.064750-세계선-솔리튜드"
+  },
+  {
+    "id": "WL_1_081163",
+    "class": "WorldLine",
+    "labelKo": "1.081163% 세계선 (존재증명의 오토마톤)",
+    "divergence": 1.081163,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.081163-세계선-오토마톤"
+  },
+  {
+    "id": "WL_1_123581",
+    "class": "WorldLine",
+    "labelKo": "1.123581% 세계선 (아마데우스 삭제 후 β)",
+    "divergence": 1.123581,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.123581-세계선-제로-베타-엔딩"
+  },
+  {
+    "id": "WL_1_130205",
+    "class": "WorldLine",
+    "labelKo": "1.130205% 세계선 (알파 탈출 직후 베타)",
+    "divergence": 1.130205,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.130205-세계선-크리스-사망"
+  },
+  {
+    "id": "WL_1_130209",
+    "class": "WorldLine",
+    "labelKo": "1.130209% 세계선 (스쿨드 작전 직전 베타)",
+    "divergence": 1.130209,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.130209-세계선-스쿨드-작전-직전"
+  },
+  {
+    "id": "WL_1_130426",
+    "class": "WorldLine",
+    "labelKo": "1.130426% 세계선 (베타 시작점)",
+    "divergence": 1.130426,
+    "attractorField": "AF_Beta",
+    "isActive": false,
+    "wikiSlug": "1.130426-세계선-베타-시작점"
+  },
+  {
+    "id": "WL_Neg_0_275349",
+    "class": "WorldLine",
+    "labelKo": "-0.275349% 세계선 (Ω, 페이리스 엔딩)",
+    "divergence": -0.275349,
+    "attractorField": "AF_Omega",
+    "isActive": false,
+    "wikiSlug": null
+  },
+  {
+    "id": "Shift_AlphaInternal_01",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "로또6 D메일로 0.571024에서 0.571015로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-03 12:00",
+    "fromWorldLineId": "WL_0_571024",
+    "toWorldLineId": "WL_0_571015"
+  },
+  {
+    "id": "Shift_AlphaInternal_02",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "모에카 D메일로 0.571015에서 0.523299로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-04 14:00",
+    "fromWorldLineId": "WL_0_571015",
+    "toWorldLineId": "WL_0_523299"
+  },
+  {
+    "id": "Shift_AlphaInternal_03",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "루카 D메일로 0.523299에서 0.456903으로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-05 16:00",
+    "fromWorldLineId": "WL_0_523299",
+    "toWorldLineId": "WL_0_456903"
+  },
+  {
+    "id": "Shift_AlphaInternal_04",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "페이리스 D메일로 0.456903에서 0.409420으로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-06 18:00",
+    "fromWorldLineId": "WL_0_456903",
+    "toWorldLineId": "WL_0_409420"
+  },
+  {
+    "id": "Shift_AlphaInternal_05",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "스즈하 미행 중지 D메일로 0.409420에서 0.337187로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-08 11:00",
+    "fromWorldLineId": "WL_0_409420",
+    "toWorldLineId": "WL_0_337187"
+  },
+  {
+    "id": "Shift_AlphaToBeta",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "에셜론 기록 삭제로 알파에서 베타(1.130205)로 복귀한다.",
+    "shiftType": "presentAction",
+    "shiftMoment": "2010-08-17 17:00",
+    "fromWorldLineId": "WL_0_571024",
+    "toWorldLineId": "WL_1_130205"
+  },
+  {
+    "id": "Shift_Alpha_337187_to_409431",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "스즈하 D메일 취소로 0.337187에서 0.409431로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-15 13:00",
+    "fromWorldLineId": "WL_0_337187",
+    "toWorldLineId": "WL_0_409431"
+  },
+  {
+    "id": "Shift_Alpha_409431_to_456914",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "페이리스 D메일 취소로 0.409431에서 0.456914로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-16 14:00",
+    "fromWorldLineId": "WL_0_409431",
+    "toWorldLineId": "WL_0_456914"
+  },
+  {
+    "id": "Shift_Alpha_456914_to_523307",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "루카 D메일 취소로 0.456914에서 0.523307로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-16 18:00",
+    "fromWorldLineId": "WL_0_456914",
+    "toWorldLineId": "WL_0_523307"
+  },
+  {
+    "id": "Shift_Alpha_523307_to_571046",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "모에카 D메일 취소로 0.523307에서 0.571046로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-17 13:00",
+    "fromWorldLineId": "WL_0_523307",
+    "toWorldLineId": "WL_0_571046"
+  },
+  {
+    "id": "Shift_Alpha_571046_to_571024",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "로또6 D메일 취소로 0.571046에서 0.571024로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-08-17 15:00",
+    "fromWorldLineId": "WL_0_571046",
+    "toWorldLineId": "WL_0_571024"
+  },
+  {
+    "id": "Shift_BetaToAlpha",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "첫 D메일에 의해 β(1.130426)에서 α(0.571024)로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2010-07-28 12:41",
+    "fromWorldLineId": "WL_1_130426",
+    "toWorldLineId": "WL_0_571024"
+  },
+  {
+    "id": "Shift_BetaToSteinsGate",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "스쿨드 작전 성공으로 β(1.130209)에서 슈타인즈 게이트(1.048596)로 이동한다.",
+    "shiftType": "physicaltravel+videodmail",
+    "shiftMoment": "2010-07-28 12:40",
+    "fromWorldLineId": "WL_1_130209",
+    "toWorldLineId": "WL_1_048596"
+  },
+  {
+    "id": "Shift_SG0_053649_to_055821",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "카가리에서 크리스 기억을 제거하는 선택으로 1.053649에서 1.055821로 이동한다.",
+    "shiftType": "presentAction",
+    "shiftMoment": "2011-01-15 20:00",
+    "fromWorldLineId": "WL_1_053649",
+    "toWorldLineId": "WL_1_055821"
+  },
+  {
+    "id": "Shift_SG0_055821_to_123581",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "오카베가 자신에게 보낸 D메일로 1.055821에서 1.123581로 이동한다.",
+    "shiftType": "dmail",
+    "shiftMoment": "2011-01-23 20:00",
+    "fromWorldLineId": "WL_1_055821",
+    "toWorldLineId": "WL_1_123581"
+  },
+  {
+    "id": "Shift_SG0_064750_to_081163",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "아마데우스 전화를 받지 않아 1.064750에서 1.081163으로 이동한다.",
+    "shiftType": "presentAction",
+    "shiftMoment": "2011-01-02 18:00",
+    "fromWorldLineId": "WL_1_064750",
+    "toWorldLineId": "WL_1_081163"
+  },
+  {
+    "id": "Shift_SG0_Alpha_to_Beta",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "α 밀회 종료 후 β로 복귀(Ep.09).",
+    "shiftType": "readingsteiner",
+    "shiftMoment": "2011-01-09 00:00",
+    "fromWorldLineId": "WL_0_571024",
+    "toWorldLineId": "WL_1_064750"
+  },
+  {
+    "id": "Shift_SG0_Beta_to_Alpha",
+    "class": "WorldLineShift",
+    "labelKo": null,
+    "summary": "크리스의 구원 요청으로 β→α 일시 이동(Ep.08).",
+    "shiftType": "readingsteiner",
+    "shiftMoment": "2011-01-06 00:00",
+    "fromWorldLineId": "WL_1_064750",
+    "toWorldLineId": "WL_0_571024"
+  }
+]
