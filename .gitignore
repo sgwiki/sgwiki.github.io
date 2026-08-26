@@ -93,6 +93,9 @@ sg-worldline-map/node_modules/
 sg-worldline-map/dist/
 sg-worldline-map/dist-tsbuildinfo/
 sg-worldline-map/*.tsbuildinfo
+# README는 docker/holyclaude/ontology 생성 절차를 서술하므로 public 추적 금지.
+# private 미러로는 rsync 필터를 통해 정상 전달된다.
+sg-worldline-map/README.md
 
 # Planning/interview 산출물 (planning-with-files + omx)
 .omx/
@@ -118,6 +121,7 @@ package-lock.json
 pyproject.toml
 Makefile
 AGENTS.md
+CLAUDE.md
 PROJECT_ANALYSIS.md
 DEVELOPMENT.md
 RUN_STEPS.md
