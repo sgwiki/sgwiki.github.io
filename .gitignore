@@ -125,11 +125,45 @@ CLAUDE.md
 PROJECT_ANALYSIS.md
 DEVELOPMENT.md
 RUN_STEPS.md
+
+# ── 코딩 에이전트 지침/설정 (public 저장소에 절대 올리지 않는다) ──
+# 위 AGENTS.md·CLAUDE.md 는 경로 앵커가 없어 하위 디렉터리(sg-worldline-map/ 등)까지
+# 함께 무시된다. 아래는 다른 에이전트 도구가 만드는 동종 파일들.
+# 주의: .gitignore 는 "아직 추적되지 않은" 파일만 막는다. 이미 추적 중인 파일은
+# git rm --cached 로 인덱스에서 빼야 하고, git add -f 는 이 목록을 무시한다.
+AGENT.md
+AGENTS.local.md
+CLAUDE.local.md
+GEMINI.md
+QWEN.md
+.claude/
+.codex/
+.cursor/
+.cursorrules
+.windsurfrules
+.clinerules
+.roo/
+.continue/
+.junie/
+.kiro/
+.trae/
+.augment/
+.serena/
+.opencode/
+opencode.json
+.aider*
+.mcp.json
+.specstory/
+
 .env.example
 .gitattributes
-.github/
-# 예외: 배포 워크플로우는 필수
+# 예외: 배포 워크플로우는 필수.
+# 주의: 디렉터리를 통째로 제외하면(`.github/`) git 이 그 안으로 내려가지 않아
+# 하위 negation 이 무효가 된다 — deploy.yml 은 "이미 추적 중"이라 살아 있었을 뿐,
+# 한 번 추적이 끊기면 -f 없이는 다시 추가할 수 없었다. 단계별로 열어야 예외가 먹는다.
+.github/*
 !.github/workflows/
+.github/workflows/*
 !.github/workflows/deploy.yml
 .python-version
 makewiki_all_runs.sh
@@ -138,3 +172,6 @@ run_makewiki.sh
 request_test.sh
 test-proxy.js
 uv.lock
+
+# SPA 디버그 산출물 — 코드에서 참조되지 않으며 배포본에 불필요
+sg-worldline-map/public/graph_node_ids.json

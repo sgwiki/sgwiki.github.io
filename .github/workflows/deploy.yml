@@ -8,8 +8,6 @@ on:
       - "mkdocs.yml"
       - "overrides/**"
       - "sg-worldline-map/**"
-      - "scripts/generate-data.py"
-      - "docker/holyclaude/ontology/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
@@ -30,22 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python (for generate-data.py)
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
-      - name: Install rdflib
-        run: uv pip install --system rdflib
-
-      - name: Regenerate series JSON from ontology TTL (best-effort)
-        # 온톨로지 TTL(docker/holyclaude/ontology/)은 git 추적 대상이 아니라 CI에 없을 수 있음.
-        # src/data/*.json은 이미 커밋되어 있으므로 실패해도 빌드는 계속됨.
-        continue-on-error: true
-        run: python scripts/generate-data.py --out sg-worldline-map/src/data
+      # 주: 시리즈 JSON(sg-worldline-map/src/data/*.json)은 커밋된 빌드 입력이다.
+      # 재생성 스크립트(scripts/generate-data.py)와 온톨로지 TTL은 public 저장소에
+      # 추적되지 않으므로 CI 체크아웃에 존재하지 않는다. 데이터를 바꾸려면 dev 트리에서
+      # 재생성해 커밋한다.
 
       - name: Setup Node
         uses: actions/setup-node@v4
