@@ -70,3 +70,4 @@ extra_css:
 extra_javascript:
   - javascripts/worldline-map-btn.js
   - javascripts/sg-enhance.js
+  - javascripts/amadeus-chat-btn.js
