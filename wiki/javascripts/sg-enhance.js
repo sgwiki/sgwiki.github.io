@@ -4,7 +4,10 @@
   1) 인용 태그 칩: **[공식]** · **[팬 분석]** · **[심층]** → 색상 칩
   2) 온톨로지 산문 링크화 (P1-4): 본문 인라인 코드의 mnemonic ID
      (`Event_X` 등)를 /maps/?view=graph&focus=<id> 링크로 변환.
-     실존 노드 id 목록(/maps/graph_node_ids.json)과 대조 — 미실존은 무변경.
+     패턴(MNEMONIC_RE)만으로 판정한다 — 노드 id 목록에 의존하지 않는다.
+     존재하지 않는 id 를 넘겨도 맵은 정상 렌더한다(2026-09-15 실측). 목록에
+     의존하던 때는 그 파일이 다른 프로젝트의 빌드 산출물이라, SPA 쪽 정리
+     커밋 하나로 이 기능이 조용히 죽었다.
   3) 온톨로지 그래프 임베드 (P2-1):
      - 명시 마커: <div data-sg-graph="Event_X"></div>
      - 세계선 자동: wiki/세계선/{divergence}-… 페이지는 발산률→WL id 역산.
@@ -36,7 +39,11 @@
     });
   }
 
-  // ─── 공유: 온톨로지 노드 id 목록 (경량 파생물, 1회 fetch 후 캐시) ──
+  // ─── 3) 전용: 온톨로지 노드 id 목록 (1회 fetch 후 캐시) ──
+  // 2)는 더 이상 쓰지 않는다. 3)만 쓰고, 그것도 실제로 필요한 페이지에서만
+  // 부른다 — 모든 문서가 이 파일을 한 번씩 때리면 404 가 페이지마다 찍힌다.
+  // 이 파일은 현재 public 저장소에서 .gitignore 되어 있어 배포본에 없다.
+  // 따라서 3)은 휴면 상태다(처분은 별건).
   const MNEMONIC_RE = /^(WL|Event|EV|CP|Shift|ME|MS|Topic|Evidence|AF)_[A-Za-z0-9_]+$/;
 
   function fetchNodeIds() {
@@ -55,8 +62,7 @@
   }
 
   // ─── 2) 산문 인라인 코드 → 그래프 딥링크 (P1-4) ──────────────────
-  function linkifyOntologyIds(nodeIds) {
-    if (nodeIds.size === 0) return;
+  function linkifyOntologyIds() {
     const root = document.querySelector('.md-typeset');
     if (!root) return;
     root.querySelectorAll('code').forEach((el) => {
@@ -64,7 +70,7 @@
       if (el.closest('a')) return;                // 이미 링크면 무변경
       if (el.classList.contains('sg-ontology-link')) return; // 멱등
       const text = el.textContent.trim();
-      if (!MNEMONIC_RE.test(text) || !nodeIds.has(text)) return; // 실존 id만
+      if (!MNEMONIC_RE.test(text)) return;        // 패턴만 — 존재 검사 없음
       const a = document.createElement('a');
       a.href = `/maps/?view=graph&focus=${encodeURIComponent(text)}`;
       a.title = `온톨로지 그래프에서 ${text} 보기`;
@@ -137,12 +143,20 @@
   }
 
   // ─── 적용 (instant navigation 대응) ──────────────────────────────
+  /** 3)이 필요한 페이지에서만 노드 id 목록을 가져온다. 마커도 없고 세계선
+   *  문서도 아니면 요청 자체를 하지 않는다. */
+  function maybeInjectEmbeds() {
+    const root = document.querySelector('.md-typeset');
+    if (!root) return;
+    const needed = root.querySelector('div[data-sg-graph]') || worldlineIdFromPath();
+    if (!needed) return;
+    fetchNodeIds().then(injectEmbeds);
+  }
+
   function apply() {
     decorateTags();
-    fetchNodeIds().then((nodeIds) => {
-      linkifyOntologyIds(nodeIds);
-      injectEmbeds(nodeIds);
-    });
+    linkifyOntologyIds();
+    maybeInjectEmbeds();
   }
 
   if (typeof document$ !== 'undefined') {
