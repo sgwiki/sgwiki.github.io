@@ -82,6 +82,19 @@ jobs:
           path: maps-spa-dist
         continue-on-error: true  # build-spa 실패 시 artifact 없음 — 무시하고 wiki만 배포
 
+      # 주석 한 줄이 파일 전체를 죽일 수 있다. c62025d 가 헤더 주석의 구분자를
+      # 쉼표에서 슬래시로 바꾸면서 `**[공식]**/` 안에 별표+슬래시가 생겼고, 거기서
+      # 블록 주석이 끝나 sg-enhance.js 가 SyntaxError 로 통째로 실행되지 않았다.
+      # 죽은 채로 배포돼도 화면은 "조금 밋밋할 뿐"이라 아무도 알아채지 못했다.
+      # 이 검사가 있었다면 그날 잡혔다.
+      - name: JS 구문 검사 (wiki/javascripts)
+        run: |
+          fail=0
+          for f in wiki/javascripts/*.js; do
+            node --check "$f" || { echo "::error file=$f::구문 오류 — 이 파일은 브라우저에서 통째로 실행되지 않는다"; fail=1; }
+          done
+          exit $fail
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
