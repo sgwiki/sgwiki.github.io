@@ -4,8 +4,10 @@
   chat.flaglow.cc 를 iframe 으로 띄운다. 패널은 접었다 펼 수 있고, 기본은 접힘.
 
   ── 알아둘 제약 ──
-  · iframe 은 지연 로드한다(첫 펼침에 src 주입). 위키 방문마다 미리 띄우면
-    방문자 전원이 WS 연결을 하나씩 잡아 IP 당 동시 연결 상한을 갉아먹는다.
+  · 기본은 펼침이다(2026-09-15 요청). 대가가 있다: 위키 페이지를 볼 때마다
+    iframe 이 로드되고 WS 연결이 하나씩 열린다. 지연 로드의 이점이 첫 방문에
+    한해 사라지는 셈이라, 대신 방문자가 닫으면 그 선택을 기억한다(localStorage).
+    한 번 닫은 사람은 다시 열기 전까지 연결하지 않는다.
   · 위키(sgwiki.github.io) 안의 iframe 이므로 chat.flaglow.cc 의 쿠키·localStorage 는
     "서드파티 맥락"이 된다. Safari(ITP)는 막고 Firefox(TCP)는 파티션한다.
     → Safari 방문자는 대화가 이어지지 않는다. 그래서 헤더에 "새 창" 을 둔다 —
@@ -115,26 +117,37 @@
     root.appendChild(launcher);
     document.body.appendChild(root);
 
-    function open() {
-      // 지연 로드: 처음 펼칠 때만 붙인다. 위키를 훑기만 하는 방문자는 연결하지 않는다.
+    // 방문자가 닫아둔 상태는 기억한다. 기본이 펼침이라 이 기억이 없으면
+    // 닫은 사람도 페이지를 넘길 때마다 다시 열린 채로 만난다.
+    var PREF = 'amadeus_chat_panel';
+    function pref() { try { return localStorage.getItem(PREF); } catch (e) { return null; } }
+    function setPref(v) { try { localStorage.setItem(PREF, v); } catch (e) {} }
+
+    function open(remember) {
+      // 첫 펼침에만 src 를 붙인다 — 닫아둔 방문자는 연결 자체를 하지 않는다.
       if (!frame.src) frame.src = CHAT_URL;
       root.classList.add('ac-open');
       launcher.setAttribute('aria-expanded', 'true');
       launcher.setAttribute('aria-label', '아마데우스 채팅 닫기');
+      if (remember) setPref('open');
     }
-    function close() {
+    function close(remember) {
       root.classList.remove('ac-open');
       launcher.setAttribute('aria-expanded', 'false');
       launcher.setAttribute('aria-label', '아마데우스 채팅 열기');
+      if (remember) setPref('closed');
       launcher.focus();
     }
 
     launcher.addEventListener('click', () =>
-      root.classList.contains('ac-open') ? close() : open());
-    bar.querySelector('.ac-close').addEventListener('click', close);
+      root.classList.contains('ac-open') ? close(true) : open(true));
+    bar.querySelector('.ac-close').addEventListener('click', () => close(true));
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && root.classList.contains('ac-open')) close();
+      if (e.key === 'Escape' && root.classList.contains('ac-open')) close(true);
     });
+
+    // 기본 펼침 — 방문자가 명시적으로 닫아둔 경우에만 접은 채로 시작한다.
+    if (pref() !== 'closed') open(false);
   }
 
   if (typeof document$ !== 'undefined') {
