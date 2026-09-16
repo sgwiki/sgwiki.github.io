@@ -9,9 +9,13 @@
     한해 사라지는 셈이라, 대신 방문자가 닫으면 그 선택을 기억한다(localStorage).
     한 번 닫은 사람은 다시 열기 전까지 연결하지 않는다.
   · 위키(sgwiki.github.io) 안의 iframe 이므로 chat.flaglow.cc 의 쿠키·localStorage 는
-    "서드파티 맥락"이 된다. Safari(ITP)는 막고 Firefox(TCP)는 파티션한다.
-    → Safari 방문자는 대화가 이어지지 않는다. 그래서 헤더에 "새 창" 을 둔다 —
-      거기서 열면 1차 출처라 모든 브라우저에서 정상 동작한다.
+    "서드파티 맥락"이 된다. Safari(ITP)는 쿠키를 막고, 파티셔닝 때문에 iframe 과
+    새 창은 저장소 버킷 자체가 다르다 — 그래서 "새 창" 을 눌러도 핸드오프 없이는
+    대화가 빈 상태로 시작된다.
+    → 헤더의 "새 창" 은 iframe 에게 postMessage 로 핸드오프 URL(vid·세션 핸들 토큰)
+      을 받아 그 대화를 그대로 연다. iframe 이 아직 안 채워졌으면(응답 없음) 평범한
+      CHAT_URL 로 연다 — 거기서도 프록시의 session.latest 가 신원이 이어지는 만큼은
+      되찾아온다.
   · 이 사이트는 navigation.instant 를 쓰지 않으므로 페이지 이동 시 iframe 이 다시
     로드된다. 세션은 chat 쪽 localStorage 의 sessionKey 로 재개된다(위 제약 적용).
 */
@@ -91,7 +95,7 @@
     bar.className = 'ac-bar';
     bar.innerHTML =
       '<span class="ac-title">Amadeus</span>' +
-      `<a href="${CHAT_URL}" target="_blank" rel="noopener noreferrer" ` +
+      `<a href="${CHAT_URL}" target="_blank" rel="noopener noreferrer" class="ac-newwin" ` +
       'title="새 창에서 열기 — 대화가 확실히 이어집니다" aria-label="새 창에서 열기">↗</a>' +
       '<button type="button" class="ac-close" title="닫기" aria-label="닫기">✕</button>';
 
@@ -142,6 +146,39 @@
     launcher.addEventListener('click', () =>
       root.classList.contains('ac-open') ? close(true) : open(true));
     bar.querySelector('.ac-close').addEventListener('click', () => close(true));
+
+    // 새 창 — iframe 속 대화(vid·세션 핸들)를 핸드오프 토큰으로 건네받아 같은 대화로
+    // 연다. 파티셔닝 때문에 iframe 과 새 창은 저장소 버킷이 다르다: URL 로 건네지
+    // 않으면 새 창은 이 대화를 모르는 상태로 시작한다.
+    // window.open 을 제스처 안에서 동기적으로 먼저 열어야 팝업 차단에 걸리지 않는다.
+    // 핸드오프 URL 은 postMessage 왕복 뒤 도착하는 대로 빈 창에 넣는다(noopener 대신
+    // opener 를 직접 끊는다 — noopener 로 열면 반환값이 null 이 되어 위치를 못 준다).
+    const CHAT_ORIGIN = new URL(CHAT_URL).origin;
+    bar.querySelector('.ac-newwin').addEventListener('click', (e) => {
+      const win = window.open('', '_blank');
+      if (!win) return;            // 차단됐다 — 기본 <a> 내비게이션이 맡게 둔다
+      e.preventDefault();
+      try { win.opener = null; } catch (err) { /* cross-origin 경계에서는 무해하다 */ }
+      const serve = (url) => { try { win.location.href = url; } catch (err) {} };
+      let settled = false;
+      const onReply = (ev) => {
+        if (ev.origin !== CHAT_ORIGIN) return;
+        if (!ev.data || ev.data.type !== 'amadeus:handoff' || typeof ev.data.url !== 'string') return;
+        settled = true;
+        window.removeEventListener('message', onReply);
+        serve(ev.data.url);
+      };
+      window.addEventListener('message', onReply);
+      setTimeout(() => {
+        if (settled) return;
+        window.removeEventListener('message', onReply);
+        serve(CHAT_URL);           // iframe 이 아직 응답 못 했다 — 평범하게 연다
+      }, 350);
+      try {
+        frame.contentWindow.postMessage({ type: 'amadeus:handoff-request' }, CHAT_ORIGIN);
+      } catch (err) { /* 위 시간 초과가 CHAT_URL 폴백을 처리한다 */ }
+    });
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && root.classList.contains('ac-open')) close(true);
     });
