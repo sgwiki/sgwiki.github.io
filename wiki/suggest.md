@@ -15,13 +15,13 @@ description: "오탈자, 설정 오류, 누락된 내용, 또는 추가됐으면
     <label for="content" style="display:block;margin-bottom:.4rem;font-weight:600">제안 내용 <span style="color:#e64">*</span></label>
     <textarea id="content" name="content" rows="7"
       placeholder="예: '어트랙터 필드' 문서에서 3장 2절 내용이 원작 설정과 다릅니다. …"
-      style="width:100%;padding:.6rem;border:1px solid #555;border-radius:4px;background:#1e1e1e;color:#eee;font-size:.95rem;resize:vertical"></textarea>
+      style="width:100%;padding:.6rem;border:1px solid var(--md-default-fg-color--lighter,#767676);border-radius:4px;background:var(--md-default-bg-color,#fff);color:var(--md-typeset-color,#242424);font-size:.95rem;resize:vertical"></textarea>
   </div>
   <div style="margin-bottom:1rem">
     <label for="contact" style="display:block;margin-bottom:.4rem;font-weight:600">연락처 <span style="color:#999;font-weight:400">(선택)</span></label>
     <input type="text" id="contact" name="contact"
       placeholder="이메일, 트위터 ID 등"
-      style="width:100%;padding:.6rem;border:1px solid #555;border-radius:4px;background:#1e1e1e;color:#eee;font-size:.95rem">
+      style="width:100%;padding:.6rem;border:1px solid var(--md-default-fg-color--lighter,#767676);border-radius:4px;background:var(--md-default-bg-color,#fff);color:var(--md-typeset-color,#242424);font-size:.95rem">
   </div>
   <div class="h-captcha" data-sitekey="99cac9da-2ee2-4538-94fe-fc22794428ee" style="margin-bottom:1rem"></div>
   <button type="submit"
