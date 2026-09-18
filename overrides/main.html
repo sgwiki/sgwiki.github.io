@@ -6,6 +6,13 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
+  {#- 폰트: CSS @import 직렬 폭포 대신 <link> 병렬 로드(sg-theme.css 헤더 주석 참조) -#}
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Share+Tech+Mono&display=swap">
+
   {%- set _title = page.title if page.title else config.site_name %}
   {%- set _desc = page.meta.description if page.meta and page.meta.description else config.site_description %}
   {%- set _url = page.canonical_url if page.canonical_url else config.site_url %}

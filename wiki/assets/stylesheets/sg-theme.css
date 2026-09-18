@@ -12,9 +12,9 @@
   - 사진은 홈 히어로에만 전면 배치, 본문은 불투명 바탕 위 고대비 텍스트.
 */
 
-/* ── 폰트 로드 ───────────────────────────────────────────────── */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Share+Tech+Mono&display=swap");
+/* ── 폰트 로드 ─────────────────────────────────────────────────
+   Pretendard/JetBrains Mono/Share Tech Mono는 CSS @import 직렬 폭포를 피하기 위해
+   overrides/main.html extrahead에서 <link>로 병렬 로드한다. */
 
 :root {
   --md-text-font: "Pretendard Variable", Pretendard;
@@ -101,7 +101,7 @@
   --md-default-bg-color--lightest:#ffffff;
   --md-default-fg-color:          #22262d;   /* 다크 슬레이트(순흑 아님) */
   --md-default-fg-color--light:   #454b56;
-  --md-default-fg-color--lighter: #6b7280;
+  --md-default-fg-color--lighter: #5d6470;   /* #eef2f7 위 4.5:1 확보(구 #6b7280=4.30) */
   --md-default-fg-color--lightest:#aab0bb;
   --md-typeset-color:             #262a31;
   --md-typeset-a-color:           var(--sg-link);
@@ -121,7 +121,7 @@
   --sg-link-hover:      #8f3f12;
   --sg-border:          #d3d9e2;
   --sg-th-bg:           #e6ebf2;
-  --sg-th-fg:           #b0521c;
+  --sg-th-fg:           #a34a16;    /* #e6ebf2 위 4.5:1 확보(구 #b0521c=4.31) */
   --sg-row-hover:       #3a6ea50f;
   --sg-blockquote-bg:   #5a9fd812;
   --sg-code-border:     #dbe0e8;
@@ -323,7 +323,7 @@ body::before {
 
 /* ── 본문 타이포그래피 ───────────────────────────────────────── */
 .md-typeset {
-  font-size: .78rem;
+  font-size: .85rem;   /* 한국어 장문 가독성 — Material 기본 16px 대비 86%(구 .78rem=12.5px) */
   line-height: 1.85;
   letter-spacing: -0.003em;
 }
@@ -377,8 +377,8 @@ body::before {
 .md-typeset table:not([class]) {
   border: 1px solid var(--sg-border);
   border-radius: .2rem;
-  overflow: hidden;
-  font-size: .76rem;
+  overflow: auto;      /* Material의 와이드 표 가로 스크롤 유지(hidden은 콘텐츠를 잘라냄) */
+  font-size: .8rem;
 }
 .md-typeset table:not([class]) th {
   background: var(--sg-th-bg);
@@ -463,11 +463,35 @@ body::before {
   margin-left: -2px;
 }
 
-/* ── Worldline Map 헤더 버튼 hover(인라인 스타일 보완) ───────── */
-.worldline-map-btn { transition: opacity .15s ease, background-color .15s ease; }
+/* ── Worldline Map 헤더 버튼 ────────────────────────────────── */
+.worldline-map-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 1.8rem;
+  margin: auto 0.25rem;
+  padding: 0 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: .2rem;
+  color: var(--md-primary-bg-color, #fff);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  text-decoration: none;
+  opacity: .92;
+  transition: opacity .15s ease, background-color .15s ease;
+}
 .worldline-map-btn:hover {
-  opacity: 1 !important;
+  opacity: 1;
   background-color: #ffffff26;
+}
+/* 터치 기기: 44px 근접 타깃으로 확대 */
+@media (pointer: coarse) {
+  .worldline-map-btn {
+    height: 2.4rem;
+    padding: 0 1rem;
+    font-size: .8rem;
+  }
 }
 
 /* ── 다이버전스 미터: .sg-divergence 유틸 ───────────────────── */

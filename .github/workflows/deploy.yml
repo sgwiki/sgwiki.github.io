@@ -103,8 +103,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
+      # 버전은 정본(sg-wiki-dev) pyproject [dependency-groups] docs 와 맞춘다.
+      # awesome-pages 는 wiki/.pages 가 nav 를 구성하므로 필수다 — 빠지면
+      # mkdocs 가 플러그인을 못 찾아 빌드가 실패한다.
       - name: Install MkDocs Material
-        run: uv pip install --system mkdocs-material
+        run: uv pip install --system "mkdocs-material==9.7.6" "mkdocs-awesome-pages-plugin>=2.9,<3"
 
       - name: Build wiki site
         run: mkdocs build

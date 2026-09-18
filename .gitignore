@@ -25,6 +25,10 @@ venv/
 # Node (루트 node_modules 방지; worker 의존성은 별도 관리)
 node_modules/
 
+# wrangler 로컬 캐시 (계정/Pages 조회 결과). 발행 스크립트의 git add -A 에
+# 걸려 public 에 올라가던 것을 막는다 (2026-09-18).
+.wrangler/
+
 # Temp files
 docs/대화로그_tmp.md
 

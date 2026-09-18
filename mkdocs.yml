@@ -8,7 +8,7 @@ theme:
   name: material
   custom_dir: overrides
   language: ko
-  font: false  # Roboto 자동 로드 비활성화 — Pretendard를 sg-theme.css에서 직접 로드
+  font: false  # Roboto 자동 로드 비활성화 — Pretendard는 overrides/main.html extrahead에서 <link> 로드
   features:
     - content.code.copy
     - navigation.tabs
@@ -36,6 +36,7 @@ plugins:
       lang:
         - en
         - ja  # 한국어 형태소 분석 미지원 — ja가 가장 유사한 동작
+  - awesome-pages  # nav 구성은 wiki/.pages — 새 문서는 소속 디렉터리에 넣으면 자동 포함
 
 markdown_extensions:
   - admonition
@@ -70,4 +71,3 @@ extra_css:
 extra_javascript:
   - javascripts/worldline-map-btn.js
   - javascripts/sg-enhance.js
-  - javascripts/amadeus-chat-btn.js
