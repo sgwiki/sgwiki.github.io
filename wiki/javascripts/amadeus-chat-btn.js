@@ -21,8 +21,8 @@
       을 받아 그 대화를 그대로 연다. iframe 이 아직 안 채워졌으면(응답 없음) 평범한
       CHAT_URL 로 연다 — 거기서도 프록시의 session.latest 가 신원이 이어지는 만큼은
       되찾아온다.
-  · 이 사이트는 navigation.instant 를 쓰지 않으므로 페이지 이동 시 iframe 이 다시
-    로드된다. 세션은 chat 쪽 localStorage 의 sessionKey 로 재개된다(위 제약 적용).
+  · navigation.instant가 본문만 전환한다. document$ 구독은 매 전환 후 build를
+    호출하지만, 이미 붙인 루트를 재사용하므로 iframe/WS 연결을 새로 만들지 않는다.
 */
 (() => {
   const CHAT_URL = 'https://chat.flaglow.cc/';

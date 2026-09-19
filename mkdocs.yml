@@ -11,6 +11,9 @@ theme:
   font: false  # Roboto 자동 로드 비활성화 — Pretendard는 overrides/main.html extrahead에서 <link> 로드
   features:
     - content.code.copy
+    # document$ 구독형 보조 UI(아마데우스 포함)를 유지한 채 본문만 전환한다.
+    - navigation.instant
+    - navigation.progress
     - navigation.tabs
     - navigation.top
     - search.highlight
