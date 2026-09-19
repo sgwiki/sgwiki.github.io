@@ -169,7 +169,7 @@ description: "이 장에서는 슈타인즈;게이트의 핵심 메커니즘을 
 
 ![figure-2-2.jpg](https://i.imgur.com/nqCl1rm.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역
@@ -287,7 +287,7 @@ A25. 존 타이타는 그의 @채널 게시물 중 하나에서 타임라인의 
 
 ![figure-2-3.jpg](https://i.imgur.com/qFGzhec.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역
@@ -343,7 +343,7 @@ D-메일은 과거로 보내는 메시지입니다. 역사적 사건과 모순�
 
 ![figure-2-4.jpg](https://i.imgur.com/bg7ftJS.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역
@@ -468,7 +468,7 @@ A29: 11장의 시간 여행에 대해, 점프 경로에서 점프하기 전과 �
 
 ![figure-2-6.jpg](https://i.imgur.com/LTocJrz.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 - Genuine history: 실제 발생한 일
@@ -488,7 +488,7 @@ A29: 11장의 시간 여행에 대해, 점프 경로에서 점프하기 전과 �
 
 ![figure-2-7.jpg](https://i.imgur.com/plU3mY0.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역
@@ -606,7 +606,7 @@ final change they made.
 
 ![figure-2-8.jpg](https://i.imgur.com/FLJCOrz.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역
@@ -658,7 +658,7 @@ final change they made.
 
 ![figure-2-9.jpg](https://i.imgur.com/rnvsCjc.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역
@@ -719,7 +719,7 @@ b. 마유리가 차에 치어 죽음
 
 ![figure-2-10.jpg](https://i.imgur.com/X4oWKQu.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역

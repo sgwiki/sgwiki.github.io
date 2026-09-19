@@ -84,7 +84,7 @@ description: "우리의 마지막 원칙은 간단합니다. 가능한 경우, �
 
 ![figure-3-2.jpg](https://i.imgur.com/2M2iIk1.jpeg)
 
-<aside>
+<aside markdown="1">
 💡
 
 이미지 내용 번역

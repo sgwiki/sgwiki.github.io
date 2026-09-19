@@ -46,6 +46,13 @@ markdown_extensions:
   - attr_list
   - def_list
   - footnotes  # [^1] 인라인 각주 + [^1]: 내용 하단 정의 — demun.github.io/mkdocs-tuts 가이드 참고
+  - md_in_html  # <details markdown="1"> 안의 마크다운을 렌더 — 없으면 본문이 raw로 새어나간다
+  - toc:
+      # 기본 slugify는 ASCII 전용이라 한국어 제목이 전부 id="_2"·"_3"으로 뭉개진다.
+      # 그러면 본문이 쓰는 `#관련-문서` 류 앵커가 100% 깨진다. 유니코드 slug로 고정한다.
+      # 이 규칙은 scripts/wiki_link_lint.py 의 slugify()가 그대로 복제한다 — 함께 바꿀 것.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify {kwds: {case: lower}}
+      separator: "-"
   - pymdownx.details
   - pymdownx.superfences:
       custom_fences:
@@ -60,6 +67,14 @@ markdown_extensions:
 
 docs_dir: wiki
 site_dir: site
+
+# mkdocs 기본값은 깨진 앵커·인식 못 한 상대 링크를 INFO 로만 흘린다 — 빌드는 성공하고
+# 목차만 조용히 죽는다. warn 으로 올려 `mkdocs build --strict`(preflight G8a)가 잡게 한다.
+# absolute_links 는 info 로 남긴다 — `/maps/anime/` 는 MkDocs 밖 SPA 라우트라 정상이다.
+validation:
+  links:
+    anchors: warn
+    unrecognized_links: warn
 exclude_docs: |
   _template/
 
