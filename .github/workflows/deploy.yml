@@ -143,3 +143,54 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # deploy-pages 성공은 artifact 인수까지만 증명한다. CDN의 실제 URL에서 각
+      # 섹션이 404·홈 폴백·빈 본문 없이 열리는지를 마지막으로 확인한다.
+      - name: Live Pages smoke test
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${PAGE_URL%/}"
+          routes=(
+            ""
+            "lore/"
+            "setting/"
+            "%EC%84%B8%EA%B3%84%EC%84%A0/"
+            "%EC%BA%90%EB%A6%AD%ED%84%B0/"
+            "%EC%9A%A9%EC%96%B4/"
+            "organization/"
+            "%EA%B7%BC%EA%B1%B0%EC%9E%90%EB%A3%8C/"
+            "%EC%95%A0%EB%8B%88%EB%A9%94%EC%9D%B4%EC%85%98-%EC%97%90%ED%94%BC%EC%86%8C%EB%93%9C/"
+            "%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0-%ED%81%90%EB%A0%88%EC%9D%B4%EC%85%98/"
+          )
+          for route in "${routes[@]}"; do
+            body="$(mktemp)"
+            url="${base}/${route}"
+            for attempt in {1..20}; do
+              status="$(curl --silent --show-error --location --output "$body" --write-out '%{http_code}' "$url" || true)"
+              if [[ "$status" == "200" ]] && python3 - "$body" "$url" <<'PY'
+          import re
+          import sys
+          from html import unescape
+
+          html = open(sys.argv[1], encoding='utf-8').read()
+          article = re.search(r'<article\b[^>]*>(.*?)</article>', html, re.I | re.S)
+          text = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', article.group(1) if article else '')).strip()
+          if len(unescape(text)) < 80:
+              raise SystemExit(f'empty or incomplete page: {sys.argv[2]} ({len(text)} visible chars)')
+          PY
+              then
+                echo "PASS $url"
+                break
+              fi
+              if [[ "$attempt" == "20" ]]; then
+                echo "::error::Live Pages smoke test failed: $url (HTTP $status)"
+                exit 1
+              fi
+              sleep 15
+            done
+            rm -f "$body"
+          done
+          asset="${base}/javascripts/amadeus-chat-btn.js"
+          curl --fail --silent --show-error --location "$asset" | grep --fixed-strings 'document$.subscribe(build)' >/dev/null
