@@ -7,6 +7,11 @@
 
 {% block extrahead %}
   {#- 폰트: CSS @import 직렬 폭포 대신 <link> 병렬 로드(sg-theme.css 헤더 주석 참조) -#}
+  {#- 챗봇 출처 preconnect: TCP/TLS 핸드셰이크만 하고 HTTP 요청은 보내지 않는다.
+     프록시는 .html 응답에만 Set-Cookie 를 붙이므로 동의 전에 깔아도 쿠키가 생기지 않고,
+     [동의하기] 직후의 첫 홉 지연을 줄인다. crossorigin 을 붙이면 anonymous 소켓 풀을
+     데워 정작 iframe 탐색(credentialed)이 재사용하지 못하므로 붙이지 않는다. -#}
+  <link rel="preconnect" href="https://chat.flaglow.cc">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
