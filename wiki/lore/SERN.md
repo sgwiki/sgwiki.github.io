@@ -90,3 +90,4 @@ SERN은 타임머신 관련 정보를 조기에 포착하기 위해 전 세계 �
 - 『Steins;Gate 0』 「폐시곡선의 에피그래프」·「쌍대복음의 프로토콜」 — 베타 세계선 라운더 행보
 - 슈타게 공식 자료집 「Keyword 6 SERN」 — SERN 조직 개요, 연혁, Z 프로그램 분류, 라운더 습격 인과 Q&A
 - 팬 분석 "The Mechanics of Steins;Gate v1.0.3" — 시리즈 연대기와 베타 세계선 다극 세력 구도
+- 나무위키 [「SERN」](https://namu.wiki/w/SERN) — 교차 확인용 2차 자료
