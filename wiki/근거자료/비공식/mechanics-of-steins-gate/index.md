@@ -1,8 +1,11 @@
 ---
+spoiler: none
 description: "슈타인즈;게이트의 시간 여행 메커니즘을 체계적으로 분석한 팬 논문입니다. 작중 모든 사건을 일관되게 설명하는 단일 해석 체계를 제시하며, 흔한 팬 이론의 오류도 짚습니다."
 ---
 
 # The Mechanics of Steins;Gate v1.0.3 (한국어 번역)
+
+## 개요
 
 > **유형:** 팬 분석 논문 · 비공식 자료
 
@@ -32,3 +35,5 @@ description: "슈타인즈;게이트의 시간 여행 메커니즘을 체계적�
 | **번역 출처** | [DC Inside 갤러리 (AI번역+보정) 슈타인즈;게이트의 역학](https://gall.dcinside.com/mgallery/board/view?id=steinsgate&no=77514) · [Notion](https://app.notion.com/p/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5) |
 
 원본 라이선스에 따라 MIT 라이선스로 취급됩니다.
+
+## 인용 출처

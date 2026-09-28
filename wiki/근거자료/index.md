@@ -1,10 +1,13 @@
 ---
-description: "슈타인즈;게이트 위키에서 인용하는 자료를 공식·비공식으로 분류하여 보관합니다."
+spoiler: none
+description: "슈타인즈 게이트 위키에서 인용하는 자료를 공식·비공식으로 분류하여 보관합니다."
 ---
 
 # 근거 자료
 
-슈타인즈;게이트 위키에서 인용하는 자료를 공식·비공식으로 분류하여 보관합니다.
+## 개요
+
+슈타인즈 게이트 위키에서 인용하는 자료를 공식·비공식으로 분류하여 보관합니다.
 
 ---
 
@@ -23,3 +26,5 @@ description: "슈타인즈;게이트 위키에서 인용하는 자료를 공식�
 
 - [비공식 자료 목록](./비공식/index.md)
   - [The Mechanics of Steins;Gate v1.0.3](./비공식/mechanics-of-steins-gate/index.md) — Votuko 저, Nira 번역 (MIT License)
+
+## 인용 출처
