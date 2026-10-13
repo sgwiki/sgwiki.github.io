@@ -26,5 +26,3 @@ description: "슈타인즈 게이트 위키에서 인용하는 자료를 공식�
 
 - [비공식 자료 목록](./비공식/index.md)
   - [The Mechanics of Steins;Gate v1.0.3](./비공식/mechanics-of-steins-gate/index.md) — Votuko 저, Nira 번역 (MIT License)
-
-## 인용 출처

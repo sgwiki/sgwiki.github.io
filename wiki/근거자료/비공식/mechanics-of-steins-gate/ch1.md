@@ -12,10 +12,6 @@ description: "<aside>현실 ‘존 티토’의 내용은 ‘존 티토’로, �
 
 > 팬 분석 논문의 한국어 번역본입니다. [← 목차로 돌아가기](./index.md)
 
-
-## 개요
-
-
 ## 서론
 
 <aside>현실 ‘존 티토’의 내용은 ‘존 티토’로, 게임관련 내용은 ‘존 타이타’로 표기합니다</aside>
@@ -310,5 +306,3 @@ C204라는 번호가 붙은 이 장치는 시간 여행을 위한 캡슐을 제�
 | **번역 출처** | [DC Inside 갤러리](https://gall.dcinside.com/mgallery/board/view?id=steinsgate&no=77514) · [Notion](https://app.notion.com/p/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5) |
 
 원본 라이선스에 따라 MIT 라이선스로 취급됩니다.
-
-## 인용 출처

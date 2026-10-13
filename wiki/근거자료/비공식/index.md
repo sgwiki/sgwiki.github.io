@@ -16,5 +16,3 @@ description: "개발팀이 공식 발표한 자료가 아닌, 팬이 작성한 �
 ## 수록 자료
 
 - [The Mechanics of Steins;Gate v1.0.3](./mechanics-of-steins-gate/index.md) — Votuko 저, Nira 번역. 시간 여행 메커니즘 팬 분석 논문 (MIT License)
-
-## 인용 출처

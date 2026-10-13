@@ -363,7 +363,7 @@ description: "2025년 11월 WePlay EXPO 다음 날, Game*Spark가 과학 어드�
 
 ---
 
-## 자료 출처
+## 인용 출처
 
 - [『STEINS;GATE RE:BOOT』 일본 매체 인터뷰 전문 번역](https://gall.dcinside.com/mgallery/board/view/?id=steinsgate&no=79181)
 
@@ -374,5 +374,3 @@ description: "2025년 11월 WePlay EXPO 다음 날, Game*Spark가 과학 어드�
 - [공식 자료 목록](./index.md)
 - [본편 공식 Q&A 자료집](./qa-자료집.md)
 - [WePlay Expo 2025 개발자 토크 전문](./weplay-expo-2025.md)
-
-## 인용 출처

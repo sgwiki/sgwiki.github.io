@@ -35,5 +35,3 @@ description: "슈타인즈;게이트의 시간 여행 메커니즘을 체계적�
 | **번역 출처** | [DC Inside 갤러리 (AI번역+보정) 슈타인즈;게이트의 역학](https://gall.dcinside.com/mgallery/board/view?id=steinsgate&no=77514) · [Notion](https://app.notion.com/p/prunusnira/The-Mechanics-of-Steins-Gate-v1-0-3-26dd9363befe80f6869fc11892d4d9f5) |
 
 원본 라이선스에 따라 MIT 라이선스로 취급됩니다.
-
-## 인용 출처

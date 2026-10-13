@@ -18,5 +18,3 @@ description: "개발팀 인터뷰, 행사 토크, Q&A 자료집 등 슈타인즈
 - [본편 공식 Q&A 자료집](./qa-자료집.md) — 개발팀 공식 Q&A 30문항
 - [WePlay Expo 2025 개발자 토크 전문](./weplay-expo-2025.md) — 2025년 상하이 행사 현장 스크립트
 - [『STEINS;GATE RE:BOOT』 일본 매체 인터뷰](./reboot-인터뷰.md) — Game\*Spark 2025.12.7 인터뷰 전문
-
-## 인용 출처

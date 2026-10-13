@@ -96,5 +96,3 @@ wiki/
 ## 라이선스
 
 위키 텍스트 원저작 부분: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-
-## 인용 출처
