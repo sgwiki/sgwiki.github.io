@@ -1,6 +1,6 @@
 ---
 spoiler: endgame
-description: "D-RINE(디-라인, Dライン)은 《Steins;Gate 0》에 등장하는 D메일의"
+description: "D-RINE(디-라인)은 《Steins;Gate 0》에 등장하는 D메일의"
 ---
 
 !!! warning "스포일러"
@@ -9,11 +9,11 @@ description: "D-RINE(디-라인, Dライン)은 《Steins;Gate 0》에 등장하
     후반부 스포일러를 포함합니다. D-RINE의 작동 원리, 수발신 시점,
     진엔딩 발동 조건으로서의 역할 등 핵심 메커니즘이 노출됩니다.
 
-# D-RINE (Dライン)
+# D-RINE
 
 ## 개요
 
-D-RINE(디-라인, Dライン)은 《Steins;Gate 0》에 등장하는 [D메일](D메일.md)의
+D-RINE(디-라인)은 《Steins;Gate 0》에 등장하는 [D메일](D메일.md)의
 변형으로, RINE이라는 메신저 응용프로그램을 매개로 하여 SERN의
 [에셜론](에셜론.md) 감시망을 회피한 채 과거로 정보를 송신하는 통신 수단이다.
 β 세계선 후기, 특히 2025년경에 이르러 [하시다 이타루](../캐릭터/하시다-이타루.md)
