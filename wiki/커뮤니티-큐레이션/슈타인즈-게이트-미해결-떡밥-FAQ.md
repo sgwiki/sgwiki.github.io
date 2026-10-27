@@ -103,7 +103,7 @@ description: "슈타인즈 게이트 시리즈의 대표 미해결 떡밥(오카
 
 ## 인용 출처
 
-- [슈타게 공식 QA자료집](../근거자료/공식/qa-자료집.md) — Q2의 **[공식]** 인용(Q24)과 Q4의 노트 요지, Q9의 Q12·Q13 파라프레이즈 출처
+- [슈타게 공식 QA자료집](../근거자료/공식/qa-자료집.md) — Q2의 인용 블록(Q24)과 Q4의 노트 요지, Q9의 Q12·Q13 파라프레이즈 출처
 - 『Steins;Gate』 4챕터 · 『Steins;Gate Elite』 4챕터 — Q2의 발열 회상 서술(파라프레이즈) 출처
 - 『Steins;Gate 0』 제11장 「Vega and Altair」 — Q6의 노래 계보 서술(파라프레이즈) 출처
 - [Steins;Gate 0 EP08](https://steins-gate.fandom.com/wiki/S;G0_%28anime%29_-_Ep.08) — Q7의 줄거리 요지 출처
