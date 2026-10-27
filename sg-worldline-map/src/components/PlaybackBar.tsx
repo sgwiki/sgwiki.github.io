@@ -102,8 +102,8 @@ export function PlaybackBar({ dataset, onStepChange }: Props) {
               }}
               className={`px-3 py-1 rounded text-xs border transition-colors ${
                 channel.id === r.channelId
-                  ? 'bg-[#C25200] text-white border-[#FF8C00]/60'
-                  : 'bg-[#0A1525] text-[#4A6A8A] border-[#152240] hover:border-[#4A6A8A] hover:text-[#C0D8F0]'
+                  ? 'bg-[#451a03] text-[#ffd257] border-[#ffb000]/60'
+                  : 'bg-[#0f0b06] text-[#9d8b58] border-[#3a2d12] hover:border-[#9d8b58] hover:text-[#e6d9ac]'
               }`}
             >
               {r.labelKo}
@@ -112,10 +112,10 @@ export function PlaybackBar({ dataset, onStepChange }: Props) {
         </div>
       )}
 
-      <div className="bg-[#0A1525]/98 backdrop-blur border border-[#152240] rounded-lg p-3 shadow-2xl">
+      <div className="bg-[#0f0b06]/98 backdrop-blur border border-[#3a2d12] rounded-lg p-3 shadow-2xl">
         {showPanel && currentStep ? (
           <>
-            <p className="text-sm text-[#C0D8F0] leading-relaxed mb-2 min-h-[3em]">
+            <p className="text-sm text-[#e6d9ac] leading-relaxed mb-2 min-h-[3em]">
               {currentStep.captionKo}
             </p>
             <div className="flex items-center gap-3">
@@ -133,30 +133,30 @@ export function PlaybackBar({ dataset, onStepChange }: Props) {
               <button onClick={() => { setShowPanel(false); setPlaying(false); onStepChange(null) }} className="control-btn ml-auto">
                 ✕ 닫기
               </button>
-              <span className="text-xs text-[#4A6A8A] ml-2">
+              <span className="text-xs text-[#9d8b58] ml-2">
                 {stepIdx + 1} / {channel.steps.length}
               </span>
             </div>
             {/* 진행 바 */}
-            <div className="mt-2 h-1 bg-[#152240] rounded overflow-hidden">
+            <div className="mt-2 h-1 bg-[#3a2d12] rounded overflow-hidden">
               <div
-                className="h-full bg-[#C25200] transition-all duration-300"
+                className="h-full bg-[#451a03] transition-all duration-300"
                 style={{ width: `${((stepIdx + 1) / channel.steps.length) * 100}%` }}
               />
             </div>
           </>
         ) : (
-          <button onClick={handlePlay} className="w-full py-2 text-sm text-[#A0B8CC] hover:text-[#C0D8F0] transition-colors">
+          <button onClick={handlePlay} className="w-full py-2 text-sm text-[#bfae7e] hover:text-[#e6d9ac] transition-colors">
             ▶ 시나리오 재생
           </button>
         )}
       </div>
 
       <style>{`
-        .control-btn { padding: 4px 10px; background: #0A1525; color: #A0B8CC; border-radius: 4px; font-size: 14px; border: 1px solid #152240; cursor: pointer; }
-        .control-btn:hover { background: #152240; color: #C0D8F0; }
+        .control-btn { padding: 4px 10px; background: #0f0b06; color: #bfae7e; border-radius: 4px; font-size: 14px; border: 1px solid #3a2d12; cursor: pointer; }
+        .control-btn:hover { background: #3a2d12; color: #e6d9ac; }
         .control-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .control-btn-primary { padding: 4px 14px; background: #C25200; color: white; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .control-btn-primary { padding: 4px 14px; background: #451a03; color: white; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .control-btn-primary:hover { filter: brightness(1.15); }
       `}</style>
     </div>

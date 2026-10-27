@@ -15,6 +15,7 @@ import { EventDetailPanel } from '@/components/EventDetailPanel'
 import { PlaybackBar } from '@/components/PlaybackBar'
 import { GraphExplorer } from '@/components/GraphExplorer'
 import { EmbedGraph } from '@/components/graph/EmbedGraph'
+import { VizBackdrop } from '@/components/VizBackdrop'
 import { datasets, resolveSeries, getDataset } from '@/data/loader'
 import { validateDataset } from '@/lib/scales'
 import type { PlaybackStep, SeriesDataset, SeriesId } from '@/types/ontology'
@@ -99,19 +100,29 @@ export function App() {
   const availableSeries = Object.keys(datasets)
   const isPlayable = !!dataset.playbackScript
 
+  // 헤더 닉시관이 가리킬 다이버전스 — 선택·재생 중 세계선(비주얼라이저 미터 통일)
+  const focusWlId = playbackStep?.worldLineId ?? selectedEvent?.worldLineId ?? null
+  const focusWorldline = dataset.worldlines.find(
+    (w) => w.uri === focusWlId || w.id === focusWlId
+  )
+  const focusValue = focusWorldline ? focusWorldline.divergence.toFixed(6) : null
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="relative flex flex-col h-screen">
+      {/* 비주얼라이저 캔버스 앰비언트(그리드·입자·필드 빔) — 데이터 맵 뒤 */}
+      <VizBackdrop />
       <Header
         current={series}
         onSwitch={(s) => { setSeries(s); setSelectedEventId(null); setPlaybackStep(null) }}
         view={view}
         onViewSwitch={(v) => { setView(v); if (v !== 'timeline') setPlaybackStep(null) }}
+        focusValue={focusValue}
       />
 
       {/* 사용 가능한 시리즈가 1개면 안내 (S;G0 데이터 추가 시 자동 활성화) */}
       {view === 'timeline' && availableSeries.length === 1 && (
-        <div className="bg-[#0A1525]/60 text-[#4A6A8A] text-xs px-4 py-1 text-center border-b border-[#152240]">
-          📌 현재 애니메이션 시리즈만 제공됩니다. 추가 시리즈(S;G0 게임 등)는 데이터 저작 후 순차 공개됩니다.
+        <div className="bg-[#0f0b06]/60 text-[#9d8b58] text-xs px-4 py-1 text-center border-b border-[#3a2d12]">
+          현재 애니메이션 시리즈만 제공됩니다. 추가 시리즈(S;G0 게임 등)는 데이터 저작 후 순차 공개됩니다.
         </div>
       )}
 

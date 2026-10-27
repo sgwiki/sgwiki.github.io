@@ -6,7 +6,14 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
-  {#- 폰트: CSS @import 직렬 폭포 대신 <link> 병렬 로드(sg-theme.css 헤더 주석 참조) -#}
+  {#- 홈 판별 마커 — CRT 스캔라인 오버레이 등 "풀 B 스킨"은 홈에만 걸린다
+      (기획서 §4.3: 본문 페이지는 완화 변형). head 안에서 심으므로 첫 페인트 전 적용. -#}
+  {% if page and page.is_homepage %}
+  <script>document.documentElement.setAttribute('data-sg-home', '');</script>
+  {% endif %}
+
+  {#- 폰트: CSS @import 직렬 폭포 대신 <link> 병렬 로드(sg-theme.css 헤더 주석 참조).
+      IBM Plex Mono는 리뉴얼 B안(터미널) 표면 전용 모노(sg-theme.css --sg-mono). -#}
   {#- 챗봇 출처 preconnect: TCP/TLS 핸드셰이크만 하고 HTTP 요청은 보내지 않는다.
      프록시는 .html 응답에만 Set-Cookie 를 붙이므로 동의 전에 깔아도 쿠키가 생기지 않고,
      [동의하기] 직후의 첫 홉 지연을 줄인다. crossorigin 을 붙이면 anonymous 소켓 풀을
@@ -16,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Share+Tech+Mono&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Share+Tech+Mono&display=swap">
 
   {%- set _title = page.title if page.title else config.site_name %}
   {%- set _desc = page.meta.description if page.meta and page.meta.description else config.site_description %}
@@ -57,23 +64,31 @@
 {% endblock %}
 
 {#-
-  달빛 옥상(fg_rooftop_night) 히어로 — 홈에서만 렌더.
-  Material의 hero 블록은 .md-container 안, .md-main 바로 앞에 위치한다.
-  장식 요소이므로 aria-hidden. 실제 H1은 sg-theme.css에서 스크린리더용으로 유지.
+  홈 히어로 — 미래 가젯 터미널(리뉴얼 B안, 목업 포팅).
+  부팅 로그 → 워드마크 → 명령줄 검색. 배경 옥상 사진은 sg-theme.css 가 깐다.
+  · 히어로 문구 "WELCOME TO THE STEINS;GATE WIKI, DEAR 라보멘 00X" — 기획서 §4.1
+    확정 문구. 00X 는 문자열 리터럴 그대로(방문자 배정 로직 없음).
+  · "El Psy Kongroo." 는 홈 슬로건 후보(기획서 §10 미결정 2) — 문구 확정 시 교체.
+  · 명령줄 검색 입력은 실제 Material 헤더 검색으로 포커스를 인계한다(sg-home.js).
+  · 실제 H1은 README.md 의 제목이 스크린리더용으로 유지된다(sg-theme.css).
 -#}
 {% block hero %}
   {% if page and page.is_homepage %}
-  <section class="sg-hero" aria-hidden="true">
-    <div class="sg-hero__glow"></div>
-    <div class="sg-hero__inner md-grid">
-      <p class="sg-hero__eyebrow"><span class="sg-hero__mark">STEINS;GATE</span> · 한국어 설정 아카이브</p>
-      <p class="sg-hero__title">슈타인즈 게이트 <span>위키</span></p>
-      <p class="sg-hero__tagline">세계선과 설정, 사건의 인과를 근거와 함께 정리한 해설 아카이브.</p>
-      <div class="sg-hero__meter">
-        <span class="sg-hero__meter-label">WORLDLINE</span>
-        <span class="sg-divergence">1.048596</span>
+  <section class="sg-hero">
+    <div class="sg-hero__screen md-grid">
+      <p class="sg-hero__boot" aria-hidden="true">
+        <span>&gt; FUTURE GADGET LAB TERMINAL v1.04 부팅…</span>
+        <span>&gt; 세계선 관측자 접속 승인 <b>[ OK ]</b></span>
+        <span>&gt; 관측자 등록번호 확인: <b class="sg-hero__you">라보멘 00X</b></span>
+        <span>&gt; WELCOME TO THE STEINS;GATE WIKI, DEAR 라보멘 00X — El Psy Kongroo.</span>
+      </p>
+      <p class="sg-hero__title" aria-hidden="true">STEINS;GATE <span>WIKI</span></p>
+      <p class="sg-hero__sub" aria-hidden="true">관측자 너를 환영한다 — 무엇이 궁금한가?</p>
+      <div class="sg-cmdsearch" role="search">
+        <span class="sg-cmdsearch__pr" aria-hidden="true">&gt;</span>
+        <input type="text" placeholder="검색어를 입력 (예: 세계선, D메일, 시청 순서)" aria-label="위키 검색">
+        <span class="sg-cmdsearch__caret" aria-hidden="true">▮</span>
       </div>
-      <span class="sg-hero__cue" aria-hidden="true"></span>
     </div>
   </section>
   {% endif %}

@@ -1,184 +1,167 @@
 /*
-  Steins;Gate 한국어 위키 — 커스텀 테마 「옥상(Rooftop)」
+  Steins;Gate 한국어 위키 — 커스텀 테마 「미래 가젯 터미널」(리뉴얼 B안)
   ------------------------------------------------------------------
-  두 스킴을 한 벌의 컴포넌트 규칙으로 운용한다.
-    · slate   = 야간(달빛 옥상)  — 미드나잇 네이비, 사진 fg_rooftop_night
-    · default = 주간(한낮 옥상)  — 하늘빛 밝은 종이, 사진 fg_rooftop_day
+  tmp/위키 페이지 리뉴얼/목업/B-미래-가젯-터미널.html 의 MkDocs Material 포팅.
+  두 스킴을 B안 질감 안에서 재정의한다(기획서 §4.3).
+    · slate   = 야간(CRT 터미널) — 앰버 포스퍼 #ffb000, 스캔라인(홈 한정)
+    · default = 주간(종이 터미널) — 크림 종이 위 갈색 잉크 + 앰버 강조
   설계 원칙
-  - 유일한 강조색은 S;G 앰버(오렌지). 밤에는 창문 불빛·닉시관, 낮에는 표지판처럼
-    차가운 배경 위에서 보색으로 또렷하게 뜬다.
+  - 표면(홈·헤더)은 풀 B 컨셉, 본문(긴 글) 페이지는 포스퍼·스캔라인을 완화한
+    변형 — 스캔라인/비네트 오버레이는 홈(html[data-sg-home])에만 걸린다.
+  - 헤더·탭은 두 스킴 공통의 "터미널 베젤"(짙은 흑갈색)로 통일한다. 화면(CRT)은
+    어두운 법이므로 주간에도 크롬은 어둡게 유지된다.
   - 스킴별로 달라지는 표면색은 모두 --sg-* 시맨틱 변수로 뽑아 두고,
     컴포넌트 규칙은 그 변수만 참조한다(두 테마가 항상 동기화됨).
-  - 사진은 홈 히어로에만 전면 배치, 본문은 불투명 바탕 위 고대비 텍스트.
+  - 히어로 배경은 옥상 사진(rooftop 4종 세트)을 스크림 아래에 깔아
+    "슈타게 이미지"(기획서 §4.1) 요건을 유지한다.
 */
 
 /* ── 폰트 로드 ─────────────────────────────────────────────────
-   Pretendard/JetBrains Mono/Share Tech Mono는 CSS @import 직렬 폭포를 피하기 위해
-   overrides/main.html extrahead에서 <link>로 병렬 로드한다. */
+   Pretendard/IBM Plex Mono/JetBrains Mono/Share Tech Mono는 CSS @import 직렬
+   폭포를 피하기 위해 overrides/main.html extrahead에서 <link>로 병렬 로드한다. */
 
 :root {
   --md-text-font: "Pretendard Variable", Pretendard;
   --md-code-font: "JetBrains Mono";
-  /* S;G 앰버 — 유일한 강조색(장식용). 텍스트/링크용 대비 색은 스킴별로 따로 둔다 */
-  --sg-amber:        #e07b3c;
-  --sg-amber-soft:   #e9954f;
-  --sg-amber-bright: #f4b878;
+  --sg-mono: "IBM Plex Mono", var(--md-code-font), ui-monospace, monospace;
+
+  /* B안 토큰(목업 그대로) — 스킴 공통 앰버 */
+  --sg-amber:        #ffb000;
+  --sg-amber-hi:     #ffd257;
+  --sg-amber-dim:    #8a6d2f;
 }
 
-/* ══ 야간(slate) — 달빛 옥상 ══════════════════════════════════ */
+/* ══ 야간(slate) — CRT 터미널 ════════════════════════════════ */
 [data-md-color-scheme="slate"] {
-  --md-hue: 222;                          /* 파생 그레이 → 차가운 네이비 */
-  --md-default-bg-color:          #0b0f22;
-  --md-default-bg-color--light:   #141a30;
-  --md-default-bg-color--lighter: #1b2238;
-  --md-default-bg-color--lightest:#232c46;
-  --md-default-fg-color:          #e6eaf4;
-  --md-default-fg-color--light:   #c3cadd;
-  --md-default-fg-color--lighter: #8a93af;
-  --md-default-fg-color--lightest:#4a5372;
-  --md-typeset-color:             #e2e7f2;
+  --md-hue: 40;                            /* 파생 그레이 → 흑갈색 계열 */
+  --md-default-bg-color:          #0f0c06;
+  --md-default-bg-color--light:   #16110a;
+  --md-default-bg-color--lighter: #1b150c;
+  --md-default-bg-color--lightest:#241b0e;
+  --md-default-fg-color:          #e9dcb0;
+  --md-default-fg-color--light:   #d9cd9f;
+  --md-default-fg-color--lighter: #a08e5c;
+  --md-default-fg-color--lightest:#6e5d33;
+  --md-typeset-color:             #ddd1a4;   /* 본문 완화 잉크 — 홈보다 한 단계 눌림 */
   --md-typeset-a-color:           var(--sg-link);
 
-  --md-primary-fg-color:        #c8602b;
-  --md-primary-fg-color--light: #d8743b;
-  --md-primary-fg-color--dark:  #090c1a;
-  --md-primary-bg-color:        #eef2fb;
-  --md-accent-fg-color:         var(--sg-amber-bright);
+  --md-primary-fg-color:        #120d06;     /* 헤더 베젤 */
+  --md-primary-fg-color--light: #1a1409;
+  --md-primary-fg-color--dark:  #0a0803;
+  --md-primary-bg-color:        #ffcf66;     /* 베젤 위 텍스트 */
+  --md-accent-fg-color:         var(--sg-amber-hi);
 
-  --md-code-bg-color:           #080b18;
-  --md-code-fg-color:           #d7def0;
-  --md-typeset-table-color:     #2b3450;
+  --md-code-bg-color:           #0a0803;
+  --md-code-fg-color:           #e0d3a4;
+  --md-typeset-table-color:     #3b2e13;
 
-  /* 시맨틱 표면 */
-  --sg-link:            #e9954f;
-  --sg-link-hover:      #f4b878;
-  --sg-border:          #242c46;
-  --sg-th-bg:           #141a34;
-  --sg-th-fg:           #e9954f;
-  --sg-row-hover:       #8ea6d610;
-  --sg-blockquote-bg:   #ffffff08;
-  --sg-code-border:     #1b2440;
-  --sg-tag-fan-border:  #45507a;
-  --sg-warning-bg:        #2a1d10;
-  --sg-warning-title-bg:  #3a2614;
-  --sg-warning-title-fg:  #f4b878;
-  --sg-nixie-color:     #ff8d3a;
-  --sg-nixie-shadow:    0 0 .35rem #ff8d3a66, 0 0 .9rem #ff8d3a33;
+  /* 시맨틱 표면 — 터미널 패널 */
+  --sg-link:            #ffc14d;
+  --sg-link-hover:      #ffd257;
+  --sg-panel:           #151007;
+  --sg-panel2:          #1a1409;
+  --sg-line:            #3a2d12;
+  --sg-line-hi:         #6e5518;
+  --sg-ink:             #e6d9ac;
+  --sg-ink-dim:         #bfae7e;
+  --sg-dim:             #9d8b58;
+  --sg-border:          #3b2e13;
+  --sg-th-bg:           #191309;
+  --sg-th-fg:           #ffb000;
+  --sg-row-hover:       #ffb00012;
+  --sg-blockquote-bg:   #ffb0000a;
+  --sg-code-border:     #241b0e;
+  --sg-tag-fan-border:  #6e5d33;
+  --sg-warning-bg:        #2a1e0c;
+  --sg-warning-title-bg:  #3a2b12;
+  --sg-warning-title-fg:  #ffd257;
+  --sg-nixie-color:     #ffb000;
+  --sg-nixie-shadow:    0 0 .35rem #ffb00066, 0 0 .9rem #ffb00033;
 
-  /* 헤더 세계선 맵 — 히어로 계기판(.sg-hero__meter)과 같은 어휘 */
-  --sg-map-bg:           rgba(8,11,24,.45);
-  --sg-map-border:       #2a3a5e;
-  --sg-map-fg:           #9db2da;
-  --sg-map-glyph:        #e9954f;
-  --sg-map-bg-hover:     rgba(224,123,60,.12);
-  --sg-map-border-hover: #5e4a34;
-  --sg-map-fg-hover:     #f4b878;
-
+  /* 사이트 앰비언트(본문 페이지) — 앰버 잔광 */
   --sg-ambient:
-    radial-gradient(115% 55% at 80% -12%, rgba(142,166,214,.11), transparent 55%),
-    radial-gradient(90% 55% at 50% 118%, rgba(16,24,56,.55), transparent 60%);
+    radial-gradient(115% 55% at 80% -12%, rgba(255,176,0,.05), transparent 55%),
+    radial-gradient(90% 55% at 50% 118%, rgba(26,20,9,.65), transparent 60%);
 
-  /* 히어로 */
-  --sg-hero-scrim: linear-gradient(178deg, rgba(9,12,26,.28) 0%, rgba(9,12,26,.10) 26%,
-                                   rgba(11,15,34,.62) 70%, var(--md-default-bg-color) 100%);
+  /* 히어로(터미널 화면) — 옥상 사진을 스크림 아래에 */
+  --sg-hero-scrim: linear-gradient(180deg, rgba(12,9,4,.90) 0%, rgba(12,9,4,.74) 46%, rgba(15,12,6,.97) 100%);
   --sg-hero-fallback:    url("../img/rooftop-night.jpg");
   --sg-hero-image:       image-set(url("../img/rooftop-night.webp") type("image/webp"),
                                    url("../img/rooftop-night.jpg")  type("image/jpeg"));
-  --sg-hero-fallback-sm: url("../img/rooftop-night-960.jpg");
-  --sg-hero-image-sm:    image-set(url("../img/rooftop-night-960.webp") type("image/webp"),
-                                   url("../img/rooftop-night-960.jpg")  type("image/jpeg"));
   --sg-hero-pos:         center 30%;
-  --sg-hero-title:       #f3f5fb;
-  --sg-hero-accent:      var(--sg-amber);
-  --sg-hero-eyebrow:     #b7c6e6;
-  --sg-hero-tagline:     #cdd4e6;
-  --sg-hero-shadow:      0 2px 24px rgba(6,9,20,.7);
-  --sg-hero-glow:        radial-gradient(circle, rgba(183,198,230,.28) 0%,
-                                         rgba(142,166,214,.10) 38%, transparent 68%);
-  --sg-hero-meter-bg:     rgba(8,11,24,.5);
-  --sg-hero-meter-border: #2a3a5e;
-  --sg-hero-meter-label:  #8ea6d6;
-  --sg-hero-cue:          #b7c6e6;
 }
 
-/* ══ 주간(default) — 한낮 옥상 ════════════════════════════════ */
+/* ══ 주간(default) — 종이 터미널 ══════════════════════════════ */
 [data-md-color-scheme="default"] {
-  --md-hue: 216;
-  --md-default-bg-color:          #eef2f7;   /* 하늘빛 도는 밝은 종이 */
-  --md-default-bg-color--light:   #f6f8fb;
-  --md-default-bg-color--lighter: #ffffff;
-  --md-default-bg-color--lightest:#ffffff;
-  --md-default-fg-color:          #22262d;   /* 다크 슬레이트(순흑 아님) */
-  --md-default-fg-color--light:   #454b56;
-  --md-default-fg-color--lighter: #5d6470;   /* #eef2f7 위 4.5:1 확보(구 #6b7280=4.30) */
-  --md-default-fg-color--lightest:#aab0bb;
-  --md-typeset-color:             #262a31;
+  --md-hue: 45;
+  --md-default-bg-color:          #f1ead7;   /* 크림 종이 */
+  --md-default-bg-color--light:   #f7f1e2;
+  --md-default-bg-color--lighter: #fcf8ec;
+  --md-default-bg-color--lightest:#fffdf4;
+  --md-default-fg-color:          #2c230f;
+  --md-default-fg-color--light:   #4b3d1e;
+  --md-default-fg-color--lighter: #6d5b33;   /* #f1ead7 위 4.5:1 확보 */
+  --md-default-fg-color--lightest:#a8955f;
+  --md-typeset-color:             #352a12;
   --md-typeset-a-color:           var(--sg-link);
 
-  --md-primary-fg-color:        #3a6ea5;     /* 한낮 하늘색(헤더) */
-  --md-primary-fg-color--light: #4278b0;
-  --md-primary-fg-color--dark:  #2e5b8a;
-  --md-primary-bg-color:        #ffffff;
-  --md-accent-fg-color:         #8f3f12;
+  --md-primary-fg-color:        #221a09;     /* 베젤 — 야간과 같은 터미널 크롬 */
+  --md-primary-fg-color--light: #2b210c;
+  --md-primary-fg-color--dark:  #191307;
+  --md-primary-bg-color:        #ffcf66;
+  --md-accent-fg-color:         #9a6b00;
 
-  --md-code-bg-color:           #eceff4;
-  --md-code-fg-color:           #2a2f37;
-  --md-typeset-table-color:     #d5dae2;
+  --md-code-bg-color:           #e8e0c9;
+  --md-code-fg-color:           #332911;
+  --md-typeset-table-color:     #d6cbab;
 
-  /* 시맨틱 표면 */
-  --sg-link:            #b0521c;             /* 밝은 종이 위 대비 확보 앰버 잉크 */
-  --sg-link-hover:      #8f3f12;
-  --sg-border:          #d3d9e2;
-  --sg-th-bg:           #e6ebf2;
-  --sg-th-fg:           #a34a16;    /* #e6ebf2 위 4.5:1 확보(구 #b0521c=4.31) */
-  --sg-row-hover:       #3a6ea50f;
-  --sg-blockquote-bg:   #5a9fd812;
-  --sg-code-border:     #dbe0e8;
-  --sg-tag-fan-border:  #b9c1cf;
-  --sg-warning-bg:        #fdf1e3;
-  --sg-warning-title-bg:  #f6e0c6;
-  --sg-warning-title-fg:  #8a4a12;
-  --sg-nixie-color:     #b4531f;
+  /* 시맨틱 표면 — 종이 패널 */
+  --sg-link:            #8a5a00;             /* 종이 위 대비 확보 앰버 잉크 */
+  --sg-link-hover:      #6b4700;
+  --sg-panel:           #f8f2e2;
+  --sg-panel2:          #efe7d0;
+  --sg-line:            #d6cbab;
+  --sg-line-hi:         #b3a273;
+  --sg-ink:             #332812;
+  --sg-ink-dim:         #5d4c26;
+  --sg-dim:             #6d5b33;
+  --sg-border:          #d6cbab;
+  --sg-th-bg:           #ebe3cc;
+  --sg-th-fg:           #7a5200;
+  --sg-row-hover:       #8a6d2f0f;
+  --sg-blockquote-bg:   #8a6d2f12;
+  --sg-code-border:     #ddd3b8;
+  --sg-tag-fan-border:  #b3a273;
+  --sg-warning-bg:        #f8ecd2;
+  --sg-warning-title-bg:  #f0e0b8;
+  --sg-warning-title-fg:  #7a5200;
+  --sg-nixie-color:     #8a5a00;
   --sg-nixie-shadow:    none;
 
   --sg-ambient:
-    radial-gradient(120% 55% at 82% -14%, rgba(120,172,223,.16), transparent 55%),
-    radial-gradient(90% 50% at 50% 120%, rgba(190,189,187,.28), transparent 62%);
+    radial-gradient(120% 55% at 82% -14%, rgba(255,214,120,.22), transparent 55%),
+    radial-gradient(90% 50% at 50% 120%, rgba(214,203,171,.30), transparent 62%);
 
-  /* 히어로 — 밝은 사진 위 다크 텍스트 + 하단 밝은 스크림 */
-  --sg-hero-scrim: linear-gradient(178deg, rgba(238,242,247,0) 0%, rgba(238,242,247,.12) 42%,
-                                   rgba(238,242,247,.80) 82%, var(--md-default-bg-color) 100%);
-  --sg-hero-fallback:    url("../img/rooftop-day.jpg");
-  --sg-hero-image:       image-set(url("../img/rooftop-day.webp") type("image/webp"),
-                                   url("../img/rooftop-day.jpg")  type("image/jpeg"));
-  --sg-hero-fallback-sm: url("../img/rooftop-day-960.jpg");
-  --sg-hero-image-sm:    image-set(url("../img/rooftop-day-960.webp") type("image/webp"),
-                                   url("../img/rooftop-day-960.jpg")  type("image/jpeg"));
-  --sg-hero-pos:         center 34%;
-  --sg-hero-title:       #16212e;
-  --sg-hero-accent:      #b4531f;
-  --sg-hero-eyebrow:     #234e78;
-  --sg-hero-tagline:     #2b3846;
-  --sg-hero-shadow:      0 1px 12px rgba(255,255,255,.55);
-  --sg-hero-glow:        radial-gradient(circle, rgba(255,246,218,.55) 0%,
-                                         rgba(255,232,170,.18) 40%, transparent 66%);
-  --sg-hero-meter-bg:     rgba(255,255,255,.62);
-  --sg-hero-meter-border: rgba(58,110,165,.4);
-  --sg-hero-meter-label:  #2f5d86;
-
-  /* 주간 헤더는 파란 면(#3a6ea5)이다 — 앰버 텍스트는 대비가 안 나오므로
-     본문은 흰색으로 두고 앰버는 글리프에만 남긴다. */
-  --sg-map-bg:           rgba(255,255,255,.10);
-  --sg-map-border:       rgba(255,255,255,.34);
-  --sg-map-fg:           rgba(255,255,255,.86);
-  --sg-map-glyph:        #ffd9a8;
-  --sg-map-bg-hover:     rgba(255,255,255,.18);
-  --sg-map-border-hover: rgba(255,255,255,.62);
-  --sg-map-fg-hover:     #ffffff;
-  --sg-hero-cue:          #2f5d86;
+  /* 히어로 — 화면(CRT)은 주간에도 어둡게: 옥상 야경 + 동일 스크림 */
+  --sg-hero-scrim: linear-gradient(180deg, rgba(12,9,4,.88) 0%, rgba(12,9,4,.70) 46%, rgba(15,12,6,.96) 100%);
+  --sg-hero-fallback:    url("../img/rooftop-night.jpg");
+  --sg-hero-image:       image-set(url("../img/rooftop-night.webp") type("image/webp"),
+                                   url("../img/rooftop-night.jpg")  type("image/jpeg"));
+  --sg-hero-pos:         center 30%;
 }
 
-/* ── 사이트 전역 앰비언트: 창밖 하늘 미광(gutter에 주로 노출) ── */
+/* 헤더 세계선 맵 계기판 — 헤더가 두 스킴 공통 베젤이므로 전역 토큰 */
+:root {
+  --sg-map-bg:           rgba(12,9,4,.45);
+  --sg-map-border:       #6e5518;
+  --sg-map-fg:           #bfae7e;
+  --sg-map-glyph:        #ffb000;
+  --sg-map-bg-hover:     rgba(255,176,0,.12);
+  --sg-map-border-hover: #ffb000;
+  --sg-map-fg-hover:     #ffd257;
+}
+
+/* ── 사이트 전역 앰비언트(본문 페이지) ───────────────────────── */
 body::before {
   content: "";
   position: fixed;
@@ -188,128 +171,157 @@ body::before {
   background: var(--sg-ambient);
 }
 
-/* ── 헤더 ────────────────────────────────────────────────────── */
-[data-md-color-scheme="slate"] .md-header,
-[data-md-color-scheme="slate"] .md-tabs {
-  background-color: #090c1a;
-  background-image: linear-gradient(180deg, #0b1024 0%, #090c1a 100%);
-  border-bottom: 1px solid #1c2440;
+/* ── 홈 한정 CRT 오버레이: 스캔라인 + 비네트(기획서 §4.3) ──────
+   html[data-sg-home]은 overrides/main.html extrahead의 인라인 스크립트가
+   홈에서만 심는다(본문 페이지는 걸리지 않는다 = 완화 변형). */
+html[data-sg-home] body::before {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.20) 0 1px, transparent 1px 3px);
+  z-index: 40;
+  animation: sg-crt 4s infinite;
 }
-[data-md-color-scheme="slate"] .md-header { box-shadow: inset 0 -1px 0 #ffffff08; }
-[data-md-color-scheme="default"] .md-header,
-[data-md-color-scheme="default"] .md-tabs {
-  background-color: #3a6ea5;
-  background-image: linear-gradient(180deg, #4278b0 0%, #35639a 100%);
-  border-bottom: 1px solid #2c547e;
+html[data-sg-home] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 41;
+  pointer-events: none;
+  background: radial-gradient(ellipse 120% 100% at 50% 50%, transparent 62%, rgba(0,0,0,.5));
+}
+/* 주간(종이) 홈 — CRT 연출 없음: 본문과 같은 앰비언트로 돌아간다 */
+html[data-sg-home] body[data-md-color-scheme="default"]::before {
+  background: var(--sg-ambient);
+  z-index: -1;
+  animation: none;
+}
+html[data-sg-home] body[data-md-color-scheme="default"]::after { content: none; }
+
+@keyframes sg-crt { 0%,100% { opacity: 1; } 50% { opacity: .93; } }
+@keyframes sg-blink { 50% { opacity: 0; } }
+
+/* ── 헤더·탭: 터미널 베젤(양 스킴 공통) ──────────────────────── */
+.md-header,
+.md-tabs {
+  background-color: #120d06;
+  background-image: linear-gradient(180deg, #1a1409 0%, #120d06 100%);
+  border-bottom: 1px solid #3a2d12;
+  box-shadow: inset 0 -1px 0 #ffb00014;
 }
 .md-header[data-md-state="shadow"] {
-  box-shadow: 0 0 .4rem #0000002e, 0 .25rem .8rem #0000001f;
+  box-shadow: 0 0 .4rem #00000059, 0 .25rem .8rem #00000030;
 }
 .md-header__title {
   font-weight: 700;
   letter-spacing: .01em;
 }
+.md-tabs__link--active {
+  color: var(--sg-amber-hi);
+  font-weight: 700;
+}
+/* 검색 입력창도 베zel 안 — 어두운 인셋 */
+.md-header .md-search__form {
+  background-color: #0a0803;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.6);
+}
 
-/* ── 홈 히어로: 옥상 ─────────────────────────────────────────── */
+/* ── 홈 히어로: 부팅 로그 터미널(목업 B 포팅) ────────────────── */
 .sg-hero {
   position: relative;
-  margin: 0 0 1.4rem;
-  min-height: min(76vh, 600px);
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  background-color: var(--md-default-bg-color);
+  margin: 0;
+  padding: clamp(3.4rem, 8vw, 5.4rem) 0 clamp(2.4rem, 5vw, 3.6rem);
+  background-color: #0c0904;
   background-image: var(--sg-hero-scrim), var(--sg-hero-fallback);
   background-image: var(--sg-hero-scrim), var(--sg-hero-image);
   background-size: cover, cover;
   background-position: var(--sg-hero-pos), var(--sg-hero-pos);
   background-repeat: no-repeat;
+  border-bottom: 1px solid #3a2d12;
+  overflow: hidden;
 }
-.sg-hero__glow {   /* 달/해 주변 은은한 블룸 */
-  position: absolute;
-  top: -8%;
-  left: 26%;
-  width: 34vw;
-  max-width: 460px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--sg-hero-glow);
-  filter: blur(4px);
-  pointer-events: none;
-  animation: sg-moon-breathe 9s ease-in-out infinite;
-}
-.sg-hero__inner {
+.sg-hero__screen {
   position: relative;
   width: 100%;
-  padding: 2.4rem 1.2rem 2.2rem;
+  /* 좁은 화면에서 md-grid(100%)가 화면 가장자리에 닿는 것을 막는 거터 —
+     구 테마 .sg-hero__inner 의 1.2rem 을 승계. 넓은 화면에서는 64rem 컬럼
+     안쪽 살짝 들어간 시작점이 되어 히어로 특유의 여백으로 읽힌다. */
+  padding-inline: 1.2rem;
 }
-.sg-hero__eyebrow {
-  margin: 0 0 .7rem;
-  font-size: .72rem;
-  font-weight: 500;
-  letter-spacing: .12em;   /* 한글은 Pretendard(본문 폰트)로 렌더 → tofu 방지 */
-  color: var(--sg-hero-eyebrow);
-  text-shadow: var(--sg-hero-shadow);   /* 밝은 하늘/야경 위 가독 확보용 후광 */
+.sg-hero__boot {
+  margin: 0 0 1.7rem;
+  font-family: var(--sg-mono);
+  font-size: .8rem;
+  font-weight: 600;
+  line-height: 2.05;
+  color: #9d8b58;
+  letter-spacing: .01em;
 }
-.sg-hero__mark {   /* 라틴 워드마크만 등폭 테크노 느낌 */
-  font-family: "Share Tech Mono", var(--md-code-font), monospace;
-  letter-spacing: .26em;
-  margin-right: .35em;
+.sg-hero__boot span { display: block; opacity: 0; animation: sg-boot-up .35s ease-out forwards; }
+.sg-hero__boot span:nth-child(1) { animation-delay: .15s; }
+.sg-hero__boot span:nth-child(2) { animation-delay: .50s; }
+.sg-hero__boot span:nth-child(3) { animation-delay: .85s; }
+.sg-hero__boot span:nth-child(4) { animation-delay: 1.20s; }
+.sg-hero__boot b { color: var(--sg-amber); font-weight: 600; }
+.sg-hero__boot .sg-hero__you { color: var(--sg-amber-hi); }
+@keyframes sg-boot-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
 }
 .sg-hero__title {
-  margin: 0;
-  font-weight: 800;
-  font-size: clamp(2.1rem, 6.2vw, 3.7rem);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-  color: var(--sg-hero-title);
-  text-shadow: var(--sg-hero-shadow);
+  margin: 0 0 .5rem;
+  font-family: var(--sg-mono);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 5vw, 3.3rem);
+  line-height: 1.15;
+  letter-spacing: .01em;
+  color: var(--sg-amber);
+  text-shadow: 0 0 14px rgba(255,176,0,.35);
 }
 .sg-hero__title span {
-  color: var(--sg-hero-accent);
+  color: var(--sg-amber-hi);
+  text-shadow: 0 0 10px rgba(255,210,87,.6), 0 0 30px rgba(255,176,0,.35);
 }
-.sg-hero__tagline {
-  margin: 1rem 0 0;
-  max-width: 34rem;
-  font-size: .86rem;
-  line-height: 1.75;
-  color: var(--sg-hero-tagline);
-  text-shadow: var(--sg-hero-shadow);
-  text-wrap: pretty;
+.sg-hero__sub {
+  margin: 0 0 2rem;
+  font-family: var(--sg-mono);
+  font-size: .82rem;
+  color: #9d8b58;
+  letter-spacing: .2em;
 }
-.sg-hero__meter {
-  display: inline-flex;
-  align-items: baseline;
-  gap: .55rem;
-  margin-top: 1.5rem;
-  padding: .38rem .8rem;
-  border: 1px solid var(--sg-hero-meter-border);
-  border-radius: .25rem;
-  background: var(--sg-hero-meter-bg);
-  backdrop-filter: blur(2px);
+
+/* 히어로 명령줄 검색 — 실제 포커스는 Material 헤더 검색으로 인계(sg-home.js) */
+.sg-cmdsearch {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  max-width: 38rem;
+  padding: .72rem .95rem;
+  background: #120d05;
+  border: 1px solid #6e5518;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,.6);
 }
-.sg-hero__meter-label {
-  font-family: "Share Tech Mono", var(--md-code-font), monospace;
-  font-size: .6rem;
-  letter-spacing: .3em;
-  color: var(--sg-hero-meter-label);
+.sg-cmdsearch:focus-within {
+  border-color: var(--sg-amber);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,.6), 0 0 16px rgba(255,176,0,.18);
 }
-.sg-hero__meter .sg-divergence { font-size: 1.15rem; }
-.sg-hero__cue {   /* 스크롤 유도 셰브런(장식) */
-  position: absolute;
-  left: 50%;
-  bottom: 1.1rem;
-  width: 12px;
-  height: 12px;
-  margin-left: -6px;
-  border-right: 2px solid var(--sg-hero-cue);
-  border-bottom: 2px solid var(--sg-hero-cue);
-  transform: rotate(45deg);
-  opacity: .7;
-  animation: sg-cue-bounce 2.2s ease-in-out infinite;
+.sg-cmdsearch__pr { font-family: var(--sg-mono); font-weight: 600; color: var(--sg-amber); }
+.sg-cmdsearch input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: #e6d9ac;
+  font-family: var(--sg-mono);
+  font-size: .92rem;
 }
-/* 홈에서 히어로가 제목을 대신하므로, 렌더된 첫 H1은 스크린리더용으로만 유지
-   (.sg-hero 존재 여부로 홈을 판별 → 다른 문서에는 영향 없음) */
+.sg-cmdsearch input::placeholder { color: #6b5a30; }
+.sg-cmdsearch__caret {
+  font-family: var(--sg-mono);
+  color: var(--sg-amber-hi);
+  animation: sg-blink 1.1s steps(1) infinite;
+}
+
+/* 홈에서 히어로가 제목을 대신하므로, 렌더된 첫 H1은 스크린리더용으로만 유지 */
 .sg-hero ~ .md-main article.md-content__inner > h1:first-child {
   position: absolute;
   width: 1px;
@@ -321,28 +333,10 @@ body::before {
   white-space: nowrap;
   border: 0;
 }
-/* 좁은 화면: 가벼운 이미지로 교체 + 높이 축소 */
-@media screen and (max-width: 44rem) {
-  .sg-hero {
-    min-height: min(64vh, 440px);
-    background-image: var(--sg-hero-scrim), var(--sg-hero-fallback-sm);
-    background-image: var(--sg-hero-scrim), var(--sg-hero-image-sm);
-  }
-  .sg-hero__inner { padding: 1.8rem 1rem 1.8rem; }
-}
-
-@keyframes sg-moon-breathe {
-  0%, 100% { opacity: .85; transform: scale(1); }
-  50%      { opacity: 1;   transform: scale(1.05); }
-}
-@keyframes sg-cue-bounce {
-  0%, 100% { transform: rotate(45deg) translate(0, 0); opacity: .35; }
-  50%      { transform: rotate(45deg) translate(3px, 3px); opacity: .8; }
-}
 
 /* ── 본문 타이포그래피 ───────────────────────────────────────── */
 .md-typeset {
-  font-size: .85rem;   /* 한국어 장문 가독성 — Material 기본 16px 대비 86%(구 .78rem=12.5px) */
+  font-size: .85rem;   /* 한국어 장문 가독성 — Material 기본 16px 대비 86% */
   line-height: 1.85;
   letter-spacing: -0.003em;
 }
@@ -392,11 +386,11 @@ body::before {
   padding-bottom: .4rem;
 }
 
-/* ── 표: 다이버전스 미터 감성(닉시 숫자) ─────────────────────── */
+/* ── 표 ─────────────────────────────────────────────────────── */
 .md-typeset table:not([class]) {
   border: 1px solid var(--sg-border);
   border-radius: .2rem;
-  overflow: auto;      /* Material의 와이드 표 가로 스크롤 유지(hidden은 콘텐츠를 잘라냄) */
+  overflow: auto;      /* Material의 와이드 표 가로 스크롤 유지 */
   font-size: .8rem;
 }
 .md-typeset table:not([class]) th {
@@ -472,27 +466,209 @@ body::before {
   color: var(--sg-link);
   font-weight: 600;
 }
-.md-tabs__link--active {
-  color: var(--md-primary-bg-color);
-  font-weight: 700;
-}
 .md-nav--secondary .md-nav__link--active {
   border-left: 2px solid var(--sg-amber);
   padding-left: .5rem;
   margin-left: -2px;
 }
 
+/* ══ 홈 콘텐츠(.sg-home) — 목업 B 섹션 포팅 ══════════════════ */
+
+/* 섹션 제목 ">_ 01 /" — CSS 카운터로 자동 번호. 홈은 마크다운 래퍼
+   (.sg-home, markdown="1")와 원시 HTML 블록(카드·명부·콘솔)이 번갈아 오므로
+   카운터 스코프는 공통 조상 .md-content__inner 에 둔다 — 래퍼마다 리셋되지 않고
+   번호가 이어진다. 본문 h2 규칙보다 나중에 오므로(동일 특이도) 덮어쓴다. */
+.md-content__inner { counter-reset: sg-sec; }
+.md-typeset .sg-home h2 {
+  display: flex;
+  align-items: baseline;
+  gap: .8rem;
+  margin-top: 3.2em;
+  padding: 0 0 .6rem;
+  border-left: 0;
+  border-bottom: 1px dashed var(--sg-line-hi);
+}
+.md-typeset .sg-home h2::before {
+  counter-increment: sg-sec;
+  content: ">_ " counter(sg-sec, decimal-leading-zero) " /";
+  flex: none;
+  font-family: var(--sg-mono);
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--sg-amber);
+}
+.md-typeset .sg-home > h2:first-child { margin-top: 1.2em; }
+.md-typeset .sg-home h3 {
+  font-size: 1rem;
+  color: var(--md-default-fg-color);
+}
+
+/* 터미널 윈도 카드 — "입문 프로토콜" */
+.sg-tcards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1.4rem 0 0;
+}
+a.sg-tcard {
+  display: block;
+  background: var(--sg-panel);
+  border: 1px solid var(--sg-line-hi);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.45), inset 0 0 22px rgba(0,0,0,.18);
+  text-decoration: none;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+a.sg-tcard:hover {
+  border-color: var(--sg-amber);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.45), 0 0 24px rgba(255,176,0,.15);
+}
+a.sg-tcard:hover h3 { color: var(--sg-link-hover); }
+.sg-tcard__tb {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sg-mono);
+  font-size: .68rem;
+  color: var(--sg-dim);
+  background: var(--sg-panel2);
+  border-bottom: 1px solid var(--sg-line-hi);
+  padding: .35rem .75rem;
+  letter-spacing: .1em;
+}
+.sg-tcard__tb b { color: var(--sg-amber); font-weight: 600; }
+.sg-tcard__bd { padding: 1rem 1rem .9rem; }
+.sg-tcard__bd h3 { margin: .35rem 0 .4rem; font-size: 1.02rem; color: var(--sg-ink); }
+.sg-tcard__bd p { margin: 0; font-size: .82rem; line-height: 1.65; color: var(--sg-ink-dim); }
+
+/* 라보멘 명부 — 신분증 */
+.sg-group-label {
+  font-family: var(--sg-mono);
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--sg-dim);
+  letter-spacing: .28em;
+  margin: 1.7rem 0 .8rem;
+}
+.md-typeset .sg-group-label:first-of-type { margin-top: 1.1rem; }
+.sg-roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(122px, 1fr));
+  gap: .8rem;
+  margin: .8rem 0 0;
+}
+a.sg-member {
+  display: block;
+  background: var(--sg-panel);
+  border: 1px solid var(--sg-line-hi);
+  outline: 1px solid rgba(0,0,0,.45);
+  outline-offset: -4px;
+  padding: .5rem;
+  text-decoration: none;
+  transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+a.sg-member:hover {
+  border-color: var(--sg-amber);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+a.sg-member:hover .sg-member__nm { color: var(--sg-link-hover); }
+.sg-member__ph {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--sg-line);
+  background: #0c0904;
+}
+.sg-member__ph img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(.32) hue-rotate(-8deg) saturate(.75) contrast(1.06);
+  transition: filter .25s ease;
+}
+a.sg-member:hover .sg-member__ph img { filter: sepia(.12) hue-rotate(-4deg) saturate(.95) contrast(1.05); }
+[data-md-color-scheme="default"] .sg-member__ph img { filter: sepia(.16) saturate(.92) contrast(1.03); }
+[data-md-color-scheme="default"] a.sg-member:hover .sg-member__ph img { filter: none; }
+.sg-member__no {
+  display: block;
+  margin-top: .55rem;
+  font-family: var(--sg-mono);
+  font-size: .66rem;
+  font-weight: 600;
+  color: var(--sg-amber);
+  letter-spacing: .18em;
+}
+.sg-member__nm {
+  display: block;
+  margin-top: .1rem;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--sg-ink);
+}
+
+/* Q&A 콘솔 — 화면은 양 스킴 공통으로 어둡게(CRT) */
+.sg-console {
+  border: 1px solid var(--sg-line-hi);
+  outline: 1px solid rgba(0,0,0,.45);
+  outline-offset: -4px;
+  background: #0c0904;
+  padding: 1.6rem 1.7rem;
+  box-shadow: inset 0 0 34px rgba(0,0,0,.35);
+  margin-top: 1.4rem;
+}
+.sg-console__tag {
+  display: inline-block;
+  font-family: var(--sg-mono);
+  font-size: .68rem;
+  font-weight: 600;
+  color: #0e0b05;
+  background: var(--sg-amber);
+  padding: .12rem .6rem;
+  letter-spacing: .14em;
+  margin-bottom: .4rem;
+}
+.sg-ln { display: flex; gap: .6rem; margin: .85rem 0; font-size: .92rem; }
+.sg-ln__who {
+  flex: 0 0 auto;
+  margin-top: .25rem;
+  font-family: var(--sg-mono);
+  font-size: .76rem;
+  font-weight: 600;
+}
+.sg-ln--okabe .sg-ln__who { color: var(--sg-amber); }
+.sg-ln--kurisu .sg-ln__who { color: var(--sg-amber-hi); }
+.sg-ln__body { color: #e6d9ac; line-height: 1.7; }
+.sg-ln__src {
+  display: block;
+  margin-top: .35rem;
+  font-family: var(--sg-mono);
+  font-size: .72rem;
+  color: #9d8b58;
+}
+.sg-ln__src a { color: var(--sg-amber); text-decoration: none; border-bottom: 1px dashed #6e5518; }
+.sg-ln__src a:hover { color: var(--sg-amber-hi); border-bottom-color: currentColor; }
+/* 원문 문서 배지 — 링크 대상의 스포일러 수위(대화 본문이 아님) */
+.sg-ln__spoil { color: #9d8b58; }
+.sg-ln__spoil--main_story { color: #fbbf24; }
+.sg-ln__spoil--endgame { color: #f87171; }
+.sg-console__hint {
+  margin: 1.1rem 0 0;
+  padding-top: .7rem;
+  border-top: 1px dashed #6e5518;
+  font-family: var(--sg-mono);
+  font-size: .7rem;
+  color: #9d8b58;
+  text-align: center;
+}
+
 /* ── Worldline Map 헤더 버튼 ────────────────────────────────── */
-/* ── 헤더: 세계선 맵 ─────────────────────────────────────────
-   일반 버튼이 아니라 계기판이다. 히어로의 .sg-hero__meter 와 같은 어휘를
-   헤더 크기로 줄여 쓴다 — Share Tech Mono, 넓은 자간, 얇은 테두리, 낮은 채도 면.
-   앰버는 글리프에만 준다. 라벨까지 앰버로 하면 헤더에서 제목보다 시끄러워진다. */
 .worldline-map-btn {
   display: inline-flex;
   align-items: center;
   gap: .42rem;
   height: 1.7rem;
-  margin: auto .3rem;
+  margin: auto .6rem;            /* 타이틀·검색과의 거리 — .3rem 은 다닥 붙어 보인다 */
   padding: 0 .6rem;
   border: 1px solid var(--sg-map-border);
   border-radius: .18rem;
@@ -505,13 +681,10 @@ body::before {
   text-transform: uppercase;
   white-space: nowrap;
   text-decoration: none;
-  opacity: 1;                    /* .md-header__button 의 기본 투명도를 무효화 */
+  opacity: 1;
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
-/* 자간은 마지막 글자 뒤에도 붙는다 — 그만큼 오른쪽이 넓어 보이는 것을 보정 */
 .worldline-map-btn .wl-label { margin-right: -.22em; }
-
-/* fill="none" 속성은 CSS 에 지므로 여기서 다시 없앤다 */
 .worldline-map-btn svg {
   display: block;
   width: 18px;
@@ -521,15 +694,11 @@ body::before {
   color: var(--sg-map-glyph);
 }
 .worldline-map-btn .wl-dot { fill: currentColor; }
-
 .worldline-map-btn:hover {
   color: var(--sg-map-fg-hover);
   border-color: var(--sg-map-border-hover);
   background: var(--sg-map-bg-hover);
 }
-
-/* 좁은 화면 — 라벨을 접고 글리프만 남긴다. 이름은 aria-label 이 잇는다.
-   예전 규칙은 터치에서 버튼을 되레 키워(2.4rem) 헤더를 밀어냈다. */
 @media screen and (max-width: 59.9375em) {
   .worldline-map-btn {
     width: 2.2rem;
@@ -551,11 +720,22 @@ body::before {
   text-shadow: var(--sg-nixie-shadow);
 }
 
+/* ── 좁은 화면: 홈 히어로·카드 · 명부 ───────────────────────── */
+@media screen and (max-width: 44rem) {
+  .sg-hero { padding-top: 2.6rem; }
+  .sg-cmdsearch { max-width: 100%; }
+  .sg-roster { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  .sg-console { padding: 1.1rem 1.1rem .9rem; }
+}
+
 /* ── 접근성: 키보드 포커스 링 ───────────────────────────────── */
 .md-typeset a:focus-visible,
 .md-nav__link:focus-visible,
 .md-header__button:focus-visible,
-.worldline-map-btn:focus-visible {
+.worldline-map-btn:focus-visible,
+.sg-cmdsearch input:focus-visible,
+a.sg-tcard:focus-visible,
+a.sg-member:focus-visible {
   outline: 2px solid var(--sg-amber);
   outline-offset: 2px;
   border-radius: .1rem;
@@ -566,6 +746,316 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
-  .sg-hero__glow,
-  .sg-hero__cue { animation: none !important; }
+  .sg-hero__boot span { animation: none; opacity: 1; }
+  html[data-sg-home] body::before { animation: none; }
+  .sg-cmdsearch__caret { animation: none; }
+}
+
+/* ══ 다이버전스 비주얼라이저(.sg-viz) — 세계선 흐름 페이지 ═════════
+   tmp/ideas/steins_gate_world_line_visualizer.html(운영자 제작, 2026-10-27 이식).
+   Tailwind 유틸리티를 스코프 CSS로 옮긴 것 — 로직은 javascripts/sg-viz.js.
+   패널 전체가 양 스킴 공통의 어두운 "CRT 화면"(콘솔과 같은 위상)이라
+   주간(종이 터미널)에서도 화면으로 읽힌다. */
+.sg-viz {
+  margin: 2.2rem 0 1rem;
+  border: 1px solid rgba(120, 53, 15, .6);
+  border-radius: .6rem;
+  background: #05070a;
+  box-shadow: 0 0 30px rgba(180, 83, 9, .18);
+  color: #d1d5db;
+  overflow: hidden;
+}
+
+/* ── 상단 바: FUTURE GADGET LAB SYSTEM v2.57 ── */
+.sg-viz__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .7rem 1rem;
+  background: rgba(0, 0, 0, .8);
+  border-bottom: 1px solid rgba(120, 53, 15, .4);
+}
+.sg-viz__brand { display: flex; align-items: center; gap: .7rem; }
+.sg-viz__beacon {
+  width: .7rem; height: .7rem; border-radius: 50%;
+  background: #f59e0b;
+  animation: sg-viz-ping 1.2s cubic-bezier(0, 0, .2, 1) infinite;
+}
+@keyframes sg-viz-ping {
+  0%        { box-shadow: 0 0 0 0 rgba(245, 158, 11, .55); }
+  75%, 100% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+}
+.sg-viz__brand-title {
+  margin: 0;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+.sg-viz__brand-ver {
+  font-size: .62rem;
+  font-weight: 400;
+  letter-spacing: .06em;
+  padding: .12rem .5rem;
+  border-radius: .25rem;
+  background: #451a03;
+  color: #fbbf24;
+  border: 1px solid rgba(180, 83, 9, .5);
+}
+.sg-viz__brand-sub {
+  margin: .1rem 0 0;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .66rem;
+  letter-spacing: .05em;
+  color: #6b7280;
+}
+.sg-viz__controls { display: flex; gap: .6rem; }
+.sg-viz__btn {
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .72rem;
+  padding: .38rem .75rem;
+  border-radius: .35rem;
+  background: #171717;
+  border: 1px solid #404040;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+.sg-viz__btn:hover { border-color: #f59e0b; }
+
+/* ── 닉시관 미터 ── */
+.sg-viz__meter {
+  position: relative;
+  z-index: 2;
+  margin: 1rem 1rem .9rem;
+  max-width: 48rem;
+  background: rgba(0, 0, 0, .9);
+  padding: .9rem 1.1rem;
+  border-radius: .6rem;
+  border: 1px solid rgba(120, 53, 15, .6);
+  box-shadow: 0 0 30px rgba(180, 83, 9, .25);
+  text-align: center;
+}
+@media (min-width: 48rem) { .sg-viz__meter { margin-left: auto; margin-right: auto; } }
+.sg-viz__meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .8rem;
+  padding: 0 .3rem;
+  margin-bottom: .5rem;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .68rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #d97706;
+}
+.sg-viz__field-name {
+  letter-spacing: .02em;
+  text-transform: none;
+  color: #fbbf24;
+  font-weight: 700;
+  text-align: right;
+}
+.sg-viz__tubes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .45rem 0;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+}
+.sg-viz__sign {
+  width: 1.1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f59e0b;
+  text-shadow: 0 0 8px #ff7700;
+}
+.sg-viz__digit {
+  width: 2.1rem;
+  height: 3.4rem;
+  border-radius: .5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: linear-gradient(180deg, #180a02 0%, #080300 100%);
+  border: 1px solid #4a2105;
+  box-shadow: inset 0 0 10px rgba(255, 120, 0, .2), 0 0 15px rgba(255, 100, 0, .3);
+  text-shadow: 0 0 8px #ff7700, 0 0 18px #ff4500, 0 0 30px #ff2200;
+}
+.sg-viz__digit--spin { color: #fcd34d; }   /* 스크램블 회전 중 강조 */
+.sg-viz__dot, .sg-viz__pct {
+  align-self: flex-end;
+  padding-bottom: .45rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #d97706;
+}
+.sg-viz__pct { font-size: 1.1rem; padding-bottom: .55rem; }
+@media (min-width: 40rem) {
+  .sg-viz__digit { width: 2.9rem; height: 4.9rem; font-size: 2.8rem; }
+  .sg-viz__dot  { font-size: 2.1rem; }
+  .sg-viz__pct  { font-size: 1.6rem; }
+}
+@media (min-width: 48rem) {
+  .sg-viz__digit { width: 3.8rem; height: 5.9rem; font-size: 3.6rem; }
+  .sg-viz__dot  { font-size: 2.7rem; }
+  .sg-viz__pct  { font-size: 2rem; }
+}
+.sg-viz__meter-desc {
+  margin: .45rem 0 0;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .76rem;
+  color: #9ca3af;
+}
+
+/* ── 필드 탭 ── */
+.sg-viz__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .5rem;
+  max-width: 48rem;
+  margin: 0 auto .9rem;
+  padding: 0 1rem;
+}
+@media (min-width: 40rem) { .sg-viz__tabs { grid-template-columns: repeat(4, 1fr); } }
+.sg-viz__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .15rem;
+  padding: .55rem .4rem;
+  border-radius: .5rem;
+  background: rgba(23, 23, 23, .9);
+  border: 1px solid;
+  cursor: pointer;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  transition: background-color .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.sg-viz__tab b { font-size: .88rem; }
+.sg-viz__tab small { font-size: .6rem; color: #9ca3af; }
+.sg-viz__tab--alpha { border-color: rgba(239, 68, 68, .5);   color: #f87171; }
+.sg-viz__tab--alpha:hover { background: rgba(69, 10, 10, .4); }
+.sg-viz__tab--beta  { border-color: rgba(99, 102, 241, .5);  color: #818cf8; }
+.sg-viz__tab--beta:hover  { background: rgba(30, 27, 75, .4); }
+.sg-viz__tab--sg    { border-color: rgba(245, 158, 11, .3); color: #fbbf24; }
+.sg-viz__tab--sg:hover    { background: rgba(69, 26, 3, .4); }
+.sg-viz__tab--gamma { border-color: rgba(168, 85, 247, .3); color: #c084fc; }
+.sg-viz__tab--gamma:hover { background: rgba(59, 7, 100, .4); }
+.sg-viz__tab.is-active { background: #262626; box-shadow: 0 0 0 2px #f59e0b; }
+
+/* ── 캔버스 스테이지 ── */
+.sg-viz__stage {
+  position: relative;
+  margin: 0 1rem 1rem;
+  height: 450px;
+  border-radius: .6rem;
+  border: 1px solid #262626;
+  background: rgba(10, 10, 10, .8);
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .35);
+}
+@media (min-width: 48rem) { .sg-viz__stage { height: 550px; } }
+.sg-viz__stage::after {           /* 스테이지 한정 스캔라인 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom,
+    rgba(0, 0, 0, .16) 0 2px, transparent 2px 4px);
+}
+#worldline-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+#worldline-canvas:active { cursor: grabbing; }
+.sg-viz__hud {
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+  z-index: 1;
+  pointer-events: none;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .7rem;
+  line-height: 1.6;
+  color: #9ca3af;
+  background: rgba(0, 0, 0, .6);
+  padding: .45rem .6rem;
+  border-radius: .3rem;
+  border: 1px solid #262626;
+}
+.sg-viz__hud small { color: #6b7280; font-size: .64rem; }
+
+/* ── 노드 정보 팝업 ── */
+.sg-viz__modal {
+  position: absolute;
+  bottom: .8rem;
+  right: .8rem;
+  z-index: 3;
+  width: min(24rem, calc(100% - 1.6rem));
+  background: rgba(0, 0, 0, .95);
+  border: 1px solid rgba(245, 158, 11, .6);
+  border-radius: .5rem;
+  padding: .85rem 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .5);
+}
+.sg-viz__modal.is-hidden { display: none; }
+.sg-viz__modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: .8rem;
+  border-bottom: 1px solid rgba(120, 53, 15, .5);
+  padding-bottom: .4rem;
+  margin-bottom: .55rem;
+}
+.sg-viz__modal-head h3 {
+  margin: 0;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .84rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+#close-modal {
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  font-size: .66rem;
+  color: #9ca3af;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#close-modal:hover { color: #ffffff; }
+.sg-viz__modal-body { display: grid; gap: .5rem; font-size: .75rem; }
+.sg-viz__modal-body .sg-viz__label {
+  display: block;
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  color: #6b7280;
+}
+#modal-divergence {
+  font-family: "Share Tech Mono", var(--md-code-font), monospace;
+  color: #fcd34d;
+  font-weight: 700;
+  margin-left: .25rem;
+}
+#modal-event { margin: .15rem 0 0; color: #e5e7eb; font-weight: 600; line-height: 1.6; }
+#modal-desc { margin: .15rem 0 0; color: #9ca3af; line-height: 1.6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-viz__beacon { animation: none; }
 }

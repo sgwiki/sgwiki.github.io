@@ -26,7 +26,7 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
     <div className={[
       // 공통
       'fixed z-20 shadow-2xl overflow-y-auto',
-      'bg-[#0A1525]/98 backdrop-blur border-[#152240]',
+      'bg-[#0f0b06]/98 backdrop-blur border-[#3a2d12]',
       // 모바일: 하단 시트
       'bottom-0 left-0 right-0 max-h-[65vh] rounded-t-xl border-t p-4',
       // 데스크톱: 우측 패널
@@ -35,17 +35,17 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
     ].join(' ')}>
       {/* 모바일 드래그 핸들 */}
       <div className="flex justify-center mb-3 sm:hidden">
-        <div className="w-10 h-1 rounded-full bg-[#152240]" />
+        <div className="w-10 h-1 rounded-full bg-[#3a2d12]" />
       </div>
 
       <div className="flex justify-between items-start mb-3">
-        <h2 className="text-base sm:text-lg font-bold text-[#C0D8F0] flex items-center gap-2">
+        <h2 className="text-base sm:text-lg font-bold text-[#e6d9ac] flex items-center gap-2">
           <span className="text-xl">{mechanismIcon(event.mechanismType)}</span>
           {event.labelKo}
         </h2>
         <button
           onClick={onClose}
-          className="text-[#4A6A8A] hover:text-[#C0D8F0] text-2xl leading-none transition-colors flex-shrink-0 ml-2"
+          className="text-[#9d8b58] hover:text-[#e6d9ac] text-2xl leading-none transition-colors flex-shrink-0 ml-2"
           aria-label="닫기"
         >
           ×
@@ -61,7 +61,7 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
         <Row label="메커니즘" value={mechanismKo(event.mechanismType)} />
       </dl>
 
-      <p className="text-sm text-[#A0B8CC] leading-relaxed mb-4 whitespace-pre-line">
+      <p className="text-sm text-[#bfae7e] leading-relaxed mb-4 whitespace-pre-line">
         {event.summary}
       </p>
 
@@ -71,10 +71,10 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
           className="rounded p-3 mb-4 text-sm"
           style={{ background: shiftColor(shift.shiftType) + '18', borderLeft: `3px solid ${shiftColor(shift.shiftType)}` }}
         >
-          <div className="text-[#4A6A8A] text-xs mb-2">세계선 이동 ({shiftTypeKo(shift.shiftType)})</div>
+          <div className="text-[#9d8b58] text-xs mb-2">세계선 이동 ({shiftTypeKo(shift.shiftType)})</div>
           <div className="nixie text-sm">
             {(fromWl.divergence > 0 ? '+' : '') + fromWl.divergence.toFixed(6)}%
-            <span className="mx-2" style={{ fontFamily: 'inherit', textShadow: 'none', color: '#4A6A8A' }}>→</span>
+            <span className="mx-2" style={{ fontFamily: 'inherit', textShadow: 'none', color: '#9d8b58' }}>→</span>
             {(toWl.divergence > 0 ? '+' : '') + toWl.divergence.toFixed(6)}%
           </div>
         </div>
@@ -82,14 +82,14 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
 
       {/* 현재 세계선 */}
       {wl && (
-        <div className="rounded p-3 mb-4 text-sm" style={{ background: '#040810' }}>
-          <div className="text-[#4A6A8A] text-xs mb-1">현재 세계선</div>
-          <div className="text-[#C0D8F0] font-semibold">{wl.labelKo}</div>
+        <div className="rounded p-3 mb-4 text-sm" style={{ background: '#05070a' }}>
+          <div className="text-[#9d8b58] text-xs mb-1">현재 세계선</div>
+          <div className="text-[#e6d9ac] font-semibold">{wl.labelKo}</div>
           <div className="text-xs mt-1">
             <span className="nixie text-xs">
               {(wl.divergence > 0 ? '+' : '') + wl.divergence.toFixed(6)}%
             </span>
-            <span className="text-[#4A6A8A]"> · {wl.attractorField.replace('AF_', '')}</span>
+            <span className="text-[#9d8b58]"> · {wl.attractorField.replace('AF_', '')}</span>
           </div>
         </div>
       )}
@@ -98,10 +98,9 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
       {onShowInGraph && (
         <button
           onClick={() => onShowInGraph(event.uri)}
-          className="block w-full text-center text-white py-2 px-4 rounded transition-colors hover:brightness-110 mb-2"
-          style={{ background: '#1d4ed8' }}
+          className="font-mono-tech block w-full text-center text-[#ffd257] py-2 px-4 rounded transition-colors hover:brightness-110 mb-2 border border-[#6e5518] bg-[#0f0b06]"
         >
-          🕸 인과 그래프에서 보기
+          인과 그래프에서 보기
         </button>
       )}
 
@@ -110,10 +109,10 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
           href={worldlineWikiUrl(wl)}
           target="_blank"
           rel="noopener noreferrer"
-          className="block text-center text-white py-2 px-4 rounded transition-colors hover:brightness-110"
-          style={{ background: '#C25200' }}
+          className="block text-center text-[#16130f] font-semibold py-2 px-4 rounded transition-colors hover:brightness-110"
+          style={{ background: '#f59e0b' }}
         >
-          📖 위키에서 자세히 보기 →
+          위키에서 자세히 보기 →
         </a>
       )}
     </div>
@@ -123,8 +122,8 @@ export function EventDetailPanel({ event, dataset, onClose, onShowInGraph }: Pro
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <dt className="text-[#4A6A8A] w-16 flex-shrink-0">{label}</dt>
-      <dd className="text-[#C0D8F0]">{value}</dd>
+      <dt className="text-[#9d8b58] w-16 flex-shrink-0">{label}</dt>
+      <dd className="text-[#e6d9ac]">{value}</dd>
     </div>
   )
 }

@@ -120,29 +120,29 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
   return (
     <div className="flex h-full min-h-0">
       {/* ─── 필터 사이드바 ─── */}
-      <aside className="w-52 md:w-60 flex-shrink-0 overflow-y-auto bg-[#0A1525] border-r border-[#152240] p-3 text-sm">
+      <aside className="w-52 md:w-60 flex-shrink-0 overflow-y-auto bg-[#0f0b06] border-r border-[#3a2d12] p-3 text-sm">
         {/* 검색 */}
         <div className="relative mb-4">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="노드 검색 (라벨/ID)"
-            className="w-full bg-[#050B15] border border-[#152240] rounded px-2 py-1.5 text-[#C0D8F0] text-xs placeholder-[#4A6A8A] focus:outline-none focus:border-[#4A6A8A]"
+            className="w-full bg-[#050B15] border border-[#3a2d12] rounded px-2 py-1.5 text-[#e6d9ac] text-xs placeholder-[#9d8b58] focus:outline-none focus:border-[#9d8b58]"
           />
           {searchMatches.length > 0 && (
-            <ul className="absolute z-30 left-0 right-0 mt-1 bg-[#0A1525] border border-[#152240] rounded shadow-xl max-h-64 overflow-y-auto">
+            <ul className="absolute z-30 left-0 right-0 mt-1 bg-[#0f0b06] border border-[#3a2d12] rounded shadow-xl max-h-64 overflow-y-auto">
               {searchMatches.map((n) => (
                 <li key={n.id}>
                   <button
                     onClick={() => pickSearchResult(n)}
-                    className="w-full text-left px-2 py-1.5 hover:bg-[#152240] transition-colors"
+                    className="w-full text-left px-2 py-1.5 hover:bg-[#3a2d12] transition-colors"
                   >
                     <span
                       className="inline-block w-2 h-2 rounded-full mr-1.5"
                       style={{ background: nodeColor(n) }}
                     />
-                    <span className="text-[#C0D8F0] text-xs">{nodeLabel(n)}</span>
-                    <span className="block text-[#4A6A8A] text-[10px] ml-3.5">
+                    <span className="text-[#e6d9ac] text-xs">{nodeLabel(n)}</span>
+                    <span className="block text-[#9d8b58] text-[10px] ml-3.5">
                       {CLASS_LABEL_KO[n.class]} · {n.id}
                     </span>
                   </button>
@@ -153,7 +153,7 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
         </div>
 
         {/* 클래스 토글 */}
-        <div className="text-[#4A6A8A] text-xs mb-1.5">노드 클래스</div>
+        <div className="text-[#9d8b58] text-xs mb-1.5">노드 클래스</div>
         <div className="space-y-1 mb-4">
           {ALL_CLASSES.map((c) => (
             <label key={c} className="flex items-center gap-2 cursor-pointer select-none">
@@ -161,11 +161,11 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
                 type="checkbox"
                 checked={enabledClasses.has(c)}
                 onChange={() => toggleClass(c)}
-                className="accent-[#C25200]"
+                className="accent-[#ffb000]"
               />
               <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: CLASS_COLOR[c] }} />
-              <span className="text-[#C0D8F0] text-xs">{CLASS_LABEL_KO[c]}</span>
-              <span className="text-[#4A6A8A] text-[10px] ml-auto">
+              <span className="text-[#e6d9ac] text-xs">{CLASS_LABEL_KO[c]}</span>
+              <span className="text-[#9d8b58] text-[10px] ml-auto">
                 {nodes.filter((n) => n.class === c).length}
               </span>
             </label>
@@ -173,7 +173,7 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
         </div>
 
         {/* 관계 토글 */}
-        <div className="text-[#4A6A8A] text-xs mb-1.5">관계</div>
+        <div className="text-[#9d8b58] text-xs mb-1.5">관계</div>
         <div className="space-y-1 mb-4">
           {RELATION_GROUP_ORDER.map((g) => (
             <label key={g} className="flex items-center gap-2 cursor-pointer select-none">
@@ -181,15 +181,15 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
                 type="checkbox"
                 checked={enabledGroups.has(g)}
                 onChange={() => toggleGroup(g)}
-                className="accent-[#C25200]"
+                className="accent-[#ffb000]"
               />
-              <span className="text-[#C0D8F0] text-xs">{RELATION_GROUP_LABEL_KO[g]}</span>
+              <span className="text-[#e6d9ac] text-xs">{RELATION_GROUP_LABEL_KO[g]}</span>
             </label>
           ))}
         </div>
 
         {/* 관계 범례 (활성 그룹만) */}
-        <div className="text-[#4A6A8A] text-xs mb-1.5">범례</div>
+        <div className="text-[#9d8b58] text-xs mb-1.5">범례</div>
         <div className="space-y-1 mb-3">
           {Object.entries(RELATION_STYLES)
             .filter(([, st]) => enabledGroups.has(st.group))
@@ -203,12 +203,12 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
                     strokeDasharray={st.dash}
                   />
                 </svg>
-                <span className="text-[#A0B8CC] text-[10px]">{st.labelKo}</span>
+                <span className="text-[#bfae7e] text-[10px]">{st.labelKo}</span>
               </div>
             ))}
         </div>
 
-        <div className="text-[#4A6A8A] text-[10px] border-t border-[#152240] pt-2">
+        <div className="text-[#9d8b58] text-[10px] border-t border-[#3a2d12] pt-2">
           노드 {visibleNodes.length} · 엣지 {visibleEdges.length} 표시 중
         </div>
         <button
@@ -216,7 +216,7 @@ export function GraphExplorer({ focusNodeId, onFocusChange, onShowEventInTimelin
             setEnabledClasses(new Set(DEFAULT_CLASSES))
             setEnabledGroups(new Set(DEFAULT_GROUPS))
           }}
-          className="mt-2 text-[10px] text-[#4A6A8A] hover:text-[#C0D8F0] underline transition-colors"
+          className="mt-2 text-[10px] text-[#9d8b58] hover:text-[#e6d9ac] underline transition-colors"
         >
           기본 필터로 초기화
         </button>
@@ -266,25 +266,25 @@ function GraphNodeDetail({
     <div
       className={[
         'fixed z-20 shadow-2xl overflow-y-auto',
-        'bg-[#0A1525]/98 backdrop-blur border-[#152240]',
+        'bg-[#0f0b06]/98 backdrop-blur border-[#3a2d12]',
         'bottom-0 left-0 right-0 max-h-[60vh] rounded-t-xl border-t p-4',
         'sm:top-0 sm:right-0 sm:bottom-auto sm:left-auto sm:h-full sm:w-80',
         'sm:rounded-none sm:max-h-none sm:border-t-0 sm:border-l sm:p-5',
       ].join(' ')}
     >
       <div className="flex justify-between items-start mb-1">
-        <h2 className="text-base sm:text-lg font-bold text-[#C0D8F0] pr-2">
+        <h2 className="text-base sm:text-lg font-bold text-[#e6d9ac] pr-2">
           {nodeLabel(node)}
         </h2>
         <button
           onClick={onClose}
-          className="text-[#4A6A8A] hover:text-[#C0D8F0] text-2xl leading-none transition-colors flex-shrink-0"
+          className="text-[#9d8b58] hover:text-[#e6d9ac] text-2xl leading-none transition-colors flex-shrink-0"
           aria-label="닫기"
         >
           ×
         </button>
       </div>
-      <div className="text-xs text-[#4A6A8A] mb-3">
+      <div className="text-xs text-[#9d8b58] mb-3">
         <span
           className="inline-block w-2 h-2 rounded-full mr-1"
           style={{ background: nodeColor(node) }}
@@ -293,7 +293,7 @@ function GraphNodeDetail({
       </div>
 
       {node.summary && (
-        <p className="text-sm text-[#A0B8CC] leading-relaxed mb-3 whitespace-pre-line">
+        <p className="text-sm text-[#bfae7e] leading-relaxed mb-3 whitespace-pre-line">
           {node.summary}
         </p>
       )}
@@ -325,7 +325,7 @@ function GraphNodeDetail({
 
       {/* causal-chain fail-closed: 인과 고립 사유 노출 (결합 규약) */}
       {node.isolationNote && (
-        <div className="rounded p-3 mb-4 text-xs leading-relaxed text-[#C0D8F0] bg-[#4a3200]/40 border-l-2 border-[#f59e0b]">
+        <div className="rounded p-3 mb-4 text-xs leading-relaxed text-[#e6d9ac] bg-[#4a3200]/40 border-l-2 border-[#f59e0b]">
           {node.isolationNote}
         </div>
       )}
@@ -333,14 +333,14 @@ function GraphNodeDetail({
       <div className="space-y-2 mb-4">
         <button
           onClick={onFocus}
-          className="block w-full text-center text-[#C0D8F0] py-1.5 px-3 rounded border border-[#152240] hover:border-[#4A6A8A] text-xs transition-colors"
+          className="block w-full text-center text-[#e6d9ac] py-1.5 px-3 rounded border border-[#3a2d12] hover:border-[#9d8b58] text-xs transition-colors"
         >
           ⊕ 이 노드 중심으로 보기
         </button>
         {node.class === 'Event' && (
           <button
             onClick={() => onShowEventInTimeline(node.id)}
-            className="block w-full text-center text-white py-1.5 px-3 rounded text-xs transition-colors hover:brightness-110"
+            className="block w-full text-center text-[#16130f] font-semibold py-1.5 px-3 rounded text-xs transition-colors hover:brightness-110"
             style={{ background: '#1d4ed8' }}
           >
             🕒 타임라인에서 보기
@@ -351,10 +351,10 @@ function GraphNodeDetail({
             href={worldlineWikiUrl({ divergence: node.divergence ?? 0, wikiSlug: node.wikiSlug })}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full text-center text-white py-1.5 px-3 rounded text-xs transition-colors hover:brightness-110"
-            style={{ background: '#C25200' }}
+            className="block w-full text-center text-[#16130f] font-semibold py-1.5 px-3 rounded text-xs transition-colors hover:brightness-110"
+            style={{ background: '#f59e0b' }}
           >
-            📖 위키에서 자세히 보기 →
+            위키에서 자세히 보기 →
           </a>
         )}
       </div>
@@ -362,7 +362,7 @@ function GraphNodeDetail({
       {/* 이 개체를 다루는 문서 (node_wiki_refs 랭킹) — 참조 0건이면 섹션 비표시 */}
       {refs.length > 0 && (
         <div>
-          <div className="text-[#4A6A8A] text-xs mb-2">이 개체를 다루는 문서</div>
+          <div className="text-[#9d8b58] text-xs mb-2">이 개체를 다루는 문서</div>
           <ul className="space-y-1">
             {refs.slice(0, 6).map((r) => (
               <li key={r.path}>
@@ -370,10 +370,10 @@ function GraphNodeDetail({
                   href={wikiPageUrl(r.path)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-[#7FB4E8] hover:text-[#C0D8F0] transition-colors"
+                  className="text-xs text-[#7FB4E8] hover:text-[#e6d9ac] transition-colors"
                 >
                   {r.path.split('/').pop()}
-                  <span className="text-[#4A6A8A]"> · {r.count}회</span>
+                  <span className="text-[#9d8b58]"> · {r.count}회</span>
                 </a>
               </li>
             ))}
@@ -387,8 +387,8 @@ function GraphNodeDetail({
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <dt className="text-[#4A6A8A] w-16 flex-shrink-0">{label}</dt>
-      <dd className="text-[#C0D8F0] break-all">{value}</dd>
+      <dt className="text-[#9d8b58] w-16 flex-shrink-0">{label}</dt>
+      <dd className="text-[#e6d9ac] break-all">{value}</dd>
     </div>
   )
 }

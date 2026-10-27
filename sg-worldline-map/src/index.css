@@ -1,8 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;600;700&family=Share+Tech+Mono&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── 세계선 테마 통일(2026-10-27) ──────────────────────────────
+   위키 다이버전스 비주얼라이저(tmp/ideas/steins_gate_world_line_visualizer.html
+   → wiki/javascripts/sg-viz.js)의 앰버 CRT 질감으로 전환한다.
+   · 배경 #05070a · 크롬 앰버 #ffb000 · 필드색 α#10b981 β#ef4444 SG#f59e0b γ#a855f7
+   · 고정폭 계기 표기는 Share Tech Mono */
 
 html, body, #root {
   height: 100%;
@@ -12,16 +18,103 @@ html, body, #root {
 body {
   font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
   overscroll-behavior: none;
-  background: #040810;
-  color: #C0D8F0;
+  background: #05070a;
+  color: #e6d9ac;
 }
 
-/* Nixie tube glow — 발산률 숫자 전용 */
+/* CRT 스캔라인 오버레이 — 비주얼라이저의 fixed 오버레이(z-50) 그대로 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.22) 50%,
+    rgba(0, 0, 0, 0.22)
+  );
+  background-size: 100% 4px;
+  opacity: 0.6;
+}
+
+/* 계기판 모노 — HUD·라벨 공용 */
+.font-mono-tech {
+  font-family: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+}
+
+/* Nixie tube glow — 발산률 숫자 전용 (비주얼라이저 글로우로 통일) */
 .nixie {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
-  color: #FF8C00;
-  text-shadow: 0 0 8px rgba(255, 140, 0, 0.7), 0 0 20px rgba(255, 107, 0, 0.3);
+  font-family: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(255, 119, 0, 0.8), 0 0 20px rgba(255, 69, 0, 0.35);
   letter-spacing: 0.05em;
+}
+
+/* ── 닉시관 미터(NixieMeter) — sg-viz .sg-viz__digit 포팅 ── */
+.viz-nixie {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+}
+.viz-nixie__tube {
+  width: 2.1rem;
+  height: 3.3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: linear-gradient(180deg, #180a02 0%, #080300 100%);
+  border: 1px solid #4a2105;
+  box-shadow: inset 0 0 10px rgba(255, 120, 0, 0.2), 0 0 15px rgba(255, 100, 0, 0.3);
+  text-shadow: 0 0 8px #ff7700, 0 0 18px #ff4500, 0 0 30px #ff2200;
+}
+.viz-nixie__sign {
+  width: 0.9rem;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f59e0b;
+  text-shadow: 0 0 8px #ff7700;
+}
+.viz-nixie__dot,
+.viz-nixie__pct {
+  align-self: flex-end;
+  padding-bottom: 0.45rem;
+  font-weight: 700;
+  color: #d97706;
+}
+.viz-nixie__dot { font-size: 1.4rem; }
+.viz-nixie__pct { font-size: 1.05rem; padding-bottom: 0.55rem; }
+
+/* 헤더용 컴팩트 */
+.viz-nixie--compact .viz-nixie__tube {
+  width: 1.3rem;
+  height: 2rem;
+  border-radius: 0.35rem;
+  font-size: 1.05rem;
+}
+.viz-nixie--compact .viz-nixie__sign { width: 0.55rem; font-size: 0.95rem; }
+.viz-nixie--compact .viz-nixie__dot { font-size: 0.9rem; padding-bottom: 0.3rem; }
+.viz-nixie--compact .viz-nixie__pct { font-size: 0.72rem; padding-bottom: 0.35rem; }
+
+/* 비콘(통신중 표시등) — 비주얼라이저 헤더 그대로 */
+.viz-beacon {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: #ffb000;
+  animation: viz-ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes viz-ping {
+  0%        { box-shadow: 0 0 0 0 rgba(255, 176, 0, 0.55); }
+  75%, 100% { box-shadow: 0 0 0 10px rgba(255, 176, 0, 0); }
 }
 
 /* SVG 트랜지션 공통 */
@@ -32,4 +125,9 @@ body {
 /* 줌 핸들러가 터치 스크롤을 막기 위해 */
 .map-container {
   touch-action: none;
+  /* 배경은 body(#05070a) + VizBackdrop 캔버스가 보이게 투명 — 옥상 밤하늘 위 계기판 */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viz-beacon { animation: none; }
 }

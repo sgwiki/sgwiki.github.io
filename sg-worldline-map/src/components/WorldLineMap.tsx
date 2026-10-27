@@ -8,6 +8,7 @@ import * as d3 from 'd3'
 import gsap from 'gsap'
 import type { SeriesDataset } from '@/types/ontology'
 import { MAP_DIMENSIONS, computeScales, parseLocalDateTime } from '@/lib/scales'
+import { sfx } from '@/lib/sfx'
 import { useD3Zoom } from '@/hooks/useD3Zoom'
 import { BandsLayer } from './BandsLayer'
 import { WorldLineLayer } from './WorldLineLayer'
@@ -18,7 +19,8 @@ import { Legend } from './Legend'
 
 interface Props {
   dataset: SeriesDataset
-  onSelectEvent?: (eventId: string) => void
+  /** 사건(또는 화살표가 가리키는 출발 사건) 선택. null = 선택 해제(패널 닫기). */
+  onSelectEvent?: (eventId: string | null) => void
   externalHighlight?: {
     worldLineId?: string | null
     eventId?: string | null
@@ -43,6 +45,10 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   const [highlightedWl, setHighlightedWl] = useState<string | null>(null)
   const [highlightedEvent, setHighlightedEvent] = useState<string | null>(null)
   const [highlightedShift, setHighlightedShift] = useState<string | null>(null)
+
+  // 배경 클릭 판정용 — 팬(드래그) 직후의 click 이벤트는 선택 해제로 오인하지 않게
+  // 시작점에서 5px 이상 움직였으면 무시한다.
+  const pointerDownAt = useRef<{ x: number; y: number } | null>(null)
 
   // 외부 강조(재생 모드) 반영
   useEffect(() => {
@@ -97,21 +103,27 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
   }
 
   return (
-    <div className="map-container relative w-full h-full overflow-hidden bg-[#040810]">
+    <div className="map-container relative w-full h-full overflow-hidden">
       <svg
         ref={svgRef}
         viewBox={`0 0 ${width} ${height}`}
         className="w-full h-full"
         style={{ cursor: 'grab' }}
         onClick={(e) => {
-          // 배경 클릭 → 강조 해제
+          // 배경 클릭 → 강조 해제 + 우측 상세 패널 닫기(포커스 비활성화)
           if (e.target === e.currentTarget || (e.target as Element).tagName === 'rect') {
+            const dp = pointerDownAt.current
+            if (dp && Math.hypot(e.clientX - dp.x, e.clientY - dp.y) > 5) return // 팬 후 클릭 무시
             if (!externalHighlight) {
               setHighlightedWl(null)
               setHighlightedEvent(null)
               setHighlightedShift(null)
+              onSelectEvent?.(null)
             }
           }
+        }}
+        onPointerDown={(e) => {
+          pointerDownAt.current = { x: e.clientX, y: e.clientY }
         }}
       >
         <g transform={`translate(${marginLeft}, ${marginTop}) scale(${transform.k}) translate(${transform.x / transform.k}, ${transform.y / transform.k})`}>
@@ -136,9 +148,13 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
             highlightedShiftId={highlightedShift}
             onSelectShift={(id) => {
               if (externalHighlight) return
+              sfx.playBeep(1200, 0.08)
               setHighlightedShift(id)
-              // 화살표 클릭 → 이 이동을 일으킨 D메일도 함께 강조
-              setHighlightedEvent(eventIdByShiftId.get(id) ?? null)
+              // 화살표가 출발한 D메일(꼬리) 아이콘을 클릭한 것과 동일 취급 —
+              // 강조 짝 연결 + 우측 패널에 그 사건 상세를 띄운다.
+              const eventId = eventIdByShiftId.get(id) ?? null
+              setHighlightedEvent(eventId)
+              if (eventId) onSelectEvent?.(eventId)
             }}
           />
           <EventLayer
@@ -149,6 +165,7 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
             highlightedWorldLineId={highlightedWl}
             onSelectEvent={(id) => {
               if (externalHighlight) return
+              sfx.playBeep(1200, 0.08)
               setHighlightedEvent(id)
               // D메일 클릭 → 이 D메일로 인한 이동 화살표도 함께 강조
               setHighlightedShift(shiftIdByEventId.get(id) ?? null)
@@ -164,7 +181,7 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
       {/* 줌 리셋 버튼 — 전체 보기로 복귀 */}
       <button
         onClick={() => reset()}
-        className="absolute top-3 right-3 z-10 bg-[#0A1525]/90 hover:bg-[#152240] text-[#4A6A8A] hover:text-[#C0D8F0] px-3 py-1.5 rounded text-sm border border-[#152240] transition-colors"
+        className="absolute top-3 right-3 z-10 bg-[#0f0b06]/90 hover:bg-[#3a2d12] text-[#9d8b58] hover:text-[#e6d9ac] px-3 py-1.5 rounded text-sm border border-[#3a2d12] transition-colors"
       >
         ⟲ 전체 보기
       </button>
@@ -173,7 +190,7 @@ export function WorldLineMap({ dataset, onSelectEvent, externalHighlight }: Prop
       <Legend />
 
       {/* 현재 줌 표시 */}
-      <div className="absolute bottom-3 left-3 text-xs text-[#4A6A8A] bg-[#040810]/80 px-2 py-1 rounded">
+      <div className="absolute bottom-3 left-3 text-xs text-[#9d8b58] bg-[#05070a]/80 px-2 py-1 rounded">
         줌 {transform.k.toFixed(2)}× · 드래그=이동 · 휠=확대
       </div>
     </div>
@@ -242,7 +259,7 @@ function TimeBreaks({ scales }: { scales: ReturnType<typeof computeScales> }) {
       {breaks.map((b, i) => (
         <g key={`break${i}`}>
           {/* 배경색 얇은 마스크로 양옆을 살짝 가려 끊김 강조 */}
-          <rect x={b.x - 7} y={yMin} width={14} height={yMax - yMin} fill="#040810" opacity={0.85} />
+          <rect x={b.x - 7} y={yMin} width={14} height={yMax - yMin} fill="#05070a" opacity={0.85} />
           <path
             d={wavyVerticalPath(b.x, yMin, yMax)}
             fill="none"

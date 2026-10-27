@@ -27,7 +27,7 @@ export function EmbedGraph({ initialFocus, theme }: Props) {
 
   const dark = theme === 'dark'
   const chrome = dark
-    ? { bg: '#0A1525', border: '#152240', text: '#C0D8F0', sub: '#4A6A8A' }
+    ? { bg: '#0f0b06', border: '#3a2d12', text: '#e6d9ac', sub: '#9d8b58' }
     : { bg: '#eef2f7', border: '#d3dce6', text: '#1e293b', sub: '#64748b' }
 
   if (!focusNode) {
@@ -67,7 +67,7 @@ export function EmbedGraph({ initialFocus, theme }: Props) {
           href={`/maps/?view=graph&focus=${encodeURIComponent(focusNode.id)}`}
           target="_top"
           className="flex-shrink-0 ml-3 font-medium hover:underline"
-          style={{ color: '#FF8C00' }}
+          style={{ color: '#ffb000' }}
         >
           전체 그래프에서 열기 →
         </a>

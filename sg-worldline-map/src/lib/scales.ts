@@ -106,6 +106,9 @@ export function computeScales(dataset: SeriesDataset) {
 }
 
 // ─── 색상 매핑 ───────────────────────────────────────────────────────
+// 필드색은 원전 그대로 유지한다(운영자 확인 2026-10-27): α 빨강 · β 남색 · SG 앰버.
+// 크롬(배경·테두리·텍스트)만 비주얼라이저 앰버 CRT로 통일 — 데이터 색과 크롬 색은
+// 별개 축이다. tailwind.config.js 의 sg.* 와 함께 갱신할 것.
 export const FIELD_COLOR: Record<AttractorFieldId, string> = {
   AF_Alpha: '#ef4444',
   AF_Beta: '#6366f1',

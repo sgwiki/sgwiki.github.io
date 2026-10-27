@@ -40,8 +40,8 @@ interface SimLink extends d3.SimulationLinkDatum<SimNode> {
 }
 
 const THEME = {
-  dark: { bg: '#050B15', label: '#C0D8F0', halo: '#050B15', ring: '#FF8C00' },
-  light: { bg: '#f8fafc', label: '#1e293b', halo: '#f8fafc', ring: '#C25200' },
+  dark: { bg: '#050B15', label: '#e6d9ac', halo: '#050B15', ring: '#ffb000' },
+  light: { bg: '#f8fafc', label: '#1e293b', halo: '#f8fafc', ring: '#451a03' },
 }
 
 export function GraphView({
