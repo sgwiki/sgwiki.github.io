@@ -37,7 +37,7 @@ evidence_grade: corroborated
 
 ---
 
-## 2. DURPA·Stratfor·러시아 3파전 역학
+## 2. DURPA·스트래트포·러시아 3파전 역학
 
 ### Q: 레이예스와 레스키넨이 같은 편인데 왜 따로 움직이나요?
 
