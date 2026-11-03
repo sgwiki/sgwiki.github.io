@@ -13,6 +13,8 @@ description: "슈타인즈;게이트의 시간 여행 메커니즘을 체계적�
 
 원본은 Votuko가 영어로 작성했으며, Nira가 Gemini-2.5-pro로 초벌 번역 후 수동 보정한 한국어 번역본을 기반으로 위키화했습니다.
 
+이 자료의 위키 근거 체계에서의 위상과 활용 지침은 [The Mechanics of Steins;Gate (팬 해설)](../../../setting/the-mechanics-of-steins-gate.md) 문서가 다룹니다.
+
 ---
 
 ## 목차
