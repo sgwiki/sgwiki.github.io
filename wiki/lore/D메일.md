@@ -3,9 +3,10 @@ description: "D메일은 슈타인즈 게이트에서 가장 먼저 등장하는
 spoiler: early_story
 ---
 
-# D메일
+!!! warning "스포일러 (early_story)"
+    이 문서는 스포일러(early_story)를 포함합니다. 난이도: 기초
 
-> **스포일러:** early_story | **난이도:** 기초
+# D메일
 
 ## 개요
 
