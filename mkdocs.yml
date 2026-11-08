@@ -96,7 +96,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/worldline-map-btn.js
-  - javascripts/amadeus-chat-btn.js
+  # - javascripts/amadeus-chat-btn.js  # 2026-11-08 챗봇 서비스 중단(docs/decisions/0022) — 재가동 시 주석 해제
   - javascripts/sg-enhance.js
   - javascripts/sg-home.js  # 홈(리뉴얼 B안) 전용 — 랜덤 FAQ 콘솔 · 히어로 검색 인계
   - javascripts/sg-viz.js   # 다이버전스 비주얼라이저(세계선 흐름 페이지) — 운영자 제작 이식
